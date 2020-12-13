@@ -10,7 +10,7 @@ class DB(object):
     def __init__(self):
         self.connect = pymysql.connect(
             host=os.getenv('MYSQL_HOST'),
-            port=os.getenv('MYSQL_PORT'),
+            port=int(os.getenv('MYSQL_PORT')),
             user=os.getenv('MYSQL_USER'),
             password=os.getenv('MYSQL_PASSWORD'),
             database=os.getenv('MYSQL_DB'),
