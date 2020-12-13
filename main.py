@@ -3,7 +3,7 @@ from flask.templating import render_template
 from blueprints import tourney, api
 
 app = Flask(__name__)
-app.register_blueprint(tourney, url_prefix='/staff')
+app.register_blueprint(tourney, url_prefix='/manager')
 app.register_blueprint(api, url_prefix='/api')
 
 @app.route('/')
