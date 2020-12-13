@@ -13,44 +13,52 @@ def index():
     """
     return render_template('index.html')
 
-@app.route('/rule')
+@app.route('/base')
+def base():
+    """
+    testing
+    """
+    return render_template('base.html')
+
+@app.route('/rule/')
 def rule():
     """
     比賽規則文檔，使用html編寫
     """
     return render_template('rule.html')
 
-@app.route('/matchs')
-def matchs():
-    """
-    查看比賽最近的賽程，歷史紀錄
-    """
-    return render_template('matchs.html')
-
+@app.route('/matchs/')
 @app.route('/matchs/<match_id>')
-def view_match(match_id):
+def matchs(match=None):
     """
     查看比賽最近的賽程，歷史紀錄
     """
-    match = get_match(match_id)
-    return render_template('matchs.html', match=match_id)
+    return render_template('matchs.html', match=match)
 
-@app.route('/teams')
-def teams():
+@app.route('/registeredlist/')
+def registeredlist():
     """
-    列出本比賽所有參賽隊伍
+    顯示已報名的名單
     """
-    return render_template('teams.html')
+    return render_template('registeredlist.html')
 
-@app.route('/teams/<team_id>')
-def view_team(team_id):
-    """
-    查看目標隊伍的詳細內容
-    """
-    team = get_team(team_id)
-    return render_template('team.html', team=team)
 
-@app.route('/staff')
+@app.route('/player/<user_id>')
+def player(user_id=None):
+    """
+    顯示玩家資訊
+    """
+    return render_template('player.html', user=user_id)
+
+# @app.route('/teams/')
+# @app.route('/teams/<team_id>')
+# def teams(team=None):
+#     """
+#     列出本比賽所有參賽隊伍
+#     """
+#     return render_template('teams.html', team=team)
+
+@app.route('/staff/')
 def staff():
     """
     列出本比賽所有工作人員
