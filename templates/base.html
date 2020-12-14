@@ -78,7 +78,9 @@
         </nav>
 
         <main class="container min-vh-100">
+        {% block header %}
             <h1 class="text-center display-3 m-3">{{ self.title() }}</h1>
+        {% endblock header %}
         {% block main %}
             <div class="starter-template text-center py-5 px-3">
                 <h1>Bootstrap starter template</h1>
