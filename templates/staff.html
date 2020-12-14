@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Staff{% endblock title %}
+{% block main %}
+<h1 class="text-center display-3 m-3">STAFF</h1>
+{% for s in staff %}
+    <div class="row bg-light rounded m-2 py-2">
+        <div class="col-12 ms-1">
+            <h2 class="border-bottom">{{s}}</h2>
+        </div>
+        <div class="col-12">
+            <div class="row">
+            {% for ss in staff[s] %}
+                <div class="col-12 col-lg-6 col-xl-4">
+                    <div class="card m-1">
+                        <div class="row g-0">
+                            <div class="col-auto">
+                                <img src="https://a.ppy.sh/{{ss['user_id']}}" class="avatar rounded">
+                            </div>
+                            <div class="col-auto">
+                                <div class="card-body">
+                                    <h3 class="card-title text-nowrap">{{ss['username']}}</h3>
+                                    <p class="card-text">OSU! DISCORD ETC.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endblock main %}
