@@ -33,7 +33,7 @@ def rules():
     """
     比賽規則文檔
     """
-    return render_template('rule.html')
+    return render_template('rules.html')
 
 @app.route('/schedule/')
 def schedule():
