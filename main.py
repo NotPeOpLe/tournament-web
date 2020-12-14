@@ -1,6 +1,7 @@
 from flask import Flask
 from flask.templating import render_template
 from blueprints import tourney, api
+import example
 
 app = Flask(__name__)
 app.register_blueprint(tourney, url_prefix='/manager')
@@ -27,7 +28,10 @@ def rule():
     """
     return render_template('rule.html')
 
-@app.route('/matchs/')
+@app.route('/schedule/')
+def schedule():
+    return render_template('schedule.html')
+
 @app.route('/matchs/<match_id>')
 def matchs(match=None):
     """
@@ -57,6 +61,13 @@ def player(user_id=None):
 #     列出本比賽所有參賽隊伍
 #     """
 #     return render_template('teams.html', team=team)
+
+@app.route('/mappools/<pool_id>')
+def mappools(pool_id=None):
+    """
+    顯示玩家資訊
+    """
+    return render_template('mappools.html', mappool=pool_id)
 
 @app.route('/staff/')
 def staff():
