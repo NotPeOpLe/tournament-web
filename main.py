@@ -21,10 +21,17 @@ def base():
     """
     return render_template('base.html')
 
-@app.route('/rule/')
-def rule():
+@app.route('/info/')
+def info():
     """
-    比賽規則文檔，使用html編寫
+    比賽資訊文檔
+    """
+    return render_template('info.html')
+
+@app.route('/rules/')
+def rules():
+    """
+    比賽規則文檔
     """
     return render_template('rule.html')
 
