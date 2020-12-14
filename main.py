@@ -63,7 +63,9 @@ def staff():
     """
     列出本比賽所有工作人員
     """
-    return render_template('staff.html')
+    staff = example.staff
+
+    return render_template('staff.html', staff=staff)
 
 
 if __name__ == '__main__':
