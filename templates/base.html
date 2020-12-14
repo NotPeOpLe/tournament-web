@@ -43,17 +43,21 @@
                         <li class="nav-item active">
                             <a class="nav-link" aria-current="page" href="#">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/info">比賽資訊</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="dropdown00" data-bs-toggle="dropdown" aria-expanded="false">比賽資訊</a>
+                            <ul class="dropdown-menu" aria-labelledby="dropdown00">
+                                <li><a class="dropdown-item" href="/info/">比賽資訊</a></li>
+                                <li><a class="dropdown-item" href="/rules/">比賽規定</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/registeredlist">玩家名單</a>
+                            <a class="nav-link" href="/registeredlist/">玩家名單</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/schedule">比賽行程</a>
+                            <a class="nav-link" href="/schedule/">比賽行程</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="/mappools/" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">比賽圖池</a>
+                            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">比賽圖池</a>
                             <ul class="dropdown-menu" aria-labelledby="dropdown01">
                                 <li><a class="dropdown-item" href="/mappools/0">預選賽</a></li>
                                 <li><a class="dropdown-item" href="/mappools/1">十六強賽</a></li>
@@ -63,7 +67,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/staff">工作人員</a>
+                            <a class="nav-link" href="/staff/">工作人員</a>
                         </li>
                         <li class="nav-item">
                             <a class="btn btn-sm btn-danger mt-1" href="#">參加比賽!</a>
@@ -74,6 +78,7 @@
         </nav>
 
         <main class="container min-vh-100">
+            <h1 class="text-center display-3 m-3">{{ self.title() }}</h1>
         {% block main %}
             <div class="starter-template text-center py-5 px-3">
                 <h1>Bootstrap starter template</h1>
