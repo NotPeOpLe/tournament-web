@@ -3,3 +3,23 @@
 body {
     font-family: 'Cuprum', 'Noto Sans', sans-serif;
 }
+
+.avatar {
+    width: 100px;
+    height: 100px;
+}
+
+.toggle-top {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    border-radius: 50px;
+    background-color: white;
+    opacity:0.5;
+    cursor: pointer; 
+  }
+
+.toggle-top:hover {
+    background-color: #555;
+}
