@@ -1,4 +1,53 @@
 {% extends 'base.html' %}
 {% block title %}Registered list{% endblock title %}
 {% block main %}
+<div class="row g-0 text-center">
+    <div class="col">
+        PLAYER
+    </div>
+    <div class="col d-none">
+        RANK
+    </div>
+    <div class="col d-none">
+        PP/BP
+    </div>
+    <div class="col d-none">
+        ACC/PC
+    </div>
+</div>
+<div class="row bg-light rounded p2 py-2 text-nowrap">
+    <div class="col">
+        <div class="card">
+            <div class="row g-0">
+                <div class="col-auto border border-success">
+                    <img src="https://a.ppy.sh/6008293" class="avatar rounded">
+                </div>
+                <div class="col-9 col-sm-6 border border-danger">
+                    <div class="card-body">
+                        <h3 class="card-title text-nowrap">_CHIMERAAAAAAAAA</h3>
+                        <p class="card-text">OSU! DISCORD ETC.</p>
+                    </div>
+                </div>
+                <div class="col d-none d-sm-block border border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title text-nowrap">#11223</h3>
+                        <p class="card-text">TW: #123</p>
+                    </div>
+                </div>
+                <div class="col d-none d-md-block border border-warning">
+                    <div class="card-body text-center">
+                        <h3 class="card-title text-nowrap">6543PP</h3>
+                        <p class="card-text">BP: 300PP</p>
+                    </div>
+                </div>
+                <div class="col d-none d-lg-block border border-warning">
+                    <div class="card-body text-center">
+                        <h3 class="card-title text-nowrap">99.88%</h3>
+                        <p class="card-text">PC: 250,000</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock main %}
