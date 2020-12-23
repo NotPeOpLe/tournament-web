@@ -34,7 +34,10 @@
     <body>
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/">8TT: 2021</a>
+                <a class="navbar-brand" href="/">
+                    <img src="/static/img/PENGUINWORRIED.png" width="24" height="24">
+                    <span class="align-text-top">8PPC 2020</span> 
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -77,7 +80,7 @@
             </div>
         </nav>
 
-        <main class="container" style="min-height: 86.3vh;">
+        <main class="container px-5" style="min-height: 86.3vh;">
         {% block header %}
             <h1 class="text-center display-3 m-3">{{ self.title() }}</h1>
         {% endblock header %}
@@ -102,8 +105,9 @@
             </div>
         {% endblock footer %}
         </footer>
-
+        
         <script src="/static/js/bootstrap.bundle.min.js"></script>
+        <script src="/static/js/jquery.min.js"></script>
         {% block scripts %}{% endblock scripts %}
     </body>
 </html>

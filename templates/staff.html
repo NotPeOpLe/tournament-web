@@ -7,18 +7,20 @@
             <h2 class="border-bottom">{{s}}</h2>
         </div>
         <div class="col-12">
-            <div class="row">
+            <div class="row px-3">
             {% for ss in staff[s] %}
-                <div class="col-12 col-lg-6 col-xl-4">
+                <div class="col-12 col-md-6 col-lg-4 px-0">
                     <div class="card m-1">
                         <div class="row g-0">
                             <div class="col-auto">
-                                <img src="https://a.ppy.sh/{{ss['user_id']}}" class="avatar rounded">
+                                <img src="https://a.ppy.sh/{{ss.user_id}}" class="avatar rounded">
                             </div>
                             <div class="col-auto">
-                                <div class="card-body">
-                                    <h3 class="card-title text-nowrap">{{ss['username']}}</h3>
-                                    <p class="card-text">OSU! DISCORD ETC.</p>
+                                <div class="card-body pe-0">
+                                    <h3 class="card-title">{{ss.username}}</h3>
+                                    <p class="card-text">
+                                        <a href="https://osu.ppy.sh/users/{{ss.user_id}}" class="text-decoration-none">UserPage</a>
+                                    </p>
                                 </div>
                             </div>
                         </div>

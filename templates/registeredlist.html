@@ -2,52 +2,75 @@
 {% block title %}Registered list{% endblock title %}
 {% block main %}
 <div class="row g-0 text-center">
-    <div class="col">
+    <div class="col-auto">
+        <div style="min-width: 100px;">AVATAR</div>
+    </div>
+    <div class="col col-sm-5">
         PLAYER
     </div>
-    <div class="col d-none">
+    <div class="col d-none d-sm-block">
         RANK
     </div>
-    <div class="col d-none">
+    <div class="col d-none d-md-block">
         PP/BP
     </div>
-    <div class="col d-none">
+    <div class="col d-none d-lg-block">
         ACC/PC
     </div>
 </div>
+{% for p in players %}
 <div class="row bg-light rounded p2 py-2 text-nowrap">
     <div class="col">
         <div class="card">
             <div class="row g-0">
-                <div class="col-auto border border-success">
-                    <img src="https://a.ppy.sh/6008293" class="avatar rounded">
+                <div class="col-auto">
+                    <img src="https://a.ppy.sh/{{p.user_id}}" class="avatar rounded">
                 </div>
-                <div class="col-9 col-sm-6 border border-danger">
+                <div class="col col-sm-5">
                     <div class="card-body">
-                        <h3 class="card-title text-nowrap">_CHIMERAAAAAAAAA</h3>
-                        <p class="card-text">OSU! DISCORD ETC.</p>
+                        <h3 class="card-title text-nowrap">{{p.username}}</h3>
+                        <p class="card-text">
+                            <a href="https://osu.ppy.sh/users/{{p.user_id}}" target="_blank">UserPage</a> | 
+                            <a href="https://osustats.click/{{p.username}}" target="_blank">Stats</a> | 
+                            <a href="http://osuskills.com/user/{{p.username}}" target="_blank">Skills</a>
+                        </p>
                     </div>
                 </div>
-                <div class="col d-none d-sm-block border border-primary">
+                <div class="col d-none d-sm-block" style="width: 152px;">
                     <div class="card-body text-center">
-                        <h3 class="card-title text-nowrap">#11223</h3>
-                        <p class="card-text">TW: #123</p>
+                        <h3 class="card-title text-nowrap">#{{p.pp_rank | num}}</h3>
+                        <p class="card-text">{{p.country}}: #{{p.pp_country_rank | num}}</p>
                     </div>
                 </div>
-                <div class="col d-none d-md-block border border-warning">
+                <div class="col d-none d-md-block" style="width: 152px;">
                     <div class="card-body text-center">
-                        <h3 class="card-title text-nowrap">6543PP</h3>
-                        <p class="card-text">BP: 300PP</p>
+                        <h3 class="card-title text-nowrap">{{ p.pp_raw | floatfix}} PP</h3>
+                        <p class="card-text">
+                            <a href="https://osu.ppy.sh/scores/osu/{{p.bp1.score_id}}" target="_blank" class="link-dark text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="bottom" title="" data-bs-original-title="點我查看詳細">
+                                BP: {{p.bp1.pp | floatfix}} PP
+                            </a>
+                        </p>
                     </div>
                 </div>
-                <div class="col d-none d-lg-block border border-warning">
+                <div class="col d-none d-lg-block" style="width: 152px;">
                     <div class="card-body text-center">
-                        <h3 class="card-title text-nowrap">99.88%</h3>
-                        <p class="card-text">PC: 250,000</p>
+                        <h3 class="card-title text-nowrap">{{p.accuracy | floatfix}}%</h3>
+                        <p class="card-text">PC: {{p.playcount | num}}</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endfor %}
+
 {% endblock main %}
+
+{% block scripts %}
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+{% endblock scripts %}

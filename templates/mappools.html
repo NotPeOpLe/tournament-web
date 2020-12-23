@@ -1,4 +1,18 @@
 {% extends 'base.html' %}
 {% block title %}Mappools{% endblock title %}
 {% block main %}
+<div class="row">
+    {% for map in mappool %}
+    <div class="col-lg-6 p-2">
+        <div class="card bg-dark text-light shadow-sm" style="height: 110px;">
+            <img src="https://assets.ppy.sh/beatmaps/{{map.beatmapset_id}}/covers/cover.jpg" class="card-img overflow-hidden" alt="{{map.mapname}} bg.">
+            <div class="card-img-overlay dark-background text-truncate">
+                <h4 class="card-title fw-bold">{{map.title}} [{{map.version}}]</h5>
+                <p class="card-text">{{map.artist}} || MAPPER: {{map.creator}}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
 {% endblock main %}
