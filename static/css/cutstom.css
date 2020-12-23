@@ -23,3 +23,7 @@ body {
 .toggle-top:hover {
     background-color: #555;
 }
+
+.dark-background {
+    background-color: rgb(0,0,0,0.4);
+}
