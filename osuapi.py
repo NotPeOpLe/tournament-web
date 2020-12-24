@@ -1,6 +1,5 @@
 import re
 import requests, os, logging
-from rich import print
 
 logging.basicConfig(level=logging.DEBUG)
 API_KEY = os.getenv('OSU_API_KEY')
