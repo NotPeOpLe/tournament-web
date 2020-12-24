@@ -109,7 +109,7 @@ def num_filter(num):
 
 if __name__ == '__main__':
     app.run(
-        host='192.168.0.26',
+        host='0.0.0.0',
         port=80,
         debug=True,
     )
