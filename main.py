@@ -108,8 +108,4 @@ def num_filter(num):
     return remain_amount_format
 
 if __name__ == '__main__':
-    app.run(
-        host='0.0.0.0',
-        port=80,
-        debug=True,
-    )
+    app.run(port=80,debug=True)
