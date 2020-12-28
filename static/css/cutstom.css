@@ -9,6 +9,11 @@ body {
     height: 100px;
 }
 
+.avatar-min {
+    width: 60px;
+    height: 60px;
+}
+
 .toggle-top {
     display: none;
     position: fixed;
@@ -26,4 +31,26 @@ body {
 
 .dark-background {
     background-color: rgb(0,0,0,0.4);
+    transition: background-color 161ms;
+}
+
+.dark-background:hover {
+    background-color: rgb(0,0,0,0.6);
+}
+
+.map-card {
+    background-position: center !important;
+    background-size: cover !important;
+    height: 90px !important;
+    border: 0px;
+    user-select: none;
+}
+
+
+.mod-icon {
+    position: absolute;
+    pointer-events: none;
+    right: 10px;
+    width: 60px;
+    height: 60px;
 }
