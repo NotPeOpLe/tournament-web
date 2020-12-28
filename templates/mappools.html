@@ -1,18 +1,31 @@
 {% extends 'base.html' %}
 {% block title %}Mappools{% endblock title %}
 {% block main %}
-<div class="row">
-    {% for map in mappool %}
-    <div class="col-lg-6 p-2">
-        <div class="card bg-dark text-light shadow-sm" style="height: 110px;">
-            <img src="https://assets.ppy.sh/beatmaps/{{map.beatmapset_id}}/covers/cover.jpg" class="card-img overflow-hidden" alt="{{map.mapname}} bg.">
-            <div class="card-img-overlay dark-background text-truncate">
-                <h4 class="card-title fw-bold">{{map.title}} [{{map.version}}]</h5>
-                <p class="card-text">{{map.artist}} || MAPPER: {{map.creator}}</p>
+{% for mod in mappool %}
+<div class="row mb-2 bg-light rounded">
+    <div class="col-12">
+        <h2 class="pt-2 border-bottom">{{mod}}</h2>
+    </div>
+    <div class="col-12">
+        <div class="row px-2">
+        {% for map in mappool[mod] %}
+            <div class="col-lg-6 p-2 pt-0 pb-3">
+                <div class="card bg-dark map-card text-start" style="background: url(https://assets.ppy.sh/beatmaps/{{map.beatmapset_id}}/covers/cover.jpg);">
+                    <a class="text-light" href="https://osu.ppy.sh/b/{{map.beatmap_id}}" target="_blank">
+                        <div class="card-img-overlay dark-background">
+                            <img class="mod-icon" src="/static/img/mods/{{map.use_mod}}.png">
+                            <div class="text-truncate">
+                                <h4 class="card-title fw-bold">{{map.title}} [{{map.version}}]</h5>
+                                <p class="card-text">{{map.artist}} || MAPPER: {{map.creator}}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
+        {% endfor %}
         </div>
     </div>
-    {% endfor %}
 </div>
 
+{% endfor %}
 {% endblock main %}
