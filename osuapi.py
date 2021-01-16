@@ -19,6 +19,44 @@ class V1Path:
     get_match = 'get_match'
     get_replay = 'get_replay'
 
+def toen_isactive(Token):
+    url = 'https://osu.ppy.sh/api/v2/me'
+    headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {Token}'}
+    
+    if requests.get(url, headers=headers).status_code == 200:
+        return True
+    else:
+        return False
+
+def clientToken():	
+    url = 'https://osu.ppy.sh/oauth/token'	
+    token = open('access_token','w+')
+    if not toen_isactive(token.read()):
+        payload = {'username': os.getenv('osu_username'),	
+            'password': os.getenv('osu_password'),	
+            'grant_type': 'password',	
+            'client_id': '5',	
+            'client_secret': 'FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk',	
+            'scope': '*'}
+        headers = {	
+            'Accept': 'application/json',	
+            'User-Agent': 'osu!',	
+            'Accept-Encoding': 'gzip, deflate'	
+        }	
+
+        response = requests.request('POST', url, headers=headers, data = payload)
+        access_token = response.json()['access_token']
+        token.write(access_token)
+        token.close()
+        log.info('透過 clientToken() 取得 Token')
+    else:
+        log.info('透過 File 取得 Token')
+
+    return token
+
+v2Token = None if None else clientToken()
+v2Headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {v2Token}'}
+
 def get(path:V1Path, **args):
     args['k'] = API_KEY
     req = requests.get(
@@ -28,84 +66,13 @@ def get(path:V1Path, **args):
 
     return req.json()
 
-def ouput_registeredlist() -> None:
-    registers = [
-        9868529,654296,2472609,5155973,3416783,2200982,
-        9539163,2808144,7172340,12717375,1860489,5920715,
-        3366658,4519494,5413624,3163649,4183988,1786610,
-        3066316,1593180,2529213,2165650,9991663,9632700,
-        3517706,8660293
-        ]
+def get2(**kargs):
+    path = ''
+    a = []
+    for p in kargs.items():
+        for q in p:
+            a.append(str(q))
+    path = '/'.join(a)
+    req = requests.get(f'https://osu.ppy.sh/api/v2/{path}', headers=v2Headers)
+    return req.json()
 
-    registeredlist = []
-    for player in registers:
-        player_data:dict = get(V1Path.get_user, u=player, m=0)[0]
-        player_data.pop('events')
-
-        bp1:dict = get(V1Path.get_user_best, u=player, m=0, limit=1)[0]
-
-        for key in player_data:
-            player_data[key] = todata(player_data[key])
-
-        for key in bp1:
-            bp1[key] = todata(bp1[key])
-
-        newdata = player_data
-        newdata['bp1'] = bp1
-        
-        registeredlist.append(newdata)
-
-    with open('registered.list', 'w+', encoding='utf8') as output_file:
-        print(registeredlist, file=output_file)
-        output_file.close()
-
-def output_staff() -> None:
-    with open('staff.txt', 'r', encoding='utf8') as staff_file:
-        staff_value = staff_file.read()
-        staff_list = staff_value.split('\n')
-        staff_file.close()
-
-    staff = {}
-    for s in staff_list:
-        s = s.split(':')
-
-        try:
-            s_data:dict = get(V1Path.get_user, u=s[0], m=0)[0]
-        except:
-            pass
-        
-        if not staff.get(s[1]):
-            staff[s[1]] = []
-
-        staff[s[1]].append({
-            'user_id': todata(s_data['user_id']),
-            'username': todata(s_data['username']),
-            'group': todata(s[1])
-        })
-
-    with open('staff.list', 'w+', encoding='utf-8') as output_file:
-        print(staff, file=output_file)
-        output_file.close()
-
-def output_mappool() -> None:
-    mappool = []
-    mappool_files = []
-    for file in os.listdir(os.getcwd()+"\\input"):
-        if file.startswith('mappool-') and file.endswith('.txt'):
-            mappool_files.append(file)
-    
-    for mappool_file in mappool_files:
-        mappool_name = re.match(r'mappool-(.+).txt', mappool_file).group(1)
-        with open(f'{os.getcwd()}\\input\\{mappool_file}', 'r', encoding='utf-8') as mf:
-            maps = mf.read().split('\n')
-            for m in maps:
-                map = m.split(":") # 0=mapid; 1=mod(s); 2=num
-                map_data = get(V1Path.get_beatmaps,b=map[0], m=0)[0]
-                map_data['round_name'] = mappool_name
-                map_data['use_mod'] = map[1]
-                map_data['mapname'] = f"{map[1]}{map[2]}"
-                mappool.append(map_data)
-
-    with open('mappools.list', 'w+', encoding='utf-8') as output:
-        print(mappool, file=output)
-        output.close()
