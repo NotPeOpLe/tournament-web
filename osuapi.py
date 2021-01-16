@@ -10,7 +10,6 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 API_KEY = os.getenv('OSU_API_KEY')
-
 def todata(value):
     try:
         return eval(value)
@@ -82,4 +81,3 @@ def get2(**kargs):
     path = '/'.join(a)
     req = requests.get(f'https://osu.ppy.sh/api/v2/{path}', headers=v2Headers)
     return req.json()
-
