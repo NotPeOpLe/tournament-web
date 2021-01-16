@@ -38,13 +38,13 @@
                 </div>
                 <div class="col d-none d-sm-block" style="width: 152px;">
                     <div class="card-body text-center">
-                        <h3 class="card-title text-nowrap">#{{p.pp_rank | num}}</h3>
-                        <p class="card-text">{{p.country}}: #{{p.pp_country_rank | num}}</p>
+                        <h3 class="card-title text-nowrap">#{{p.info.pp_rank | num}}</h3>
+                        <p class="card-text">{{p.info.country}}: #{{p.info.pp_country_rank | num}}</p>
                     </div>
                 </div>
                 <div class="col d-none d-md-block" style="width: 152px;">
                     <div class="card-body text-center">
-                        <h3 class="card-title text-nowrap">{{ p.pp_raw | floatfix}} PP</h3>
+                        <h3 class="card-title text-nowrap">{{ p.info.pp_raw | floatfix}} PP</h3>
                         <p class="card-text">
                             <a href="https://osu.ppy.sh/scores/osu/{{p.bp1.score_id}}" target="_blank" class="link-dark text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="bottom" title="" data-bs-original-title="點我查看詳細">
                                 BP: {{p.bp1.pp | floatfix}} PP
@@ -54,8 +54,8 @@
                 </div>
                 <div class="col d-none d-lg-block" style="width: 152px;">
                     <div class="card-body text-center">
-                        <h3 class="card-title text-nowrap">{{p.accuracy | floatfix}}%</h3>
-                        <p class="card-text">PC: {{p.playcount | num}}</p>
+                        <h3 class="card-title text-nowrap">{{p.info.accuracy | floatfix}}%</h3>
+                        <p class="card-text">PC: {{p.info.playcount | num}}</p>
                     </div>
                 </div>
             </div>

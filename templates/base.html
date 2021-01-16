@@ -43,8 +43,8 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                     <ul class="navbar-nav ms-auto mb-2 mb-md-0 text-center text-nowrap">
-                        <li class="nav-item active">
-                            <a class="nav-link" aria-current="page" href="#">Home</a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="dropdown00" data-bs-toggle="dropdown" aria-expanded="false">比賽資訊</a>
@@ -62,11 +62,9 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">比賽圖池</a>
                             <ul class="dropdown-menu text-center" aria-labelledby="dropdown01">
-                                <li><a class="dropdown-item" href="/mappools/0">預選賽</a></li>
-                                <li><a class="dropdown-item" href="/mappools/1">十六強賽</a></li>
-                                <li><a class="dropdown-item" href="/mappools/2">八強賽</a></li>
-                                <li><a class="dropdown-item" href="/mappools/3">準決賽</a></li>
-                                <li><a class="dropdown-item" href="/mappools/4">決賽</a></li>
+                                {% for r in rounds %}
+                                <li><a class="dropdown-item" href="/mappools/{{r.id}}">{{r.name}}</a></li>
+                                {% endfor %}
                             </ul>
                         </li>
                         <li class="nav-item">
