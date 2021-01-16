@@ -124,3 +124,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 .vscode/
+access_token
+.vscode/settings.json
+.gitignore
