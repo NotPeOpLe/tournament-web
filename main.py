@@ -21,6 +21,10 @@ app.config['JSON_SORT_KEYS'] = False
 def faviconico():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+@app.context_processor
+def rounds():
+    return dict(rounds=sql.active_rounds)
+
 @app.route('/')
 def index():
     """
