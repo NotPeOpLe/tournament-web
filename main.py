@@ -1,10 +1,21 @@
-from flask import Flask, render_template, url_for, redirect, send_from_directory
+from flask import Flask, render_template, url_for, redirect, send_from_directory, jsonify, request
 from blueprints import tourney, api
-import example, re, os
+import example, re, os, mysql, json, logging
+from rich.logging import RichHandler
 
+FORMAT = "%(message)s"
+logging.basicConfig(
+    level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
+)
+
+log = logging.getLogger(__name__)
+
+test = 'ABC TEST'
+sql = mysql.DB()
 app = Flask(__name__)
 app.register_blueprint(tourney, url_prefix='/manager')
 app.register_blueprint(api, url_prefix='/api')
+app.config['JSON_SORT_KEYS'] = False
 
 @app.route('/favicon.ico')
 def faviconico():
