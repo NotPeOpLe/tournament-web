@@ -70,7 +70,7 @@ def registeredlist():
     顯示已報名的名單
     """
     return render_template('registeredlist.html', players=sql.get_players())
-    
+
 
 @app.route('/player/<user_id>')
 def player(user_id=None):
@@ -125,7 +125,6 @@ def num_filter(num):
 
 if __name__ == '__main__':
     app.run(
-        host='192.168.0.26',
         port=80,
         debug=True,
-    )
+    ) 
