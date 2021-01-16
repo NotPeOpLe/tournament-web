@@ -69,10 +69,8 @@ def registeredlist():
     """
     顯示已報名的名單
     """
+    return render_template('registeredlist.html', players=sql.get_players())
     
-    players = example.registered_list
-    return render_template('registeredlist.html', players=players)
-
 
 @app.route('/player/<user_id>')
 def player(user_id=None):
@@ -90,11 +88,12 @@ def player(user_id=None):
 #     return render_template('teams.html', team=team)
 
 @app.route('/mappools/<pool_id>')
-def mappools(pool_id=None):
+def mappools(pool_id=0):
     """
     顯示圖譜資訊
     """
-    mappool = example.mappools
+    mappool = sql.get_mappool(pool_id)
+    if request.args.get('json'): return jsonify(mappool)
     return render_template('mappools.html', mappool=mappool)
 
 @app.route('/staff/')
@@ -106,6 +105,9 @@ def staff():
 
     return render_template('staff.html', staff=staff)
 
+@app.route('/test')
+def test():
+    return jsonify(sql.get_players())
 
 @app.template_filter('num')
 def num_filter(num):
