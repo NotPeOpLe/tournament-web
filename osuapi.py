@@ -1,7 +1,14 @@
 import re
 import requests, os, logging
+from rich.logging import RichHandler
 
-logging.basicConfig(level=logging.DEBUG)
+FORMAT = "%(message)s"
+logging.basicConfig(
+    level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler()]
+)
+
+log = logging.getLogger(__name__)
+
 API_KEY = os.getenv('OSU_API_KEY')
 
 def todata(value):
