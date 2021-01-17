@@ -1,6 +1,7 @@
-import pymysql, os, json
+import pymysql, os
+import simplejson as json
+from datetime import datetime
 from pymysql.cursors import DictCursor
-
 
 class DB(object):
     """
@@ -134,3 +135,43 @@ class DB(object):
                 p['info'] = json.loads(p['info'])
                 p['bp1'] = json.loads(p['bp1'])
         return players
+
+    def get_matchs(self, round_id=None, id=None):
+        query_text = """SELECT JSON_OBJECT(
+            'id', m.id,
+            'code', m.code,
+            'round', JSON_OBJECT('id', r.id, 'name', r.name, 'description', r.description, 'best_of', r.best_of, 'start_date', r.start_date),
+            'team1', JSON_OBJECT('id', t1.id, 'full_name', t1.full_name, 'flag_name', t1.flag_name, 'acronym', t1.acronym, 'score', m.team1_score),
+            'team2', JSON_OBJECT('id', t2.id, 'full_name', t2.full_name, 'flag_name', t2.flag_name, 'acronym', t2.acronym, 'score', m.team2_score),
+            'date', m.date,
+            'referee', JSON_OBJECT('id', ref.id, 'group_id', ref.group_id, 'user_id', ref.user_id, 'username', ref.username),
+            'referee2', JSON_OBJECT('id', ref2.id, 'group_id', ref2.group_id, 'user_id', ref2.user_id, 'username', ref2.username),
+            'streamer', JSON_OBJECT('id', str.id, 'group_id', str.group_id, 'user_id', str.user_id, 'username', str.username),
+            'commentator', JSON_OBJECT('id', com.id, 'group_id', com.group_id, 'user_id', com.user_id, 'username', com.username),
+            'commentator2', JSON_OBJECT('id', com2.id, 'group_id', com2.group_id, 'user_id', com2.user_id, 'username', com2.username),
+            'mp_link', m.mp_link,
+            'video_link', m.video_link,
+            'live', m.live,
+            'loser', m.loser,
+            'stats', m.stats
+            ) AS `json`
+            FROM `match` m
+            LEFT JOIN `round` r ON r.id = m.round_id
+            LEFT JOIN team t1 ON t1.id = m.team1
+            LEFT JOIN team t2 ON t2.id = m.team2
+            LEFT JOIN staff ref ON ref.id = m.referee
+            LEFT JOIN staff ref2 ON ref2.id = m.referee2
+            LEFT JOIN staff str ON str.id = m.streamer
+            LEFT JOIN staff com ON com.id = m.commentator
+            LEFT JOIN staff com2 ON com2.id = m.commentator2
+            """
+        if round_id or id:
+            query_text += " WHERE "
+            if round_id: query_text += "round_id = %d " % round_id
+            if id: query_text += "id = %d " % id
+        matchs = []
+        query = self.query_all(query_text)
+        for m in query:
+            matchs.append(json.loads(m['json']))
+
+        return matchs
