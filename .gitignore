@@ -127,3 +127,5 @@ dmypy.json
 .vscode/*
 access_token
 importsql.py
+server.key
+server.crt
