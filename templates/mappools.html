@@ -5,15 +5,16 @@
     <div class="col-auto">
         <div id="rounds-btn-group" class="btn-group">
             {% for r in rounds %}
-            <a href="{{r.id}}" class="btn btn-primary">{{r.name}}</a>
+            <a id="r{{r.id}}" href="{{r.id}}" class="btn btn-primary {% if pool_id | int == r.id %}active{% endif %}">{{r.name}}</a>
             {% endfor %}
         </div>
     </div>
 </div>
 {% if mappool.mappool == {} %}
 <div class="row mb-3">
-    <div class="col">
-        <h1 class="text-center">找不到圖池!</h1>
+    <div class="col text-center">
+        <h1>找不到圖池!</h1>
+        <p>可能該階段的圖池還未公布，或者根本就沒有這階段的圖池!</p>
     </div>
 </div>
 {% endif %}

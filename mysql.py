@@ -78,7 +78,7 @@ class DB(object):
         # 檢查此階段的圖池是否已公布
         if round['pool_publish'] and not ingore_pool_publish: 
             # 從資料庫取得圖池
-            pooldata = self.query_all(f"SELECT `id`, `beatmap_id`, `group`, `code`, `mods`, `info` FROM mappool WHERE round_id = {round_id} ORDER BY FIELD(`group`, 'NM', 'HD', 'HR', 'DT', 'FM', 'Roll', 'EZ', 'TB'), code")
+            pooldata = self.query_all(f"SELECT `id`, `beatmap_id`, `group`, `code`, `mods`, `info` FROM mappool WHERE round_id = {round_id} ORDER BY FIELD(`group`, 'FM', 'NM', 'HD', 'HR', 'DT', 'Roll', 'EZ', 'TB'), code")
         
             # map['info'] 轉化為 dict 類型
             for map in pooldata:
@@ -157,7 +157,9 @@ class DB(object):
             'video_link', m.video_link,
             'live', (m.date < NOW()),
             'loser', (m.loser = m.loser),
-            'stats', m.stats
+            'stats', m.stats,
+            'note', m.note,
+            'winpoint', CEIL(r.best_of/2+1)
             ) AS `json`
             FROM `match` m
             LEFT JOIN `round` r ON r.id = m.round_id

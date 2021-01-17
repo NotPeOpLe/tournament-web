@@ -64,8 +64,8 @@ def rules():
 
 @app.route('/schedule/')
 @app.route('/schedule/<round_id>')
-def schedule(round_id=None):
-    return render_template('schedule.html', matchs=sql.get_matchs(round_id))
+def schedule(round_id=sql.current_round['id']):
+    return render_template('schedule.html', matchs=sql.get_matchs(round_id), round_id=round_id)
 
 @app.route('/matchs/<match_id>')
 def matchs(match=None):
@@ -97,14 +97,15 @@ def player(user_id=None):
 #     """
 #     return render_template('teams.html', team=team)
 
+@app.route('/mappools/')
 @app.route('/mappools/<pool_id>')
-def mappools(pool_id=0):
+def mappools(pool_id=sql.current_round['id']):
     """
     顯示圖譜資訊
     """
     mappool = sql.get_mappool(pool_id)
     if request.args.get('json'): return jsonify(mappool)
-    return render_template('mappools.html', mappool=mappool)
+    return render_template('mappools.html', mappool=mappool, pool_id=pool_id)
 
 @app.route('/staff/')
 def staff():
@@ -117,9 +118,7 @@ def staff():
 
 @app.route('/test')
 def test():
-    match = sql.get_matchs()
-    app.logger.info(match)
-    return jsonify(match)
+    return jsonify(sql.active_rounds)
 
 @app.template_filter('num')
 def num_filter(num):
@@ -145,6 +144,9 @@ def flag_url(flag_name: str):
     elif flag_name[0] == 'url':
         return flag_name[1]
 
+@app.errorhandler(404)
+def page_not_foubd(error):
+    return error
 
 if __name__ == '__main__':
     app.run(
