@@ -1,3 +1,4 @@
+from pymysql import NULL
 import osuapi
 import mysql
 import json
