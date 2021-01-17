@@ -127,3 +127,4 @@ dmypy.json
 access_token
 .vscode/settings.json
 .gitignore
+.vscode/settings.json
