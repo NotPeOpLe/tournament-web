@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, redirect, send_from_directory, jsonify, request
 from blueprints import tourney, api
-import example, re, os, mysql, json, logging
+import example, re, os, mysql, logging
+import simplejson as json
 from rich.logging import RichHandler
 
 FORMAT = "%(message)s"
@@ -53,7 +54,7 @@ def rules():
     """
     return render_template('rules.html')
 
-@app.route('/schedule/')
+@app.route('/schedule/<round_id>')
 def schedule():
     return render_template('schedule.html')
 
@@ -107,7 +108,9 @@ def staff():
 
 @app.route('/test')
 def test():
-    return jsonify(sql.get_players())
+    match = sql.get_matchs()
+    app.logger.info(match)
+    return jsonify(match)
 
 @app.template_filter('num')
 def num_filter(num):
