@@ -105,6 +105,13 @@ class DB(object):
         rounds = self.query_all("SELECT * FROM round WHERE start_date < NOW()")
         return rounds
 
+    @property
+    def current_round(self):
+        """
+        取得當前進行的階段
+        """
+        return self.query_one("SELECT * FROM round WHERE start_date < NOW() ORDER BY start_date DESC")
+
     def get_teams(self, id=None):
         query_team_text = "SELECT * FROM team"
         if id: query_team_text += " WHERE id = %d" % id
