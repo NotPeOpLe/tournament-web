@@ -10,20 +10,81 @@
         </div>
     </div>
 </div>
+{% for m in matchs %}
+<div class="row bg-light rounded m-2 p-2 text-nowrap">
+    <div class="col-12 col-xl-6">
+        <div class="row align-items-center justify-content-center">
+            <div class="col">
+                <a>
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col-auto d-none d-md-block">
+                            <img src="{{ m.team1.flag_name | flag_url }}" class="avatar-min rounded">
+                        </div>
+                        <div class="col text-center text-truncate">
+                            <span>{{ m.team1.full_name }}</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col">
+                <div class="row text-center">
+                    <div class="fs-3 m-0">{{ m.team1.score }} : {{ m.team2.score }}</div>
+                    <div class="m-0">{{ m.date }}</div>
+                </div>
+            </div>
+            <div class="col">
+                <a>
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col text-center text-truncate">
+                            <span>{{ m.team2.full_name }}</span>
+                        </div>
+                        <div class="col-auto d-none d-md-block">
+                            <img src="{{ m.team2.flag_name | flag_url }}" class="avatar-min rounded">
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl d-none d-xl-block p-0">
+        <div class="row align-items-center justify-content-center text-center" style="min-height: 60px;">
+            <div class="col">
+                <span>裁判</span><br>
+                <span class="overflow-hidden">{{ m.referee.username }}{% if m.referee2.username %}, {{ m.referee2.username }}{% endif %}</span>
+            </div>
+            <div class="col">
+                <span>直播</span><br>
+                <span class="overflow-hidden">{{ m.streamer.username }}</span>
+            </div>
+            <div class="col d-none d-md-block">
+                <span>賽評</span><br>
+                <span class="overflow-hidden">{{ m.commentator.username }}{% if m.commentator2.username %}, {{ m.commentator2.username }}{% endif %}</span>
+            </div>
+            <div class="col-12 col-xl-2 text-end user-select-none">
+                <a {% if m.live and m.streamer.username and not m.stats %}href="{{ tourney.live_link }}" target="_blank"{% endif %}><span class="badge {% if m.live and m.streamer.username and not m.stats %}bg-danger{% else %}bg-secondary{% endif %}">Live</span></a><br>
+                <a {% if m.mp_link %}href="{{ m.mp_link }}" target="_blank"{% endif %}><span class="badge {% if m.mp_link %}bg-primary{% else %}bg-secondary{% endif %}">mp link</span></a><br>
+                <a {% if m.video_link %}href="{{ m.video_link }}" target="_blank"{% endif %}><span class="badge {% if m.video_link %}bg-warning text-dark{% else %}bg-secondary{% endif %}">replay</span></a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<div>下為舊範例</div>
 <div class="row bg-light rounded m-2 p-2 text-nowrap">
     <div class="col-12 col-xl-6">
         <div class="row align-items-center justify-content-center">
             <div class="col-auto d-none d-md-block">
                 <img src="https://a.ppy.sh/6008293" class="avatar-min rounded">
             </div>
-            <div class="col text-center overflow-hidden">
+            <div class="col text-center text-truncate">
                 <span>ABCDEFGHIJKLMNOP</span>
             </div>
             <div class="col text-center">
                 <p class="fs-3 m-0">5 : 1</p>
                 <p class="m-0">12/17 00:00 UTC</p>
             </div>
-            <div class="col text-center overflow-hidden">
+            <div class="col text-center text-truncate">
                 <span>ABCDEFGHIJKLMNOP</span>
             </div>
             <div class="col-auto d-none d-md-block">
@@ -51,7 +112,6 @@
             </div>
         </div>
     </div>
-    
 </div>
 <div class="row bg-light rounded m-2 p-2 text-nowrap">
     <div class="col-12 col-xl-6">

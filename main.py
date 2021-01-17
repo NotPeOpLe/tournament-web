@@ -26,6 +26,14 @@ def faviconico():
 def rounds():
     return dict(rounds=sql.active_rounds)
 
+@app.context_processor
+def current_round():
+    return dict(current_round=sql.current_round)
+
+@app.context_processor
+def tourney_info():
+    return dict(tourney=sql.tourney)
+
 @app.route('/')
 def index():
     """
@@ -54,9 +62,10 @@ def rules():
     """
     return render_template('rules.html')
 
+@app.route('/schedule/')
 @app.route('/schedule/<round_id>')
-def schedule():
-    return render_template('schedule.html')
+def schedule(round_id=None):
+    return render_template('schedule.html', matchs=sql.get_matchs(round_id))
 
 @app.route('/matchs/<match_id>')
 def matchs(match=None):
@@ -125,6 +134,17 @@ def num_filter(num):
     remain_amount = '%0.2f' % (float(num))
     remain_amount_format =re.sub(r"(\d)(?=(\d\d\d)+(?!\d))", r"\1,", remain_amount)
     return remain_amount_format
+
+@app.template_filter('flag_url')
+def flag_url(flag_name: str):
+    flag_name = flag_name.split('.')
+    if flag_name[0] == 'avatar':
+        return f'https://a.ppy.sh/{flag_name[1]}'
+    elif flag_name[0] == 'local':
+        return f'/static/teams/flags/{flag_name[1]}'
+    elif flag_name[0] == 'url':
+        return flag_name[1]
+
 
 if __name__ == '__main__':
     app.run(

@@ -113,6 +113,10 @@ class DB(object):
         """
         return self.query_one("SELECT * FROM round WHERE start_date < NOW() ORDER BY start_date DESC")
 
+    @property
+    def tourney(self):
+        return self.query_one("SELECT * FROM tourney WHERE id = 1")
+
     def get_teams(self, id=None):
         query_team_text = "SELECT * FROM team"
         if id: query_team_text += " WHERE id = %d" % id
@@ -140,10 +144,10 @@ class DB(object):
         query_text = """SELECT JSON_OBJECT(
             'id', m.id,
             'code', m.code,
-            'round', JSON_OBJECT('id', r.id, 'name', r.name, 'description', r.description, 'best_of', r.best_of, 'start_date', r.start_date),
+            'round', JSON_OBJECT('id', r.id, 'name', r.name, 'description', r.description, 'best_of', r.best_of, 'start_date', DATE_FORMAT(r.start_date, '%Y-%m-%d %H:%i')),
             'team1', JSON_OBJECT('id', t1.id, 'full_name', t1.full_name, 'flag_name', t1.flag_name, 'acronym', t1.acronym, 'score', m.team1_score),
             'team2', JSON_OBJECT('id', t2.id, 'full_name', t2.full_name, 'flag_name', t2.flag_name, 'acronym', t2.acronym, 'score', m.team2_score),
-            'date', m.date,
+            'date', DATE_FORMAT(m.date, '%Y-%m-%d %H:%i'),
             'referee', JSON_OBJECT('id', ref.id, 'group_id', ref.group_id, 'user_id', ref.user_id, 'username', ref.username),
             'referee2', JSON_OBJECT('id', ref2.id, 'group_id', ref2.group_id, 'user_id', ref2.user_id, 'username', ref2.username),
             'streamer', JSON_OBJECT('id', str.id, 'group_id', str.group_id, 'user_id', str.user_id, 'username', str.username),
@@ -151,8 +155,8 @@ class DB(object):
             'commentator2', JSON_OBJECT('id', com2.id, 'group_id', com2.group_id, 'user_id', com2.user_id, 'username', com2.username),
             'mp_link', m.mp_link,
             'video_link', m.video_link,
-            'live', m.live,
-            'loser', m.loser,
+            'live', (m.date < NOW()),
+            'loser', (m.loser = m.loser),
             'stats', m.stats
             ) AS `json`
             FROM `match` m
@@ -167,8 +171,8 @@ class DB(object):
             """
         if round_id or id:
             query_text += " WHERE "
-            if round_id: query_text += "round_id = %d " % round_id
-            if id: query_text += "id = %d " % id
+            if round_id: query_text += "round_id = %s " % round_id
+            if id: query_text += "id = %s " % id
         matchs = []
         query = self.query_all(query_text)
         for m in query:
