@@ -150,6 +150,7 @@ def page_not_foubd(error):
 
 if __name__ == '__main__':
     app.run(
-        port=80,
-        debug=True,
+        host='0.0.0.0',
+        port=443,
+        ssl_context=('server.crt', 'server.key')
     ) 
