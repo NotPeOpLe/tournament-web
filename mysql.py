@@ -107,13 +107,12 @@ class DB(object):
 
     def get_teams(self, id=None):
         query_team_text = "SELECT * FROM team"
-        if id:
-            query_team_text += " WHERE id = %d" % id
+        if id: query_team_text += " WHERE id = %d" % id
 
         teams = self.query_all(query_team_text)
         for t in teams:
             t['players'] = []
-            players = self.query_all("SELECT * FROM player WHERE team_id = %s", (t['id'],))
+            players = self.query_all("SELECT * FROM player WHERE team = %s", (t['id'],))
             for p in players:
                 p['info'] = json.loads(p['info'])
                 p['bp1'] = json.loads(p['bp1'])
@@ -122,8 +121,7 @@ class DB(object):
 
     def get_players(self, id=None):
         query_text = "SELECT * FROM player"
-        if id:
-            query_text += " WHERE id = %d" % id
+        if id: query_text += " WHERE id = %d" % id
         players = self.query_all(query_text)
         for p in players:
                 p['info'] = json.loads(p['info'])
