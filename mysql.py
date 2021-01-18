@@ -181,3 +181,12 @@ class DB(object):
             matchs.append(json.loads(m['json']))
 
         return matchs
+
+    def get_staff(self):
+        query = self.query_all('SELECT s.id, s.user_id, s.username ,g.* FROM staff s INNER JOIN `group` g ON g.id = s.group_id')
+        staff = {}
+        for s in query:
+            if s['ch_name'] not in staff.keys():
+                staff[s['ch_name']] = []
+            staff[s['ch_name']].append(s)
+        return staff
