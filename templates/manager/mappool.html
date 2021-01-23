@@ -1,0 +1,290 @@
+{% extends 'manager/dashboard.html' %}
+{% block title %}圖池{% endblock title %}
+{% block main %}
+    <h1>圖池管理</h1>
+    <div class="row">
+        <div class="col">
+            <div class="input-group">
+                <span class="input-group-text">Round</span>
+                <select class="form-select" name="round" id="select-round">
+                    {% for r in rounds %}
+                    <option value="{{r.id}}" {% if r.id == round_id | int %}selected{% endif %}>{{r.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add-map-modal">Add Map</button>
+        </div>
+    </div>
+    <hr>
+    <div class="table-responsive">
+        <table class="table text-center text-nowrap">
+            <thead>
+                <tr>
+                    <th>Song</th>
+                    <th width="50">CS</th>
+                    <th width="50">AR</th>
+                    <th width="50">HP</th>
+                    <th width="50">OD</th>
+                    <th width="50">Stars</th>
+                    <th width="50">BPM</th>
+                    <th width="70">Length</th>
+                    <th width="100">mods</th>
+                    <th width="150">提名人</th>
+                    <th width="1">備註</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in mappool %}
+                <tr style="background-color: rgb({{m.color}});">
+                    <td style="
+                        background: -webkit-linear-gradient(right, rgba({{m.color}},1), rgba({{m.color}}, 0.2)),
+                        url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
+                        background: -moz-linear-gradient(right, rgba({{m.color}},1), rgba({{m.color}}, 0.2)),
+                        url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
+                        background: -o-linear-gradient(right, rgba({{m.color}},1), rgba({{m.color}}, 0.2)),
+                        url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
+                        background: linear-gradient(right, rgba({{m.color}},1), rgba({{m.color}}, 0.2)),
+                        url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
+                        background-size: cover;
+                    ">
+                    <a href="https://osu.ppy.sh/b/{{m.beatmap_id}}" class="text-dark">{{m.info.artist}} - {{m.info.title}} [{{m.info.version}}]</a>
+                    </td>
+                    <td>{{m.info.diff_size}}</td>
+                    <td>{{m.info.diff_approach}}</td>
+                    <td>{{m.info.diff_drain}}</td>
+                    <td>{{m.info.diff_overall}}</td>
+                    <td>{{m.info.difficultyrating | floatfix}}</td>
+                    <td>{{m.info.bpm}}</td>
+                    <td>{{m.info.total_length | timef}}</td>
+                    <td>{{m.group}}</td>
+                    <td>{{m.username}}</td>
+                    <td>{{m.note}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal fade"  tabindex="-1" id="add-map-modal" aria-labelledby="add-map-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="add-map-modal-label">Add map</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="add-map-form" method="POST">
+                            <div class="mb-3">
+                                <label for="add-map-id" class="col-form-label">Map ID:</label>
+                                <input type="text" name="id" class="form-control" id="add-map-id" autocomplete="off" pattern="[0-9]{0:10}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="add-map-group" class="col-form-label">Group: <small class="text-muted">(自動填入，如果需要特別分開可自另外取名，NF不會分類)</small></label>
+                                <input type="text" name="group" class="form-control" id="add-map-group" value="NM" autocomplete="off" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="add-map-mods" class="col-form-label">Mods: <span id="add-map-selected-mods"></span></label>
+                                <br>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="2" id="ez">
+                                    <label class="form-check-label" for="ez">EZ</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="1" id="nf">
+                                    <label class="form-check-label" for="nf">NF</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="256" id="ht">
+                                    <label class="form-check-label" for="ht">HT</label>
+                                </div>
+                                <br>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="16" id="hr">
+                                    <label class="form-check-label" for="hr">HR</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="8" id="hd">
+                                    <label class="form-check-label" for="hd">HD</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="16384" id="sd">
+                                    <label class="form-check-label" for="sd">SD</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="16416" id="pf">
+                                    <label class="form-check-label" for="pf">PF</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="512" id="dt">
+                                    <label class="form-check-label" for="dt">DT</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="576" id="nc">
+                                    <label class="form-check-label" for="nc">NC</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="1024" id="fl">
+                                    <label class="form-check-label" for="fl">FL</label>
+                                </div>
+                                <br>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="128" id="rx">
+                                    <label class="form-check-label" for="rx">RX</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="8192" id="ap">
+                                    <label class="form-check-label" for="ap">AP</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="4096" id="so">
+                                    <label class="form-check-label" for="so">SO</label>
+                                </div>
+                                <br>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="tb" id="tb">
+                                    <label class="form-check-label" for="tb">TB</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <input class="form-check-input select-mod" type="checkbox" value="fm" id="fm">
+                                    <label class="form-check-label" for="fm">FM</label>
+                                </div>
+                                <input type="hidden" name="mods" id="add-map-mods" value="0">
+                            </div>
+                            <div class="mb-3">
+                                <label for="add-map-note" class="col-form-label" maxlength="50">Note: <small class="text-muted">(max 50 char.)</small></label>
+                                <textarea name="note" class="form-control" id="add-map-note"></textarea>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Post</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>   
+    </div>
+         
+{% endblock main %}
+{% block script %}
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        var add_map_modal = new bootstrap.Modal(document.getElementById('add-map-modal'))
+
+        //std mods
+        var mod_ez = document.getElementById('ez');
+        var mod_nf = document.getElementById('nf');
+        var mod_ht = document.getElementById('ht');
+        var mod_hr = document.getElementById('hr');
+        var mod_hd = document.getElementById('hd');
+        var mod_sd = document.getElementById('sd');
+        var mod_pf = document.getElementById('pf');
+        var mod_dt = document.getElementById('dt');
+        var mod_nc = document.getElementById('nc');
+        var mod_fl = document.getElementById('fl');
+        var mod_rx = document.getElementById('rx');
+        var mod_ap = document.getElementById('ap');
+        var mod_so = document.getElementById('so');
+        var mod_tb = document.getElementById('tb');
+        var mod_fm = document.getElementById('fm');
+        var map_mods = document.getElementById('add-map-mods');
+        var map_group = document.getElementById('add-map-group');
+        var enabled_mods = 0;
+
+        $(document).ready(function(){
+            $('#select-round').change(function(){
+                location.href = $(this).val();
+            });
+
+            $(document).on('keydown', 'form', function(event) { 
+                return event.key != 'Enter';
+            });
+
+            $('.select-mod').change(function(){
+                if ($(this)[0].checked) {
+                    if ($(this)[0].id != 'tb' || $(this)[0].id != 'tb') {
+                        mod_tb.checked = false;
+                        mod_fm.checked = false;
+                    }
+
+                    switch ($(this)[0].id) {
+                        case 'nf':
+                            mod_sd.checked = false;
+                            mod_pf.checked = false;
+                            break;
+                        case 'ht':
+                            mod_dt.checked = false;
+                            mod_nc.checked = false;
+                            break;
+                        case 'ez':
+                            mod_hr.checked = false;
+                            break;
+                        case 'hr':
+                            mod_ez.checked = false;
+                            break;
+                        case 'sd':
+                            mod_pf.checked = false;
+                            mod_nf.checked = false;
+                            break;
+                        case 'pf':
+                            mod_sd.checked = false;
+                            mod_nf.checked = false;
+                            break;
+                        case 'dt':
+                            mod_nc.checked = false;
+                            break;
+                        case 'nc':
+                            mod_dt.checked = false;
+                            break;
+                        case 'rx':
+                            mod_ap.checked = false;
+                            break;
+                        case 'ap':
+                            mod_rx.checked = false;
+                            break;
+                        case 'tb':
+                            $('.select-mod:checked').click();
+                            mod_tb.checked = true;
+                            break;
+                        case 'fm':
+                            $('.select-mod:checked').click();
+                            mod_fm.checked = true;
+                            break;
+                        default:
+                    }
+                }
+
+                var checked_mods = [].slice.call($('.select-mod:checked'));
+                enabled_mods = 0;
+                map_group.value = "";
+                checked_mods.map(function(element){
+                    if (element.value == 'fm' || element.value == 'tb') {
+                        enabled_mods = element.value;
+                        map_group.value = element.id.toUpperCase();
+                    } else {
+                        enabled_mods += Number(element.value);
+                        if (element.id != 'nf') {
+                            map_group.value += element.id.toUpperCase();
+                        }
+                    }
+                });
+                map_mods.value = enabled_mods;
+                if (enabled_mods == 0 || enabled_mods == 1) {
+                    map_group.value = "NM";
+                }
+                console.log(enabled_mods);
+            });
+
+            $('#add-map-submit').click(function(){
+                $('#add-map-form').submit()
+            });
+        });
+    </script>
+{% endblock script %}

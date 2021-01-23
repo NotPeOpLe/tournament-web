@@ -1,5 +1,4 @@
-import pymysql, os
-import simplejson as json
+import pymysql, os, json
 from datetime import datetime
 from pymysql.cursors import DictCursor
 
@@ -67,7 +66,7 @@ class DB(object):
         # 断开数据库连接
         self.connect.close()
 
-    def get_mappool(self, round_id, ingore_pool_publish = False):
+    def get_mappool(self, round_id, ingore_pool_publish=False, format=True):
         """
         取得圖池: round_id = 階段ID
         """
@@ -75,28 +74,32 @@ class DB(object):
         mappool = {}
         # 從資料庫取得階段資訊
         round = self.query_one(f"SELECT * FROM round WHERE id = {round_id}")
+        # 從資料庫取得圖池
+        pooldata = self.query_all(f"SELECT m.*, mg.color, s.user_id, s.username FROM mappool AS m LEFT JOIN staff AS s ON s.id=m.nominator LEFT JOIN map_group AS mg ON mg.name=m.group WHERE round_id = {round_id} ORDER BY FIELD(`group`, 'FM', 'NM', 'HD', 'HR', 'DT', 'Roll', 'EZ', 'TB'), code")
         # 檢查此階段的圖池是否已公布
-        if round['pool_publish'] and not ingore_pool_publish: 
-            # 從資料庫取得圖池
-            pooldata = self.query_all(f"SELECT `id`, `beatmap_id`, `group`, `code`, `mods`, `info` FROM mappool WHERE round_id = {round_id} ORDER BY FIELD(`group`, 'FM', 'NM', 'HD', 'HR', 'DT', 'Roll', 'EZ', 'TB'), code")
-        
-            # map['info'] 轉化為 dict 類型
-            for map in pooldata:
-                map['info'] = json.loads(map['info'])
+        if round['pool_publish'] or ingore_pool_publish:
+            if format:
+                # map['info'] 轉化為 dict 類型
+                for map in pooldata:
+                    map['info'] = json.loads(map['info'])
 
-            # 將 map 以 group 分類
-            for map in pooldata:
-                # 如果這 map 的 group 沒有在 mappool.keys() 裡面，則創建它
-                if map['group'] not in mappool.keys():
-                    mappool[map['group']] = []
+                # 將 map 以 group 分類
+                for map in pooldata:
+                    # 如果這 map 的 group 沒有在 mappool.keys() 裡面，則創建它
+                    if map['group'] not in mappool.keys():
+                        mappool[map['group']] = []
 
-                # 將 map 添加到 mappool 的 group 裡
-                mappool[map['group']].append(map)
-            
-        return {
-            'round_id': int(round_id),
-            'mappool': mappool
-        }
+                    # 將 map 添加到 mappool 的 group 裡
+                    mappool[map['group']].append(map)
+                return {
+                    'round_id': int(round_id),
+                    'mappool': mappool
+                    }
+            else:
+                for map in pooldata:
+                    map['info'] = json.loads(map['info'])
+                return pooldata
+       
 
     @property
     def active_rounds(self):
@@ -182,11 +185,17 @@ class DB(object):
 
         return matchs
 
-    def get_staff(self):
-        query = self.query_all('SELECT s.id, s.user_id, s.username ,g.* FROM staff s INNER JOIN `group` g ON g.id = s.group_id')
-        staff = {}
-        for s in query:
-            if s['ch_name'] not in staff.keys():
-                staff[s['ch_name']] = []
-            staff[s['ch_name']].append(s)
-        return staff
+    def get_staff(self, user_id=None, format=True):
+        if user_id:
+            query = self.query_one('select * from staff where user_id = %s', (user_id,))
+            return query
+        query = self.query_all('SELECT s.id, s.user_id, s.username, s.privileges ,g.* FROM staff s INNER JOIN `group` g ON g.id = s.group_id')
+        if format:
+            staff = {}
+            for s in query:
+                if s['ch_name'] not in staff.keys():
+                    staff[s['ch_name']] = []
+                staff[s['ch_name']].append(s)
+            return staff
+        else:
+            return query
