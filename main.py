@@ -1,19 +1,12 @@
-from flask import Flask, render_template, url_for, redirect, send_from_directory, jsonify, request
+from flask import Flask, render_template, url_for, redirect, send_from_directory, jsonify, request, session
 from blueprints import tourney, api
-import example, re, os, mysql, logging
-import simplejson as json
-from rich.logging import RichHandler
-
-FORMAT = "%(message)s"
-logging.basicConfig(
-    level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
-)
-
-log = logging.getLogger(__name__)
+from logger import log
+import re, os, mysql, osuapi
 
 test = 'ABC TEST'
 sql = mysql.DB()
 app = Flask(__name__)
+app.secret_key = b'840' # os.urandom(16)
 app.register_blueprint(tourney, url_prefix='/manager')
 app.register_blueprint(api, url_prefix='/api')
 app.config['JSON_SORT_KEYS'] = False
@@ -24,7 +17,7 @@ def faviconico():
 
 @app.context_processor
 def rounds():
-    return dict(rounds=sql.active_rounds)
+    return dict(active_rounds=sql.active_rounds)
 
 @app.context_processor
 def current_round():
@@ -33,6 +26,10 @@ def current_round():
 @app.context_processor
 def tourney_info():
     return dict(tourney=sql.tourney)
+
+@app.context_processor
+def authorize():
+    return dict(authorize=osuapi.authorize('login','identify'))
 
 @app.route('/')
 def index():
@@ -116,7 +113,7 @@ def staff():
 
 @app.route('/test')
 def test():
-    return jsonify(sql.get_staff())
+    return jsonify(sql.get_mappool(1,ingore_pool_publish=False,format=False))
 
 @app.template_filter('num')
 def num_filter(num):
@@ -131,6 +128,10 @@ def num_filter(num):
     remain_amount = '%0.2f' % (float(num))
     remain_amount_format =re.sub(r"(\d)(?=(\d\d\d)+(?!\d))", r"\1,", remain_amount)
     return remain_amount_format
+
+@app.template_filter('timef')
+def timef(num):
+    return '%d:%02d' % (num//60, num%60)
 
 @app.template_filter('flag_url')
 def flag_url(flag_name: str):
