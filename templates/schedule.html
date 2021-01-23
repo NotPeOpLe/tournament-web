@@ -4,7 +4,7 @@
 <div class="row justify-content-center mb-3">
     <div class="col-auto">
         <div id="rounds-btn-group" class="btn-group">
-            {% for r in rounds %}
+            {% for r in active_rounds %}
             <a href="{{r.id}}" class="btn btn-primary {% if round_id | int == r.id %}active{% endif %}">{{r.name}}</a>
             {% endfor %}
         </div>

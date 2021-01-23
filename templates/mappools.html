@@ -4,13 +4,13 @@
 <div class="row justify-content-center mb-3">
     <div class="col-auto">
         <div id="rounds-btn-group" class="btn-group">
-            {% for r in rounds %}
+            {% for r in active_rounds %}
             <a id="r{{r.id}}" href="{{r.id}}" class="btn btn-primary {% if pool_id | int == r.id %}active{% endif %}">{{r.name}}</a>
             {% endfor %}
         </div>
     </div>
 </div>
-{% if mappool.mappool == {} %}
+{% if mappool == None %}
 <div class="row mb-3">
     <div class="col text-center">
         <h1>找不到圖池!</h1>

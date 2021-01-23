@@ -68,7 +68,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false">比賽圖池</a>
                             <ul class="dropdown-menu text-center" aria-labelledby="dropdown01">
-                                {% for r in rounds %}
+                                {% for r in active_rounds %}
                                 <li><a class="dropdown-item" href="/mappools/{{r.id}}">{{r.name}}</a></li>
                                 {% endfor %}
                             </ul>
@@ -83,17 +83,29 @@
                 </div>
             </div>
         </nav>
-
-        <main class="container px-5" style="min-height: 86.3vh;">
-        {% block header %}
-            <h1 class="text-center display-3 m-3">{{ self.title() }}</h1>
-        {% endblock header %}
-        {% block main %}
-            <div class="starter-template text-center py-5 px-3">
-                <h1>Bootstrap starter template</h1>
-                <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+                    <button type="button" class="btn-close" aria-label="Close"></button>
+                    <!-- <strong>Title</strong> --> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <main style="min-height: 86.3vh;">
+            <div class="container">
+            {% block header %}
+                <h1 class="text-center display-3 m-3">{{ self.title() }}</h1>
+            {% endblock header %}
+            {% block main %}
+                <div class="starter-template text-center py-5 px-3">
+                    <h1>Bootstrap starter template</h1>
+                    <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
+                </div>
+            {% endblock main %}
             </div>
-        {% endblock main %}
         </main>
 
         <footer class="container-fluid bg-dark">
