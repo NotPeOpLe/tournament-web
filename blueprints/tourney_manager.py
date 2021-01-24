@@ -78,29 +78,52 @@ def mappool(round_id=None):
         flash('沒有權限!', 'danger')
         return redirect(url_for('tourney.dashboard'))
     
+    # POST: 新增圖譜
     if request.method == 'POST':
         try:
-            round_info = db.query_one('select * from round where id = %s', (round_id,))
-            modcount = db.query_one('SELECT `group`, COUNT(*) AS `count` FROM mappool WHERE round_id = 1 and `group` = %s', (request.form['group'],))
-            beatmap = osuapi.get(osuapi.V1Path.get_beatmaps, b=request.form['id'], m=0)[0]
-            beatmap_id = int(request.form['id'])
-            use_mods = int(request.form['mods'])
-            group = request.form['group']
-            note = request.form['note']
-            poster = int(session['id'])
+            # request.form 取得的訊息
+            beatmap_id = int(request.form['id']) # 圖譜Id
+            use_mods = int(request.form['mods']) # 開啟的Mods
+            group = request.form['group']        # 分類
+            note = request.form['note']          # 備註
+
+            # session 取得的訊息
+            poster = int(session['id'])          # 提名人Id
+
+            # sql 取得的訊息
+            round_info = db.query_one('select * from round where id = %s', (round_id,)) # Round 資料
+            modcount = db.query_one('SELECT `group`, COUNT(*) AS `count` FROM mappool WHERE round_id = 1 and `group` = %s', (request.form['group'],)) # 取得該 group 計數
+
+            
+            # 判斷是否為會改變難度的mods
+            if Mods(use_mods) in (Mods.Easy | Mods.HalfTime | Mods.HardRock | Mods.DoubleTime | Mods.Nightcore):
+                request_mods = use_mods
+            else : 
+                request_mods = 0
+
+            # api 取得的訊息
+            beatmap = osuapi.get(osuapi.V1Path.get_beatmaps, b=request.form['id'], m=0, mods=request_mods)[0]
+            # 將 api 的資料轉換成正確的類型
             for k in beatmap:
                 beatmap[k] = osuapi.todata(beatmap[k])
-            json_beatmap = json.dumps(beatmap)
+
+            # debug
             log.debug(dict(request.form))
+
+            # 圖譜插入至SQL
             db.query('insert into mappool (`round_id`, `beatmap_id`, `group`, `code`, `mods`, `info`, `note`, `nominator`) values (%s, %s, %s, %s, %s, %s, %s, %s)',
-                (int(round_id), beatmap_id, group, modcount['count']+1, use_mods, json_beatmap, note, poster))
+                (int(round_id), beatmap_id, group, modcount['count']+1, use_mods, json.dumps(beatmap), note, poster))
+
+            # 成功訊息
             info = '%s - %s [%s] (%s) 已新增至 %s' % (beatmap['artist'], beatmap['title'], beatmap['version'], group, round_info['name'])
             flash(info, 'success')
         except Exception as e:
+            # 錯誤訊息
             flash(e, 'danger')
             log.exception()
         finally:
             return redirect(url_for('tourney.mappool', round_id=round_id))
 
+    # GET: 查看網頁
     mappool = db.get_mappool(round_id, ingore_pool_publish=True, format=False)
     return render_template('manager/mappool.html', round_id=round_id, mappool=mappool)
