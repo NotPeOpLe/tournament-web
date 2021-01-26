@@ -1,3 +1,4 @@
+from flag import Staff
 from flask import Flask, render_template, url_for, redirect, send_from_directory, jsonify, request, session
 from blueprints import tourney, api
 from logger import log
@@ -113,7 +114,7 @@ def staff():
 
 @app.route('/test')
 def test():
-    return jsonify(sql.get_mappool(1,ingore_pool_publish=False,format=False))
+    return jsonify(sql.get_staff(format=False))
 
 @app.template_filter('num')
 def num_filter(num):
@@ -142,6 +143,10 @@ def flag_url(flag_name: str):
         return f'/static/teams/flags/{flag_name[1]}'
     elif flag_name[0] == 'url':
         return flag_name[1]
+
+@app.template_filter('privilege')
+def privilege(num):
+    return str(Staff(num))[6:].replace('|', ', ')
 
 @app.errorhandler(404)
 def page_not_foubd(error):

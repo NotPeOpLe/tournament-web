@@ -10,6 +10,7 @@ else :
 
 
 print(diff_mods.value, diff_mods)
+print(diff_mods)
 print(use_mods, Mods(use_mods))
 print(request_mods, Mods(request_mods))
 

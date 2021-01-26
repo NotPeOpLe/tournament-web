@@ -1,6 +1,6 @@
 from enum import Flag
 
-class StaffPrivilege(Flag):
+class Staff(Flag):
     STAFF           = 1
     REFFEREE        = 2
     COMMENTATOR     = 4

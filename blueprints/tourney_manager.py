@@ -1,18 +1,43 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session, request
 from logger import log
-from flag import StaffPrivilege, Mods
+from flag import Staff, Mods
+from rich.console import Console
+from functools import wraps
 import osuapi, mysql, json
 
 tourney = Blueprint('tourney', __name__)
 db = mysql.DB()
+console = Console()
 
 @tourney.context_processor
 def rounds():
     return dict(rounds=db.query_all("select * from round"))
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        console.log(dict(session))
+        if session == {}:
+            return redirect(url_for('tourney.gologin'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def need_privilege(privilege: Staff):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user = db.get_staff(session['user_id'])
+            if Staff(user['privileges']) not in privilege:
+                flash(f'你沒有 {privilege.name} 權限!', 'danger')
+                return redirect(url_for('tourney.dashboard'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
 @tourney.route('/')
+@login_required
 def dashboard():
-    if session == {}: return redirect(url_for('tourney.gologin'))
     return render_template('manager/dashboard.html')
 
 @tourney.route('/login')
@@ -46,44 +71,49 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-@tourney.route('/matchs')
+@tourney.route('/matchs/')
+@login_required
 def matchs():
     if session == {}: return redirect(url_for('tourney.gologin'))
     return render_template('manager/matchs.html')
 
-@tourney.route('/teams')
+@tourney.route('/teams/')
+@login_required
 def teams():
     if session == {}: return redirect(url_for('tourney.gologin'))
     return render_template('manager/teams.html')
 
-@tourney.route('/staff')
+@tourney.route('/staff/')
+@login_required
+@need_privilege(Staff.ADMIN|Staff.HOST)
 def staff():
     if session == {}: return redirect(url_for('tourney.gologin'))
-    return render_template('manager/staff.html')
+
+
+    return render_template('manager/staff.html', staff=db.get_staff(format=False))
 
 @tourney.route('/settings')
+@login_required
 def settings():
     if session == {}: return redirect(url_for('tourney.gologin'))
     return render_template('manager/settings.html')
 
 @tourney.route('/mappool/')
 @tourney.route('/mappool/<round_id>', methods=['GET', 'POST', 'DELETE', 'PATCH'])
+@login_required
+@need_privilege(Staff.MAPPOOLER|Staff.HOST)
 def mappool(round_id=None):
     if session == {}: return redirect(url_for('tourney.gologin'))
     if round_id == None: return redirect(url_for('tourney.mappool', round_id=1))
-
-    log.debug(session)
-    user = db.get_staff(session['user_id'])
-    if StaffPrivilege.MAPPOOLER not in StaffPrivilege(user['privileges']):
-        flash('沒有權限!', 'danger')
-        return redirect(url_for('tourney.dashboard'))
     
     # POST: 新增圖譜
     if request.method == 'POST':
         try:
             # request.form 取得的訊息
-            beatmap_id = int(request.form['id']) # 圖譜Id
-            use_mods = int(request.form['mods']) # 開啟的Mods
+            beatmap_id:str = request.form['id']      # 圖譜Id
+            if not beatmap_id.isdigit(): 
+                raise ValueError('beatmap_id 必須是數字')
+            use_mods = request.form['mods']      # 開啟的Mods
             group = request.form['group']        # 分類
             note = request.form['note']          # 備註
 
@@ -96,7 +126,9 @@ def mappool(round_id=None):
 
             
             # 判斷是否為會改變難度的mods
-            if Mods(use_mods) in (Mods.Easy | Mods.HalfTime | Mods.HardRock | Mods.DoubleTime | Mods.Nightcore):
+            if use_mods in ('tb', 'fm') :
+                request_mods = 0
+            elif Mods(int(use_mods)) in (Mods.Easy | Mods.HalfTime | Mods.HardRock | Mods.DoubleTime | Mods.Nightcore):
                 request_mods = use_mods
             else : 
                 request_mods = 0
@@ -109,18 +141,18 @@ def mappool(round_id=None):
 
             # debug
             log.debug(dict(request.form))
-
+            console.log('', log_locals=True)
             # 圖譜插入至SQL
             db.query('insert into mappool (`round_id`, `beatmap_id`, `group`, `code`, `mods`, `info`, `note`, `nominator`) values (%s, %s, %s, %s, %s, %s, %s, %s)',
-                (int(round_id), beatmap_id, group, modcount['count']+1, use_mods, json.dumps(beatmap), note, poster))
-
+                (int(round_id), int(beatmap_id), group, modcount['count']+1, use_mods, json.dumps(beatmap), note, poster))
+            
             # 成功訊息
             info = '%s - %s [%s] (%s) 已新增至 %s' % (beatmap['artist'], beatmap['title'], beatmap['version'], group, round_info['name'])
             flash(info, 'success')
         except Exception as e:
             # 錯誤訊息
-            flash(e, 'danger')
-            log.exception()
+            flash(e.args, 'danger')
+            log.exception(e)
         finally:
             return redirect(url_for('tourney.mappool', round_id=round_id))
 

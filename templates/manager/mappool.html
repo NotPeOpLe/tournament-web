@@ -60,7 +60,7 @@
                     <td>{{m.info.total_length | timef}}</td>
                     <td>{{m.group}}</td>
                     <td>{{m.username}}</td>
-                    <td>{{m.note}}</td>
+                    <td class="text-start">{{m.note}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -154,8 +154,8 @@
                                 <input type="hidden" name="mods" id="add-map-mods" value="0">
                             </div>
                             <div class="mb-3">
-                                <label for="add-map-note" class="col-form-label" maxlength="50">Note: <small class="text-muted">(max 50 char.)</small></label>
-                                <textarea name="note" class="form-control" id="add-map-note"></textarea>
+                                <label for="add-map-note" class="col-form-label">Note: <small class="text-muted">(max 50 char.)</small></label>
+                                <textarea name="note" class="form-control" id="add-map-note" maxlength="50"></textarea>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -171,11 +171,6 @@
 {% endblock main %}
 {% block script %}
     <script>
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-
         var add_map_modal = new bootstrap.Modal(document.getElementById('add-map-modal'))
 
         //std mods
@@ -238,9 +233,11 @@
                             mod_nf.checked = false;
                             break;
                         case 'dt':
+                            mod_ht.checked = false;
                             mod_nc.checked = false;
                             break;
                         case 'nc':
+                            mod_ht.checked = false;
                             mod_dt.checked = false;
                             break;
                         case 'rx':
