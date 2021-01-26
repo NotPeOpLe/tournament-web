@@ -1,0 +1,107 @@
+{% extends 'manager/dashboard.html' %}
+{% block title %}人員管理{% endblock title %}
+{% block main %}
+<h1>工作人員</h1>
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-staff-modal">Add staff</button>
+<div class="table-responsive">
+    <table class="table table-hover text-nowrap">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>User Id</th>
+                <th></th>
+                <th>Username</th>
+                <th>職位</th>
+                <th>權限</th>
+                <th>動作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in staff %}
+            <tr>
+                <td>{{s.id}}</td>
+                <td>{{s.user_id}}</td>
+                <td><img src="https://a.ppy.sh/{{s.user_id}}" alt="{{s.username}}" width="40"></td>
+                <td>{{s.username}}</td>
+                <td>{{s.ch_name}}</td>
+                <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{s.privileges | privilege}}">{{s.privileges}}</td>
+                <td>
+                    <button class="btn btn-warning">編輯</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade"  tabindex="-1" id="add-staff-modal" aria-labelledby="add-staff-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="add-staff-modal-label">Add Staff</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="add-staff-id">Osu User ID:</label>
+                            <input type="text" name="id" class="form-control" id="add-staff-id" autocomplete="off" pattern="[0-9]{0:10}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-staff-group">職位:</label>
+                            <select name="group" id="add-staff-group" class="form-select" required>
+                                <option value="10" selected>工作人員</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-staff-id">權限:</label>
+                            <div class="form-check">
+                                <label for="checkbox-staff" class="form-check-label">STAFF</label>
+                                <input type="checkbox" name="STAFF" value="1" id="checkbox-staff" class="form-check-input" checked>
+                            </div>
+                            <div class="form-check">
+                                <label for="checkbox-referee" class="form-check-label">REFFEREE</label>
+                                <input type="checkbox" name="REFFEREE" value="2" id="checkbox-referee" class="form-check-input">
+                            </div>
+                            <div class="form-check">
+                                <label for="checkbox-commentator" class="form-check-label">COMMENTATOR</label>
+                                <input type="checkbox" name="COMMENTATOR" value="4" id="checkbox-srteamer" class="form-check-input">
+                            </div>
+                            <div class="form-check">
+                                <label for="checkbox-srteamer" class="form-check-label">STREAMER</label>
+                                <input type="checkbox" name="STREAMER" value="8" id="checkbox-srteamer" class="form-check-input">
+                            </div>
+                            <div class="form-check">
+                                <label for="checkbox-mappooler" class="form-check-label">MAPPOOLER</label>
+                                <input type="checkbox" name="MAPPOOLER" value="16" id="checkbox-mappooler" class="form-check-input">
+                            </div>
+                            <div class="form-check">
+                                <label for="checkbox-gfx" class="form-check-label">GFX</label>
+                                <input type="checkbox" name="GFX" value="32" id="checkbox-gfx" class="form-check-input">
+                            </div>
+                            <div class="form-check">
+                                <label for="checkbox-admin" class="form-check-label">ADMIN</label>
+                                <input type="checkbox" name="ADMIN" value="64" id="checkbox-admin" class="form-check-input">
+                            </div>
+                            <div class="form-check">
+                                <label for="checkbox-tester" class="form-check-label">TESTER</label>
+                                <input type="checkbox" name="TESTER" value="128" id="checkbox-tester" class="form-check-input">
+                            </div>
+                            <div class="form-check">
+                                <label for="checkbox-tech" class="form-check-label">TECH</label>
+                                <input type="checkbox" name="TECH" value="256" id="checkbox-tech" class="form-check-input">
+                            </div>
+                            <input type="hidden" name="privileges" value="1">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main %}
