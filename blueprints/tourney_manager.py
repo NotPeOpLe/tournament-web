@@ -13,6 +13,7 @@ console = Console()
 def rounds():
     return dict(rounds=db.query_all("select * from round"))
 
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -22,12 +23,14 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
 def need_privilege(privilege: Staff):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             user = db.get_staff(session['user_id'])
-            if Staff(user['privileges']) not in privilege:
+            user_privilege = Staff(user['privileges'])
+            if privilege not in user_privilege:
                 flash(f'你沒有 {privilege.name} 權限!', 'danger')
                 return redirect(url_for('tourney.dashboard'))
             return f(*args, **kwargs)
@@ -40,9 +43,11 @@ def need_privilege(privilege: Staff):
 def dashboard():
     return render_template('manager/dashboard.html')
 
+
 @tourney.route('/login')
 def gologin():
     return render_template('manager/auth.html')
+
 
 def login(user):
     session.clear()
@@ -50,6 +55,7 @@ def login(user):
     session['id'] = user['id']
     session['user_id'] = user['user_id']
     session['username'] = user['username']
+
 
 @tourney.route('/callback')
 def callback():
@@ -66,10 +72,12 @@ def callback():
             log.exception(e)
     return redirect(url_for('index'))
 
+
 @tourney.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
 
 @tourney.route('/matchs/')
 @login_required
@@ -77,33 +85,33 @@ def matchs():
     if session == {}: return redirect(url_for('tourney.gologin'))
     return render_template('manager/matchs.html')
 
+
 @tourney.route('/teams/')
 @login_required
 def teams():
     if session == {}: return redirect(url_for('tourney.gologin'))
     return render_template('manager/teams.html')
 
+
 @tourney.route('/staff/')
 @login_required
-@need_privilege(Staff.ADMIN|Staff.HOST)
+@need_privilege(Staff.ADMIN)
 def staff():
-    if session == {}: return redirect(url_for('tourney.gologin'))
-
 
     return render_template('manager/staff.html', staff=db.get_staff(format=False))
+
 
 @tourney.route('/settings')
 @login_required
 def settings():
-    if session == {}: return redirect(url_for('tourney.gologin'))
     return render_template('manager/settings.html')
+
 
 @tourney.route('/mappool/')
 @tourney.route('/mappool/<round_id>', methods=['GET', 'POST', 'DELETE', 'PATCH'])
 @login_required
-@need_privilege(Staff.MAPPOOLER|Staff.HOST)
+@need_privilege((Staff.MAPPOOLER))
 def mappool(round_id=None):
-    if session == {}: return redirect(url_for('tourney.gologin'))
     if round_id == None: return redirect(url_for('tourney.mappool', round_id=1))
     
     # POST: 新增圖譜
@@ -122,6 +130,8 @@ def mappool(round_id=None):
 
             # sql 取得的訊息
             round_info = db.query_one('select * from round where id = %s', (round_id,)) # Round 資料
+            if not round_info['pool_publish']:
+                raise Exception('此階段圖池已公布，無法進行變動!')
             modcount = db.query_one('SELECT `group`, COUNT(*) AS `count` FROM mappool WHERE round_id = 1 and `group` = %s', (request.form['group'],)) # 取得該 group 計數
 
             
