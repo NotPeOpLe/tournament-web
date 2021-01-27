@@ -49,8 +49,16 @@
                             <input type="text" name="id" class="form-control" id="add-staff-id" autocomplete="off" pattern="[0-9]{0:10}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="add-staff-group">職位:</label>
+                            <label for="add-staff-group">主職位:</label>
                             <select name="group" id="add-staff-group" class="form-select" required>
+                                <option value="2">管理員</option>
+                                <option value="3">裁判</option>
+                                <option value="4">賽評</option>
+                                <option value="5">直播</option>
+                                <option value="6">圖池</option>
+                                <option value="7">美術</option>
+                                <option value="8">測試員</option>
+                                <option value="9">技術人員</option>
                                 <option value="10" selected>工作人員</option>
                             </select>
                         </div>
@@ -58,41 +66,41 @@
                             <label for="add-staff-id">權限:</label>
                             <div class="form-check">
                                 <label for="checkbox-staff" class="form-check-label">STAFF</label>
-                                <input type="checkbox" name="STAFF" value="1" id="checkbox-staff" class="form-check-input" checked>
+                                <input type="checkbox" name="STAFF" value="1" id="checkbox-staff" class="form-check-input staff-checkbox" checked>
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-referee" class="form-check-label">REFFEREE</label>
-                                <input type="checkbox" name="REFFEREE" value="2" id="checkbox-referee" class="form-check-input">
+                                <input type="checkbox" name="REFFEREE" value="2" id="checkbox-referee" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-commentator" class="form-check-label">COMMENTATOR</label>
-                                <input type="checkbox" name="COMMENTATOR" value="4" id="checkbox-srteamer" class="form-check-input">
+                                <input type="checkbox" name="COMMENTATOR" value="4" id="checkbox-commentator" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-srteamer" class="form-check-label">STREAMER</label>
-                                <input type="checkbox" name="STREAMER" value="8" id="checkbox-srteamer" class="form-check-input">
+                                <input type="checkbox" name="STREAMER" value="8" id="checkbox-srteamer" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-mappooler" class="form-check-label">MAPPOOLER</label>
-                                <input type="checkbox" name="MAPPOOLER" value="16" id="checkbox-mappooler" class="form-check-input">
+                                <input type="checkbox" name="MAPPOOLER" value="16" id="checkbox-mappooler" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-gfx" class="form-check-label">GFX</label>
-                                <input type="checkbox" name="GFX" value="32" id="checkbox-gfx" class="form-check-input">
+                                <input type="checkbox" name="GFX" value="32" id="checkbox-gfx" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-admin" class="form-check-label">ADMIN</label>
-                                <input type="checkbox" name="ADMIN" value="64" id="checkbox-admin" class="form-check-input">
+                                <input type="checkbox" name="ADMIN" value="64" id="checkbox-admin" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-tester" class="form-check-label">TESTER</label>
-                                <input type="checkbox" name="TESTER" value="128" id="checkbox-tester" class="form-check-input">
+                                <input type="checkbox" name="TESTER" value="128" id="checkbox-tester" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-tech" class="form-check-label">TECH</label>
-                                <input type="checkbox" name="TECH" value="256" id="checkbox-tech" class="form-check-input">
+                                <input type="checkbox" name="TECH" value="256" id="checkbox-tech" class="form-check-input staff-checkbox">
                             </div>
-                            <input type="hidden" name="privileges" value="1">
+                            <input type="hidden" name="privileges" id="privileges" value="1">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -105,3 +113,35 @@
     </div>
 </div>
 {% endblock main %}
+{% block script %}
+<script>
+    var checkboxStaff = document.getElementById('checkbox-staff');
+    var checkboxReferee = document.getElementById('checkbox-referee');
+    var checkboxCommentator = document.getElementById('checkbox-commentator');
+    var checkboxSrteamer = document.getElementById('checkbox-srteamer');
+    var checkboxMappooler = document.getElementById('checkbox-mappooler');
+    var checkboxGFX = document.getElementById('checkbox-gfx');
+    var checkboxAdmin = document.getElementById('checkbox-Admin');
+    var checkboxTester = document.getElementById('checkbox-tester');
+    var checkboxTech = document.getElementById('checkbox-tech');
+    var inputPrivileges = document.getElementById('privileges');
+
+    $(document).ready(function(){
+        $(document).on('keydown', 'form', function(event) { 
+            return event.key != 'Enter';
+        });
+
+        $('.staff-checkbox').change(function(){
+            var checked_privileges = [].slice.call($('.staff-checkbox:checked'));
+            enabled_privileges = 0;
+            checked_privileges.map(function(element){
+                enabled_privileges += Number(element.value);
+            });
+
+            inputPrivileges.value = enabled_privileges;
+            console.log(enabled_privileges)
+        });
+
+    });
+</script>
+{% endblock script %}
