@@ -187,7 +187,7 @@ class DB(object):
 
     def get_staff(self, user_id=None, format=True, viewall=False):
         if user_id:
-            query = self.query_one('select * from staff where user_id = %s', (user_id,))
+            query = self.query_one('select * from staff where user_id = %s and active = 1', (user_id,))
             return query
 
         va = 'WHERE s.active = 1 ORDER BY s.active, s.id' if not viewall else 'ORDER BY s.id'

@@ -29,6 +29,8 @@ def need_privilege(privilege: Staff):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             user = db.get_staff(session['user_id'])
+            if user == None:
+                return redirect(url_for('tourney.gologin'))
             user_privilege = Staff(user['privileges'])
             if privilege not in user_privilege:
                 flash(f'你沒有 {privilege.name} 權限!', 'danger')
