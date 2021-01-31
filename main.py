@@ -2,6 +2,7 @@ from flag import Staff
 from flask import Flask, render_template, url_for, redirect, send_from_directory, jsonify, request, session
 from blueprints import tourney, api
 from logger import log
+from datetime import datetime
 import re, os, mysql, osuapi
 
 test = 'ABC TEST'
@@ -133,6 +134,10 @@ def num_filter(num):
 @app.template_filter('timef')
 def timef(num):
     return '%d:%02d' % (num//60, num%60)
+
+@app.template_filter('datetime')
+def timef(date_time: datetime, sep='T', timespec='auto'):
+    return date_time.isoformat(sep, timespec)
 
 @app.template_filter('flag_url')
 def flag_url(flag_name: str):
