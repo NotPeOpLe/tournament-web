@@ -1,0 +1,125 @@
+{% extends 'manager/dashboard.html' %}
+{% block title %}比賽基本設定{% endblock title %}
+{% block main %}
+<h1>比賽基本設定</h1>
+<hr>
+<form autocomplete="off" method="POST">
+    <div class="row mb-3">
+        <label for="full_name" class="col-sm-2 col-form-label">比賽全名</label>
+        <div class="col-sm-10">
+            <input type="text" name="full_name" id="full_name" class="form-control" value="{{settings.full_name}}" maxlength="50">
+            <div class="form-text">字限 50 字</div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="acronym" class="col-sm-2 col-form-label">比賽簡稱</label>
+        <div class="col-sm-10">
+            <input type="text" name="acronym" id="acronym" class="form-control" value="{{settings.acronym}}" maxlength="10">
+            <div class="form-text">字限 10 字</div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="register_start_date" class="col-sm-2 col-form-label">報名開始時間</label>
+        <div class="col-sm-10">
+            <input type="datetime-local" name="register_start_date" id="register_start_date" class="form-control" value="{{settings.register_start_date | datetime(timespec='seconds')}}" step="1">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="register_end_date" class="col-sm-2 col-form-label">報名結束時間</label>
+        <div class="col-sm-10">
+            <input type="datetime-local" name="register_end_date" id="register_end_date" class="form-control" value="{{settings.register_end_date | datetime(timespec='seconds')}}" step="1">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="max_team" class="col-sm-2 col-form-label">報名隊伍上限</label>
+        <div class="col-sm-10">
+            <input type="number" name="max_team" id="max_team" class="form-control" value="{{settings.max_team}}">
+            <div class="form-text">0 = 無限制</div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="room_size" class="col-sm-2 col-form-label">預設房間大小</label>
+        <div class="col-sm-10">
+            <input type="number" name="room_size" id="room_size" class="form-control" value="{{settings.room_size}}" min="1" max="16">
+            <div class="form-text">最小 1，最大 16</div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="team_size" class="col-sm-2 col-form-label">預設房間每隊人數</label>
+        <div class="col-sm-10">
+            <input type="number" name="team_size" id="team_size" class="form-control" value="{{settings.team_size}}" min="1" max="8">
+            <div class="form-text">最小 1，最大 8</div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="per_team_players_min" class="col-sm-2 col-form-label">每隊最少人數</label>
+        <div class="col-sm-10">
+            <input type="number" name="per_team_players_min" id="per_team_players_min" class="form-control" value="{{settings.per_team_players_min}}" min="1" max="8">
+            <div class="form-text">最小 1，最大 8</div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="per_team_players_max" class="col-sm-2 col-form-label">每隊最多人數</label>
+        <div class="col-sm-10">
+            <input type="number" name="per_team_players_max" id="per_team_players_max" class="form-control" value="{{settings.per_team_players_max}}" min="1" max="8">
+            <div class="form-text">最小 1，最大 8</div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="game_mode" class="col-sm-2 col-form-label">遊戲模式</label>
+        <div class="col-sm-10">
+            <select name="game_mode" id="game_mode" class="form-select">
+                <option value="0"{% if settings.game_mode == 0 %} selected{% endif %}>Osu</option>
+                <option value="1"{% if settings.game_mode == 1 %} selected{% endif %}>Taiko</option>
+                <option value="2"{% if settings.game_mode == 2 %} selected{% endif %}>Catch</option>
+                <option value="3"{% if settings.game_mode == 3 %} selected{% endif %}>Mania</option>
+            </select>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="win_condition" class="col-sm-2 col-form-label">勝利條件</label>
+        <div class="col-sm-10">
+            <select name="win_condition" id="win_condition" class="form-select">
+                <option value="0"{% if settings.win_condition == 0 %} selected{% endif %}>Score</option>
+                <option value="1"{% if settings.win_condition == 1 %} selected{% endif %}>Accuracy</option>
+                <option value="2"{% if settings.win_condition == 2 %} selected{% endif %}>Combo</option>
+                <option value="3"{% if settings.win_condition == 3 %} selected{% endif %}>Score V2</option>
+            </select>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="team_mode" class="col-sm-2 col-form-label">分組方式</label>
+        <div class="col-sm-10">
+            <select name="team_mode" id="team_mode" class="form-select">
+                <option value="0"{% if settings.team_mode == 0 %} selected{% endif %}>Head To Head</option>
+                <option value="1"{% if settings.team_mode == 1 %} selected{% endif %}>Tag Coop</option>
+                <option value="2"{% if settings.team_mode == 2 %} selected{% endif %}>Team Vs</option>
+                <option value="3"{% if settings.team_mode == 3 %} selected{% endif %}>Tag Team Vs</option>
+            </select>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="timer" class="col-sm-2 col-form-label">預設倒數時間</label>
+        <div class="col-sm-10">
+            <input type="number" name="timer" id="timer" class="form-control" value="{{settings.timer}}" min="0">
+            <div class="form-text">0 = 停用</div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="live_link" class="col-sm-2 col-form-label">直播連結</label>
+        <div class="col-sm-10">
+            <input type="url" name="live_link" id="live_link" class="form-control" value="{{settings.live_link}}">
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="map_sort" class="col-sm-2 col-form-label">圖池分組排序</label>
+        <div class="col-sm-10">
+            <input type="url" name="map_sort" id="map_sort" class="form-control" value="{{settings.map_sort}}">
+            <div class="form-text">ex: NM, HR, HD, DT, FM, TB</div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+
+{% endblock main %}
