@@ -92,12 +92,40 @@ def teams():
     return render_template('manager/teams.html')
 
 
-@tourney.route('/staff/')
+@tourney.route('/staff/', methods=['GET', 'POST'])
 @login_required
 @need_privilege(Staff.ADMIN)
 def staff():
+    view_all = False
+    if 'view_all' in request.args:
+        view_all = True
+    if request.method == 'POST':
+        try:
+            console.log(dict(request.form))
+            postype = request.form['type']
+            user_id = int(request.form['id'])
+            if postype in ('add', 'update'):
+                group = int(request.form['group'])
+                privileges = int(request.form['privileges'])
+                username = osuapi.get(osuapi.V1Path.get_user, u=user_id)[0]['username']
+                if postype == 'add':
+                    if db.query_one("Select user_id from staff where user_id = %s", (user_id,)) == None:
+                        db.query("Insert into staff (user_id, username, group_id, privileges) Values (%s, %s, %s, %s)", (user_id, username, group, privileges))
+                    else:
+                        db.query("Update staff Set group_id = %s, privileges = %s, username = %s, active = 1 Where user_id = %s", (group, privileges, username, user_id))
+                elif postype == 'update':
+                    db.query("Update staff Set group_id = %s, privileges = %s, username = %s Where user_id = %s", (group, privileges, username, user_id))
+            elif postype == 'disable':
+                db.query("Update staff Set active = 0 Where user_id = %s", (user_id,))
+            elif postype == 'enable':
+                db.query("Update staff Set active = 1 Where user_id = %s", (user_id,))
+        except Exception as e:
+            flash(e.args[0], 'danger')
+            log.exception(e)
+        finally:
+            return redirect(url_for('tourney.staff'))
 
-    return render_template('manager/staff.html', staff=db.get_staff(format=False))
+    return render_template('manager/staff.html', staff=db.get_staff(format=False,viewall=view_all), cur_user=db.get_staff(session['user_id']))
 
 
 @tourney.route('/settings/')
