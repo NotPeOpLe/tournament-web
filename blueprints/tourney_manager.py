@@ -79,11 +79,10 @@ def logout():
     return redirect(url_for('index'))
 
 
-@tourney.route('/matchs/')
+@tourney.route('/schedule/')
 @login_required
 def matchs():
-    if session == {}: return redirect(url_for('tourney.gologin'))
-    return render_template('manager/matchs.html')
+    return render_template('manager/schedule.html')
 
 
 @tourney.route('/teams/')
