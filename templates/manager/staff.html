@@ -286,7 +286,6 @@
             });
 
             inputPrivileges.value = enabled_privileges;
-            console.log(enabled_privileges)
         });
         
         $('#staff-manager-group').change(function(){
@@ -324,9 +323,10 @@
                     checkboxStaff.checked = true;
                     break; 
                 default:
-                    return;
+                    break;
             }
-        })
+            setInputPrivileges();
+        });
 
         $('.disable-staff-btn').click(function(){
             var user_id = $(this)[0].getAttribute('data-staff-id');
