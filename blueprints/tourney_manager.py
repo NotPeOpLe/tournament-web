@@ -108,7 +108,7 @@ def settings():
 
 
 @tourney.route('/mappool/')
-@tourney.route('/mappool/<round_id>', methods=['GET', 'POST', 'DELETE', 'PATCH'])
+@tourney.route('/mappool/<round_id>', methods=['GET', 'POST'])
 @login_required
 @need_privilege((Staff.MAPPOOLER))
 def mappool(round_id=None):
