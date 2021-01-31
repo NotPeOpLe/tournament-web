@@ -2,7 +2,15 @@
 {% block title %}人員管理{% endblock title %}
 {% block main %}
 <h1>工作人員</h1>
-<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-staff-modal">Add staff</button>
+<button class="btn btn-primary add-staff-btn" data-bs-toggle="modal" data-bs-target="#staff-manager-modal">Add staff</button>
+
+<div class="text-end">
+    <label for="checkbox-view-all">顯示已停用的Staff</label>
+    <input type="checkbox" id="checkbox-view-all" class="form-check-inline me-1">
+</div>
+
+<hr>
+
 <div class="table-responsive">
     <table class="table table-hover text-nowrap">
         <thead>
@@ -18,7 +26,7 @@
         </thead>
         <tbody>
             {% for s in staff %}
-            <tr>
+            <tr {% if s.active == 0 %}class="disabled-staff"{% endif %}>
                 <td>{{s.id}}</td>
                 <td>{{s.user_id}}</td>
                 <td><img src="https://a.ppy.sh/{{s.user_id}}" alt="{{s.username}}" width="40"></td>
@@ -26,7 +34,18 @@
                 <td>{{s.ch_name}}</td>
                 <td data-bs-toggle="tooltip" data-bs-placement="top" title="{{s.privileges | privilege}}">{{s.privileges}}</td>
                 <td>
-                    <button class="btn btn-warning">編輯</button>
+                    {% if s.user_id != session.user_id %}
+                    {% if s.name != 'host' %}
+                    {% if s.name != 'admin' or cur_user.group_id == 1 %}
+                    <button class="btn btn-sm btn-warning edit-staff-btn" data-bs-toggle="modal" data-bs-target="#staff-manager-modal" data-staff-id="{{s.user_id}}" data-staff-g="{{s.name}}" data-staff-p="{{s.privileges}}">編輯</button>
+                    {% if s.active == 1 %}
+                    <button class="btn btn-sm btn-danger disable-staff-btn" data-bs-toggle="modal" data-bs-target="#disable-staff" data-staff-id="{{s.user_id}}" data-staff-name="{{s.username}}">停用</button>
+                    {% else %}
+                    <button class="btn btn-sm btn-success enable-staff-btn" data-staff-id="{{s.user_id}}">啟用</button>
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -34,23 +53,25 @@
     </table>
 </div>
 
-<div class="modal fade"  tabindex="-1" id="add-staff-modal" aria-labelledby="add-staff-modal-label" aria-hidden="true">
+<div class="modal fade"  tabindex="-1" id="staff-manager-modal" aria-labelledby="staff-manager-modal-label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="add-staff-modal-label">Add Staff</h5>
+                    <h5 class="modal-title" id="staff-manager-modal-label">Add Staff</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST">
+                    <form method="POST" id="staff-manager-form">
+                        <input type="hidden" name="type" class="form-control" id="staff-manager-postype" value="add" required>
                         <div class="mb-3">
-                            <label for="add-staff-id">Osu User ID:</label>
-                            <input type="text" name="id" class="form-control" id="add-staff-id" autocomplete="off" pattern="[0-9]{0:10}" required>
+                            <label for="staff-manager-id">Osu User ID:</label>
+                            <input type="text" name="id" class="form-control" id="staff-manager-id" autocomplete="off" pattern="\d+" required>
                         </div>
                         <div class="mb-3">
-                            <label for="add-staff-group">主職位:</label>
-                            <select name="group" id="add-staff-group" class="form-select" required>
+                            <label for="staff-manager-group">主職位:</label>
+                            <select name="group" id="staff-manager-group" class="form-select" required>
+                                <option value="1" style="display: none;">主辦</option>
                                 <option value="2">管理員</option>
                                 <option value="3">裁判</option>
                                 <option value="4">賽評</option>
@@ -63,42 +84,46 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="add-staff-id">權限:</label>
+                            <label for="staff-manager-id">權限:</label>
                             <div class="form-check">
                                 <label for="checkbox-staff" class="form-check-label">STAFF</label>
-                                <input type="checkbox" name="STAFF" value="1" id="checkbox-staff" class="form-check-input staff-checkbox" checked>
+                                <input type="checkbox" value="1" id="checkbox-staff" class="form-check-input staff-checkbox" checked>
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-referee" class="form-check-label">REFFEREE</label>
-                                <input type="checkbox" name="REFFEREE" value="2" id="checkbox-referee" class="form-check-input staff-checkbox">
+                                <input type="checkbox" value="2" id="checkbox-referee" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-commentator" class="form-check-label">COMMENTATOR</label>
-                                <input type="checkbox" name="COMMENTATOR" value="4" id="checkbox-commentator" class="form-check-input staff-checkbox">
+                                <input type="checkbox" value="4" id="checkbox-commentator" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-srteamer" class="form-check-label">STREAMER</label>
-                                <input type="checkbox" name="STREAMER" value="8" id="checkbox-srteamer" class="form-check-input staff-checkbox">
+                                <input type="checkbox" value="8" id="checkbox-srteamer" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-mappooler" class="form-check-label">MAPPOOLER</label>
-                                <input type="checkbox" name="MAPPOOLER" value="16" id="checkbox-mappooler" class="form-check-input staff-checkbox">
+                                <input type="checkbox" value="16" id="checkbox-mappooler" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-gfx" class="form-check-label">GFX</label>
-                                <input type="checkbox" name="GFX" value="32" id="checkbox-gfx" class="form-check-input staff-checkbox">
+                                <input type="checkbox" value="32" id="checkbox-gfx" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-admin" class="form-check-label">ADMIN</label>
-                                <input type="checkbox" name="ADMIN" value="64" id="checkbox-admin" class="form-check-input staff-checkbox">
+                                <input type="checkbox" value="64" id="checkbox-admin" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-tester" class="form-check-label">TESTER</label>
-                                <input type="checkbox" name="TESTER" value="128" id="checkbox-tester" class="form-check-input staff-checkbox">
+                                <input type="checkbox" value="128" id="checkbox-tester" class="form-check-input staff-checkbox">
                             </div>
                             <div class="form-check">
                                 <label for="checkbox-tech" class="form-check-label">TECH</label>
-                                <input type="checkbox" name="TECH" value="256" id="checkbox-tech" class="form-check-input staff-checkbox">
+                                <input type="checkbox" value="256" id="checkbox-tech" class="form-check-input staff-checkbox">
+                            </div>
+                            <div class="form-check" style="display: none;">
+                                <label for="checkbox-host" class="form-check-label">HOST</label>
+                                <input type="checkbox" value="512" id="checkbox-host" class="form-check-input staff-checkbox">
                             </div>
                             <input type="hidden" name="privileges" id="privileges" value="1">
                         </div>
@@ -112,6 +137,35 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="disable-staff" tabindex="-1" aria-labelledby="disable-staff-label" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="disable-staff-label">Disable Staff</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          你確定要停用 <span id="disable-staff-id"></span> 嗎?
+        </div>
+        <div class="modal-footer">
+            <form method="POST">
+                <input type="hidden" name="type" value="disable">
+                <input type="hidden" name="id" id="disable-staff-id-input">
+                <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-danger">停用</button>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+
+<form method="POST" id="enable-staff">
+    <input type="hidden" name="type" value="enable">
+    <input type="hidden" name="id" id="enable-staff-id-input">
+    <button type="reset" style="display: none;"></button>
+    <button type="submit" style="display: none;"></button>
+</form>
 {% endblock main %}
 {% block script %}
 <script>
@@ -121,14 +175,107 @@
     var checkboxSrteamer = document.getElementById('checkbox-srteamer');
     var checkboxMappooler = document.getElementById('checkbox-mappooler');
     var checkboxGFX = document.getElementById('checkbox-gfx');
-    var checkboxAdmin = document.getElementById('checkbox-Admin');
+    var checkboxAdmin = document.getElementById('checkbox-admin');
     var checkboxTester = document.getElementById('checkbox-tester');
     var checkboxTech = document.getElementById('checkbox-tech');
+    var checkboxHost = document.getElementById('checkbox-host');
     var inputPrivileges = document.getElementById('privileges');
+    
+    var STAFF = {
+        Staff : 1,
+        Refferee : 2,
+        Commentator : 4,
+        Streamer : 8,
+        Mappooler : 16,
+        GFX : 32,
+        Admin : 64,
+        Tester : 128,
+        Tech : 256,
+        Host : 512
+    }
+    
+    var GROUP = {
+        host : 1,
+        admin : 2,
+        referee : 3,
+        commentator : 4,
+        steamer : 5,
+        mappooler : 6,
+        GFX : 7,
+        tester : 8,
+        tech : 9,
+        staff : 10
+    }
+
+    function getPrivilege( staff ) {
+        var selected = [];
+      
+        // The perens are needed around the bitwise operation due to the
+        // greater operator precedence of `===`
+        if ( (staff & STAFF.Staff) === STAFF.Staff ) selected.push('Staff');
+        if ( (staff & STAFF.Refferee) === STAFF.Refferee ) selected.push('Refferee');
+        if ( (staff & STAFF.Commentator) === STAFF.Commentator ) selected.push('Commentator');
+        if ( (staff & STAFF.Streamer) === STAFF.Streamer ) selected.push('Streamer');
+        if ( (staff & STAFF.Mappooler) === STAFF.Mappooler ) selected.push('Mappooler');
+        if ( (staff & STAFF.GFX) === STAFF.GFX ) selected.push('GFX');
+        if ( (staff & STAFF.Admin) === STAFF.Admin ) selected.push('Admin');
+        if ( (staff & STAFF.Tester) === STAFF.Tester ) selected.push('Tester');
+        if ( (staff & STAFF.Tech) === STAFF.Tech ) selected.push('Tech');
+        if ( (staff & STAFF.Host) === STAFF.Host ) selected.push('Host');
+      
+        return selected;
+    };
+
+    function setPrivilege( staff ) {
+        // The perens are needed around the bitwise operation due to the
+        // greater operator precedence of `===`
+        $('.staff-checkbox:checked').click();
+        if ( (staff & STAFF.Staff) === STAFF.Staff ) checkboxStaff.checked = true;
+        if ( (staff & STAFF.Refferee) === STAFF.Refferee ) checkboxReferee.checked = true;
+        if ( (staff & STAFF.Commentator) === STAFF.Commentator ) checkboxCommentator.checked = true;
+        if ( (staff & STAFF.Streamer) === STAFF.Streamer ) checkboxSrteamer.checked = true;
+        if ( (staff & STAFF.Mappooler) === STAFF.Mappooler ) checkboxMappooler.checked = true;
+        if ( (staff & STAFF.GFX) === STAFF.GFX ) checkboxGFX.checked = true;
+        if ( (staff & STAFF.Admin) === STAFF.Admin ) checkboxAdmin.checked = true;
+        if ( (staff & STAFF.Tester) === STAFF.Tester ) checkboxTester.checked = true;
+        if ( (staff & STAFF.Tech) === STAFF.Tech ) checkboxTech.checked = true;
+        if ( (staff & STAFF.Host) === STAFF.Host ) checkboxHost.checked = true;
+        setInputPrivileges();
+        return;
+    };
+
+    function setInputPrivileges() {
+        var checked_privileges = [].slice.call($('.staff-checkbox:checked'));
+        enabled_privileges = 0;
+        checked_privileges.map(function(element){
+            enabled_privileges += Number(element.value);
+        });
+
+        inputPrivileges.value = enabled_privileges;
+    };
 
     $(document).ready(function(){
         $(document).on('keydown', 'form', function(event) { 
             return event.key != 'Enter';
+        });
+
+        $('.add-staff-btn').click(function(){
+            $('#staff-manager-form')[0].reset();
+            $('#staff-manager-postype').val('add');
+            $('#staff-manager-modal-label').text('Add Staff');
+            $('#staff-manager-id').attr('readonly', null);
+        });
+
+        $('.edit-staff-btn').click(function(){
+            var id = $(this)[0].getAttribute('data-staff-id');
+            var g = $(this)[0].getAttribute('data-staff-g');
+            var p = $(this)[0].getAttribute('data-staff-p');
+            $('#staff-manager-form')[0].reset();
+            $('#staff-manager-postype').val('update');
+            $('#staff-manager-modal-label').text('Edit Staff');
+            $('#staff-manager-id').attr('readonly', true).val(id);
+            $('#staff-manager-group').val(GROUP[g]);
+            setPrivilege(Number(p));
         });
 
         $('.staff-checkbox').change(function(){
@@ -141,7 +288,72 @@
             inputPrivileges.value = enabled_privileges;
             console.log(enabled_privileges)
         });
+        
+        $('#staff-manager-group').change(function(){
+            var group = Number($(this).val())
+            $('.staff-checkbox:checked').click();
+            switch (group) {
+                case GROUP.host:
+                    checkboxHost.checked = true;
+                    break;
+                case GROUP.admin:
+                    checkboxAdmin.checked = true;
+                    break;
+                case GROUP.referee:
+                    checkboxReferee.checked = true;
+                    break;
+                case GROUP.commentator:
+                    checkboxCommentator.checked = true;
+                    break;    
+                case GROUP.steamer:
+                    checkboxSrteamer.checked = true;
+                    break;  
+                case GROUP.mappooler:
+                    checkboxMappooler.checked = true;
+                    break;  
+                case GROUP.GFX:
+                    checkboxGFX.checked = true;
+                    break;  
+                case GROUP.tester:
+                    checkboxTester.checked = true;
+                    break;
+                case GROUP.tech:
+                    checkboxTech.checked = true;
+                    break; 
+                case GROUP.staff:
+                    checkboxStaff.checked = true;
+                    break; 
+                default:
+                    return;
+            }
+        })
 
+        $('.disable-staff-btn').click(function(){
+            var user_id = $(this)[0].getAttribute('data-staff-id');
+            var username = $(this)[0].getAttribute('data-staff-name');
+            $('#disable-staff-id').text(username);
+            $('#disable-staff-id-input').val(user_id);
+        });
+
+        $('.enable-staff-btn').click(function(){
+            var user_id = $(this)[0].getAttribute('data-staff-id');
+            $('#enable-staff-id-input').val(user_id);
+            $('#enable-staff').submit();
+        });
+
+        var search_params = new URLSearchParams(location.search)
+        if (search_params.has('view_all')){
+            document.getElementById('checkbox-view-all').checked = true;
+        }
+
+        $('#checkbox-view-all').click(function(){
+            var checked = $(this)[0].checked
+            if (checked) {
+                location.search = '?view_all=True';
+            } else {
+                location.search = '';
+            }
+        });
     });
 </script>
 {% endblock script %}
