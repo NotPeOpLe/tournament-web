@@ -100,10 +100,10 @@ def staff():
     return render_template('manager/staff.html', staff=db.get_staff(format=False))
 
 
-@tourney.route('/settings')
+@tourney.route('/settings/')
 @login_required
 def settings():
-    return render_template('manager/settings.html')
+    return render_template('manager/settings.html', settings=db.query_one('select * from tourney where id = 1'))
 
 
 @tourney.route('/mappool/')
