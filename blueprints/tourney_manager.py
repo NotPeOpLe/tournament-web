@@ -130,7 +130,7 @@ def mappool(round_id=None):
 
             # sql 取得的訊息
             round_info = db.query_one('select * from round where id = %s', (round_id,)) # Round 資料
-            if not round_info['pool_publish']:
+            if round_info['pool_publish'] == 1:
                 raise Exception('此階段圖池已公布，無法進行變動!')
             modcount = db.query_one('SELECT `group`, COUNT(*) AS `count` FROM mappool WHERE round_id = 1 and `group` = %s', (request.form['group'],)) # 取得該 group 計數
 
@@ -161,7 +161,7 @@ def mappool(round_id=None):
             flash(info, 'success')
         except Exception as e:
             # 錯誤訊息
-            flash(e.args, 'danger')
+            flash(e.args[0], 'danger')
             log.exception(e)
         finally:
             return redirect(url_for('tourney.mappool', round_id=round_id))
