@@ -144,7 +144,7 @@ def settings():
 @tourney.route('/mappool/')
 @tourney.route('/mappool/<round_id>', methods=['GET', 'POST'])
 @login_required
-@need_privilege((Staff.MAPPOOLER))
+@need_privilege(Staff.MAPPOOLER)
 def mappool(round_id=None):
     if round_id == None: return redirect(url_for('tourney.mappool', round_id=1))
     
@@ -185,7 +185,6 @@ def mappool(round_id=None):
 
             # debug
             log.debug(dict(request.form))
-            console.log('', log_locals=True)
             # 圖譜插入至SQL
             db.query('insert into mappool (`round_id`, `beatmap_id`, `group`, `code`, `mods`, `info`, `note`, `nominator`) values (%s, %s, %s, %s, %s, %s, %s, %s)',
                 (int(round_id), int(beatmap_id), group, modcount['count']+1, use_mods, json.dumps(beatmap), note, poster))
