@@ -28,7 +28,7 @@ def need_privilege(privilege: Staff):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            user = db.get_staff(session['user_id'])
+            user = db.get_staff(user_id=session['user_id'])
             if user == None:
                 return redirect(url_for('tourney.gologin'))
             user_privilege = Staff(user['privileges'])
@@ -65,7 +65,7 @@ def callback():
         u = osuapi.get_token(request.args['code'])
         try:
             user = osuapi.get2(u['access_token'], me='')
-            sql = db.get_staff(user['id'])
+            sql = db.get_staff(user_id=user['id'])
             if user['id'] == sql['user_id']:
                 login(sql)
                 return redirect(url_for('tourney.dashboard'))
@@ -127,7 +127,7 @@ def staff():
         finally:
             return redirect(url_for('tourney.staff'))
 
-    return render_template('manager/staff.html', staff=db.get_staff(format=False,viewall=view_all), cur_user=db.get_staff(session['user_id']))
+    return render_template('manager/staff.html', staff=db.get_staff(format=False,viewall=view_all), cur_user=db.get_staff(user_id=session['user_id']))
 
 
 @tourney.route('/settings/')
