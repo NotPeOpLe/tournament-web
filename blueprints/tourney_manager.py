@@ -40,6 +40,11 @@ def need_privilege(privilege: Staff):
     return decorator
 
 
+def check_privilege(id, privilege: Staff):
+    user = db.get_staff(staff_id=id)
+    user_privilege = Staff(user['privileges'])
+    return bool(privilege in user_privilege)
+
 @tourney.route('/')
 @login_required
 def dashboard():
