@@ -174,8 +174,8 @@ class DB(object):
             """
         if round_id or id:
             query_text += " WHERE "
-            if round_id: query_text += "round_id = %s " % round_id
-            if id: query_text += "id = %s " % id
+            if round_id: query_text += "m.round_id = %s " % round_id
+            if id: query_text += "m.id = %d " % id
         matchs = []
         query = self.query_all(query_text)
         for m in query:
