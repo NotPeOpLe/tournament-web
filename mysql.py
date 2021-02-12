@@ -159,7 +159,7 @@ class DB(object):
             'mp_link', m.mp_link,
             'video_link', m.video_link,
             'live', (m.date < NOW()),
-            'loser', (m.loser = m.loser),
+            'loser', (m.loser = 1),
             'stats', m.stats,
             'note', m.note,
             'winpoint', CEIL(r.best_of/2+1)
