@@ -3,5 +3,107 @@
 {% block main %}
 <h1>比賽排程管理</h1>
 <hr>
-
+<div class=" table-responsive">
+    <table class="table table-sm table-hover text-nowrap align-middle user-select-none">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Team1</th>
+                <th>Team2</th>
+                <th>Ref</th>
+                <th>Streamer</th>
+                <th>Comm1</th>
+                <th>Comm2</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in matchs %}
+            <tr>
+                <td width="1">{{m.id}}</td>
+                <td>{{m.date if m.date is not none else 'no set'}}</td>
+                <td>{{m.team1.full_name if m.team1.full_name is not none else ''}}</td>
+                <td>{{m.team2.full_name if m.team2.full_name is not none else ''}}</td>
+                <td>{{m.referee.username if m.referee.username is not none else ''}}</td>
+                <td>{{m.streamer.username if m.streamer.username is not none else ''}}</td>
+                <td>{{m.commentator.username if m.commentator.username is not none else ''}}</td>
+                <td>{{m.commentator2.username if m.commentator2.username is not none else ''}}</td>
+                <td>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-secondary" id="staff-menu" data-bs-toggle="dropdown" aria-expanded="false" {% if m.stats > 0 %}disabled{% endif %}>
+                            <i class="bi bi-menu-app-fill"></i>
+                            <span class="visually-hidden">Menu</span>
+                        </button>
+                        <ul class="dropdown-menu" data-id="{{ m.id }}" aria-labelledby="staff-menu">
+                            {% if m.stats < 1 %}
+                            {% if m.referee.username and m.streamer.username and m.commentator.username and m.commentator2.username %}
+                            <span class="px-2 py-1 text-muted">該場次沒有工作可接</span>
+                            {% endif %}
+                            {% if m.referee.username is none %}
+                            <li><button class="dropdown-item job_action ref get" type="button">接裁判工作</button></li>
+                            {% endif %}
+                            {% if m.streamer.username is none %}
+                            <li><button class="dropdown-item job_action stream get" type="button">接直播工作</button></li>
+                            {% endif %}
+                            {% if (m.commentator.username is none) or (m.commentator2.username is none) %}
+                            <li><button class="dropdown-item job_action comm get" type="button">接賽評工作</button></li>
+                            {% endif %}
+                            {% if m.referee.id == staff.id %}
+                            <li><button class="dropdown-item job_action ref remove text-danger" type="button">解除裁判工作</button></li>
+                            {% endif %}
+                            {% if m.streamer.id == staff.id %}
+                            <li><button class="dropdown-item job_action stream remove text-danger" type="button">解除直播工作</button></li>
+                            {% endif %}
+                            {% if (m.commentator.id == staff.id) or (m.commentator2.id == staff.id) %}
+                            <li><button class="dropdown-item job_action comm remove text-danger" type="button">解除賽評工作</button></li>
+                            {% endif %}
+                            {% else %}
+                            <span class="px-2 py-1 text-muted">該場次已結束</span>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock main %}
+
+{% block script %}
+<script>
+    function job_action(id, job, action) {
+        var vform = document.createElement("form");
+        vform.method = "post";
+        vform.style.display = "none";
+
+        var opt = document.createElement("input");
+        opt.name = "id";
+        opt.value = id;
+        vform.appendChild(opt);
+
+        var opt2 = document.createElement("input");
+        opt2.name = "job";
+        opt2.value = job;
+        vform.appendChild(opt2);
+
+        var opt3 = document.createElement("input");
+        opt3.name = "action";
+        opt3.value = action;
+        vform.appendChild(opt3);
+
+        document.body.appendChild(vform);
+        vform.submit();
+    }
+
+    $(document).ready(function(){
+        $(".job_action").click(function(){
+            var id = $(this)[0].parentElement.parentElement.dataset.id;
+            var job = $(this)[0].classList[2];
+            var action = $(this)[0].classList[3];
+            job_action(id, job, action);
+        });
+    });
+</script>
+{% endblock script %}
