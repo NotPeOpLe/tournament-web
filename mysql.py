@@ -147,12 +147,11 @@ class DB(object):
         query_text = """SELECT JSON_OBJECT(
             'id', m.id,
             'code', m.code,
+            'date', DATE_FORMAT(m.date, '%Y-%m-%d %H:%i'),
             'round', JSON_OBJECT('id', r.id, 'name', r.name, 'description', r.description, 'best_of', r.best_of, 'start_date', DATE_FORMAT(r.start_date, '%Y-%m-%d %H:%i')),
             'team1', JSON_OBJECT('id', t1.id, 'full_name', t1.full_name, 'flag_name', t1.flag_name, 'acronym', t1.acronym, 'score', m.team1_score),
             'team2', JSON_OBJECT('id', t2.id, 'full_name', t2.full_name, 'flag_name', t2.flag_name, 'acronym', t2.acronym, 'score', m.team2_score),
-            'date', DATE_FORMAT(m.date, '%Y-%m-%d %H:%i'),
             'referee', JSON_OBJECT('id', ref.id, 'group_id', ref.group_id, 'user_id', ref.user_id, 'username', ref.username),
-            'referee2', JSON_OBJECT('id', ref2.id, 'group_id', ref2.group_id, 'user_id', ref2.user_id, 'username', ref2.username),
             'streamer', JSON_OBJECT('id', str.id, 'group_id', str.group_id, 'user_id', str.user_id, 'username', str.username),
             'commentator', JSON_OBJECT('id', com.id, 'group_id', com.group_id, 'user_id', com.user_id, 'username', com.username),
             'commentator2', JSON_OBJECT('id', com2.id, 'group_id', com2.group_id, 'user_id', com2.user_id, 'username', com2.username),
@@ -169,7 +168,6 @@ class DB(object):
             LEFT JOIN team t1 ON t1.id = m.team1
             LEFT JOIN team t2 ON t2.id = m.team2
             LEFT JOIN staff ref ON ref.id = m.referee
-            LEFT JOIN staff ref2 ON ref2.id = m.referee2
             LEFT JOIN staff str ON str.id = m.streamer
             LEFT JOIN staff com ON com.id = m.commentator
             LEFT JOIN staff com2 ON com2.id = m.commentator2
