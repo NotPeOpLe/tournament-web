@@ -135,9 +135,22 @@ def staff():
     return render_template('manager/staff.html', staff=db.get_staff(format=False,viewall=view_all), cur_user=db.get_staff(user_id=session['user_id']))
 
 
-@tourney.route('/settings/')
+@tourney.route('/settings/', methods=['GET', 'POST'])
 @login_required
+@need_privilege(Staff.HOST)
 def settings():
+    if request.method == 'POST':
+        if len(request.form):
+            update_text = ''
+            for k, v in request.form.items():
+                if v.isdigit():
+                    update_text += f"{k}={v},"
+                else:
+                    update_text += f"{k}='{v}',"
+            
+            db.query(f"UPDATE tourney SET {update_text[:-1]} WHERE id = 1")
+            flash('儲存成功', 'success')
+            return redirect(url_for('tourney.settings'))
     return render_template('manager/settings.html', settings=db.query_one('select * from tourney where id = 1'))
 
 
