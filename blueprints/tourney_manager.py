@@ -307,11 +307,33 @@ def rounds():
 
 @tourney.route('/rounds/<round_id>/update', methods=['POST'])
 def rounds_update(round_id):
-    return
+    s_round = get('round', round_id)
+    c_round = dict(
+        id=request.form.get('id', type=int),
+        name=request.form.get('name', type=str),
+        description=request.form.get('description', None, str),
+        best_of=request.form.get('best_of', type=int),
+        start_date=request.form.get('start_date', None, str),
+        pool_publish=request.form.get('pool_publish', 0, int)
+    )
+
+    try:
+        db.update('round', ('id', round_id), **dict_cmp(c_round, s_round))
+        flash('RoundID: {} 已更新'.format(round_id), 'success')
+        return redirect(url_for('tourney.rounds'))
+    except Exception as e:
+        flash('發生錯誤: {}'.format(e.args), 'danger')
+        return redirect(url_for('tourney.rounds'))
 
 @tourney.route('/rounds/<round_id>/delete', methods=['POST'])
 def rounds_delete(round_id):
-    return
+    try:
+        db.query("DELETE FROM `round` WHERE id = %s;", [round_id])
+        flash('RoundID: {} 已刪除'.format(round_id), 'success')
+        return redirect(url_for('tourney.rounds'))
+    except Exception as e:
+        flash('發生錯誤: {}'.format(e.args), 'danger')
+        return redirect(url_for('tourney.rounds'))
 
 @tourney.route('/staff/', methods=['GET', 'POST'])
 @login_required
