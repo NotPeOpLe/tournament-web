@@ -288,22 +288,38 @@ def teams():
 
 @tourney.route('/rounds/', methods=['GET', 'POST'])
 def rounds():
-    pool_group_count = db.query_all("""
-        SELECT m.round_id, m.`group`, COUNT(m.`group`) 'count', g.badge_color
-        FROM mappool m
-        LEFT JOIN map_group g ON g.`name` = m.`group`
-        GROUP BY m.round_id, m.`group`
-        ORDER BY FIELD(m.`group`, 'TB', 'EZ', 'Roll', 'DT', 'HR', 'HD', 'NM', 'FM') DESC""")
-    rounds=get('round','*')
+    if request.method == 'GET':
+        pool_group_count = db.query_all("""
+            SELECT m.round_id, m.`group`, COUNT(m.`group`) 'count', g.badge_color
+            FROM mappool m
+            LEFT JOIN map_group g ON g.`name` = m.`group`
+            GROUP BY m.round_id, m.`group`
+            ORDER BY FIELD(m.`group`, 'TB', 'EZ', 'Roll', 'DT', 'HR', 'HD', 'NM', 'FM') DESC""")
+        rounds=get('round','*')
 
-    for p in pool_group_count:
-        for r in rounds:
-            if not r.get('pool_overview'):
-                r['pool_overview'] = []
-            if r['id'] == p['round_id']:
-                r['pool_overview'].append({'group': p['group'], 'count': p['count'], 'badge_color': p['badge_color']})
+        for p in pool_group_count:
+            for r in rounds:
+                if not r.get('pool_overview'):
+                    r['pool_overview'] = []
+                if r['id'] == p['round_id']:
+                    r['pool_overview'].append({'group': p['group'], 'count': p['count'], 'badge_color': p['badge_color']})
 
-    return render_template('manager/rounds.html', rounds=rounds)
+        return render_template('manager/rounds.html', rounds=rounds)
+    elif request.method == 'POST':
+        values = (
+            request.form.get('name', type=str),
+            request.form.get('description', None, str),
+            request.form.get('best_of', type=int),
+            request.form.get('start_date', type=str)
+        )
+        try:
+            db.query("INSERT INTO `round` (name, description, best_of, start_date) VALUES (%s, %s, %s, %s)", values)
+            flash('Round: {} 新增成功'.format(values[0]), 'success')
+            return redirect(url_for('tourney.rounds'))
+        except Exception as e:
+            flash('發生錯誤: {}'.format(e.args), 'danger')
+            return redirect(url_for('tourney.rounds'))
+
 
 @tourney.route('/rounds/<round_id>/update', methods=['POST'])
 def rounds_update(round_id):
