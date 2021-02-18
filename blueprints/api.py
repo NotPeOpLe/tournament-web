@@ -1,5 +1,6 @@
+from functools import wraps
 from types import resolve_bases
-from flask import Blueprint, json, render_template, jsonify, Response, abort
+from flask import Blueprint, render_template, jsonify, Response, abort, session, redirect, url_for
 from werkzeug.exceptions import HTTPException
 from pymysql.err import *
 import mysql
@@ -15,7 +16,16 @@ funs = {
     'get_staff': db.get_staff,
 }
 
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session == {}:
+            abort(400, 'no session')
+        return f(*args, **kwargs)
+    return decorated_function
+
 @api.route('/show/<table_name>')
+@login_required
 def show_data(table_name):
     def sql():
         try:
@@ -29,8 +39,19 @@ def show_data(table_name):
         return jsonify(funs.get(table_name, sql)())
     else:
         abort(404)
-    
-    
+
+@api.route('/data/<table_name>/<id>')
+@login_required
+def getdata(table_name:str, id:str):
+    if table_name in ('game', 'group', 'map_group', 'mappool', 'match', 'player', 'round', 'staff', 'team', 'tourney', 'view_staff'):
+        if id.isdigit():
+            return jsonify(data=db.query_one('select * from `%s` where id = %s limit 1' % (table_name, id)))
+        elif id == '*':
+            return jsonify(data=db.query_all('select * from `%s`' % table_name))
+        else:
+            abort(404)
+    else:
+        abort(404)
 
 @api.errorhandler(HTTPException)
 def handle_exception(e):
