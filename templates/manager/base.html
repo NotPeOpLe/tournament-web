@@ -445,7 +445,7 @@
             {% endwith %}
             <div class="col">
               <!-- Page pre-title -->
-              <h1 class="page-title">{{self.title()}}</h1>
+              <h1 class="page-title">{% block page_title %}{{self.title()}}{% endblock %}</h1>
             </div>
             <!-- Page title actions -->
             <div class="col-auto ms-auto d-print-none">
@@ -457,11 +457,9 @@
             </div>
           </div>
         </div>
-        <div>
-          {% block content %}
-          內容
-          {% endblock content %}
-        </div>
+        {% block content %}
+        內容
+        {% endblock content %}
       </div>
       <footer class="footer footer-transparent d-print-none">
         <div class="container">
