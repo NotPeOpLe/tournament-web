@@ -150,8 +150,12 @@ def timef(num):
     return '%d:%02d' % (num//60, num%60)
 
 @app.template_filter('datetime')
-def timef(date_time: datetime, sep='T', timespec='auto'):
+def dtf(date_time: datetime, sep='T', timespec='auto'):
     return date_time.isoformat(sep, timespec)
+
+@app.template_filter('strdtf')
+def strdtf(str_dt: str, sep='T', timespec='auto'):
+    return datetime.fromisoformat(str_dt).isoformat(sep, timespec)
 
 @app.template_filter('flag_url')
 def flag_url(flag_name: str):
