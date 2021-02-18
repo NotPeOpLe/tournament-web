@@ -1,7 +1,7 @@
 {% extends 'manager/base.html' %}
 {% block title %}階段設定{% endblock title %}
 {% block actions %}
-<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#round-modal">
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-round-modal">
     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     新增階段
 </button>
@@ -41,7 +41,7 @@
                             {% endfor %}
                         </div>
                     </td>
-                    <td class="w-1">{{ r.pool_publish == 1 }}</td>
+                    <td class="w-1">{% if r.pool_publish == 1 %}<span class="text-green">Yes</span>{% else %}<span class="text-danger">No</span>{% endif %}</td>
                     <td class="w-1">
                         <div class="text-end">
                             <button type="button" class="btn dropdown-toggle align-text-top" id="staff-menu" data-bs-toggle="dropdown" aria-expanded="false">
@@ -62,9 +62,8 @@
                                 <span>選項</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end" data-id="32" aria-labelledby="staff-menu">
-                                <li><button class="dropdown-item" type="button">公佈圖池</button></li>
-                                <li><button class="dropdown-item text-primary" type="button" data-bs-toggle="modal" data-bs-target="#round-modal">修改</button></li>
-                                <li><button class="dropdown-item text-danger" type="button">刪除</button></li>
+                                <li><button class="dropdown-item text-primary ubtn" type="button" data-bs-toggle="modal" data-bs-target="#update-round-modal" data-id="{{r.id}}">修改</button></li>
+                                <li><button class="dropdown-item text-danger dbtn" type="button" data-bs-toggle="modal" data-bs-target="#del-round-modal" data-id="{{r.id}}">刪除</button></li>
                             </ul>
                         </div>
                     </td>
@@ -74,9 +73,154 @@
         </table>
     </div>
 </div>
+<!-- 新增 Round Modal -->
+<div class="modal modal-blur fade" id="add-round-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">新增 Round</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="." method="post" id="add-round-form" autocomplete="off">
+                    <div class="mb-3">
+                        <label class="form-label required">Round 名字</label>
+                        <input type="text" class="form-control" name="name" maxlength="50" placeholder="給Round一個名字 (例: 決賽)" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">簡述</label>
+                        <input type="text" class="form-control" name="description" maxlength="50" placeholder="(可選) 簡單備註">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label required">Best Of</label>
+                        <input type="number" class="form-control" name="best_of" min="0" value="9" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label required">開始時間</label>
+                        <input type="datetime-local" class="form-control" name="start_date" step="1" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" form="add-round-form" class="btn me-auto" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="add-round-form" class="btn btn-primary">新增</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 修改 Round Modal -->
+<div class="modal modal-blur fade" id="update-round-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">修改 Round</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post" id="update-round-form" autocomplete="off">
+                    <input type="hidden" name="id" id="u-id">
+                    <div class="mb-3">
+                        <label class="form-label required">Round 名字</label>
+                        <input type="text" class="form-control" id="u-name" name="name" maxlength="50" placeholder="給Round一個名字 (例: 決賽)" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">簡述</label>
+                        <input type="text" class="form-control" id="u-description" name="description" maxlength="50" placeholder="(可選) 簡單備註">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label required">Best Of</label>
+                        <input type="number" class="form-control" id="u-best_of" name="best_of" min="0" value="9" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label required">開始時間</label>
+                        <input type="datetime-local" class="form-control" id="u-start_date"  name="start_date" step="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="u-pool_publish" name="pool_publish" value="1">
+                            <span class="form-check-label">公佈圖池</span>
+                        </label>
+                    </div>
+                    <div id="spinner" style="display: none;">
+                        <div class="spinner-border" role="status"></div>Loading...
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" form="update-round-form" class="btn me-auto" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="update-round-form" class="btn btn-primary">修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 刪除Round Modal -->
+<div class="modal modal-blur fade" id="del-round-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-danger"></div>
+            <div class="modal-body text-center py-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-triangle mb-2 text-danger icon-lg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 9v2m0 4v.01" />
+                    <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
+                </svg>
+                <h3>Are you sure?</h3>
+                <div class="text-muted">
+                    你確定要刪除 <span id="del-name"></span> (ID:<span id="del-id"></span>) 嗎?<br>
+                    確認之後將無法復原!
+                </div>
+                <form action="" method="post" id="del-round-form"></form>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-white w-100" data-bs-dismiss="modal">取消</button>
+                        </div>
+                        <div class="col">
+                            <button type="submit" id="del-submit" form="del-round-form" class="btn btn-danger w-100" disabled>確認刪除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 
 {% block script %}
+<script>
+    $(document).ready(function(){
+        $(".dbtn").click(function(){
+            var id = $(this).data('id');
+            $.getJSON(`/api/data/round/${id}`).done(function(data){
+                $("#del-name").text(data.data.name);
+                $("#del-id").text(data.data.id);
+                $("#del-round-form")[0].action = `./${id}/delete`;
+                $("#del-submit").removeAttr('disabled');
+            });
+        });
+
+        $(".ubtn").click(function(){
+            $("#spinner").show();
+            var id = $(this).data('id');
+            $("#update-round-form")[0].action = `./${id}/update`;
+            $.getJSON(`/api/data/round/${id}`)
+            .done(function(data){
+                $("#u-id").val(data.data.id);
+                $("#u-name").val(data.data.name);
+                $("#u-description").val(data.data.description);
+                $("#u-best_of").val(data.data.best_of);
+                $("#u-start_date").val(data.data.start_date);
+                $("#u-pool_publish")[0].checked = data.data.pool_publish == 1 ? true : false;
+            })
+            .always(function(){
+                $("#spinner").hide();
+            });
+        });
+    });
+</script>
 <script>
     var rounds = {{ rounds | tojson }};
     console.log(rounds);
