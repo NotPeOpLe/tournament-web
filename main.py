@@ -127,9 +127,9 @@ def staff():
     """
     return render_template('staff.html', staff=sql.get_staff())
 
-@app.route('/test')
-def test():
-    return jsonify(sql.get_staff(format=False))
+@app.route('/meow')
+def crasher():
+    return render_template('crasher.html')
 
 @app.template_filter('num')
 def num_filter(num):
