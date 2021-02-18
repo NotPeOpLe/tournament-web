@@ -1,81 +1,448 @@
-{% extends 'manager/dashboard.html' %}
+{% extends 'manager/base.html' %}
 {% block title %}比賽排程管理{% endblock title %}
-{% block main %}
-<h1>比賽排程管理</h1>
-<hr>
-<div class=" table-responsive">
-    <table class="table table-sm table-hover text-nowrap align-middle user-select-none">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Team1</th>
-                <th>Team2</th>
-                <th>Ref</th>
-                <th>Streamer</th>
-                <th>Comm1</th>
-                <th>Comm2</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for m in matchs %}
-            <tr>
-                <td width="1">{{m.id}}</td>
-                <td>{{m.date if m.date is not none else 'no set'}}</td>
-                <td>{{m.team1.full_name if m.team1.full_name is not none else ''}}</td>
-                <td>{{m.team2.full_name if m.team2.full_name is not none else ''}}</td>
-                <td>{{m.referee.username if m.referee.username is not none else ''}}</td>
-                <td>{{m.streamer.username if m.streamer.username is not none else ''}}</td>
-                <td>{{m.commentator.username if m.commentator.username is not none else ''}}</td>
-                <td>{{m.commentator2.username if m.commentator2.username is not none else ''}}</td>
-                <td>
-                    <div>
-                        <button type="button" class="btn btn-sm btn-secondary" id="staff-menu" data-bs-toggle="dropdown" aria-expanded="false" {% if m.stats > 0 %}disabled{% endif %}>
-                            <i class="bi bi-menu-app-fill"></i>
-                            <span class="visually-hidden">Menu</span>
-                        </button>
-                        <ul class="dropdown-menu" data-id="{{ m.id }}" aria-labelledby="staff-menu">
-                            {% if m.stats < 1 %}
-                            {% if m.referee.username and m.streamer.username and m.commentator.username and m.commentator2.username %}
-                            <span class="px-2 py-1 text-muted">該場次沒有工作可接</span>
-                            {% endif %}
-                            {% if m.referee.username is none %}
-                            <li><button class="dropdown-item job_action ref get" type="button">接裁判工作</button></li>
-                            {% endif %}
-                            {% if m.streamer.username is none %}
-                            <li><button class="dropdown-item job_action stream get" type="button">接直播工作</button></li>
-                            {% endif %}
-                            {% if (m.commentator.username is none) or (m.commentator2.username is none) %}
-                            <li><button class="dropdown-item job_action comm get" type="button">接賽評工作</button></li>
-                            {% endif %}
-                            {% if m.referee.id == staff.id %}
-                            <li><button class="dropdown-item job_action ref remove text-danger" type="button">解除裁判工作</button></li>
-                            {% endif %}
-                            {% if m.streamer.id == staff.id %}
-                            <li><button class="dropdown-item job_action stream remove text-danger" type="button">解除直播工作</button></li>
-                            {% endif %}
-                            {% if (m.commentator.id == staff.id) or (m.commentator2.id == staff.id) %}
-                            <li><button class="dropdown-item job_action comm remove text-danger" type="button">解除賽評工作</button></li>
-                            {% endif %}
-                            {% else %}
-                            <span class="px-2 py-1 text-muted">該場次已結束</span>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% block head %}
+<style>
+    .filter-code {
+        display: none;
+    }
+
+    .filter-round {
+        display: none;
+    }
+
+    .filter-view-completed {
+        display: none;
+    }
+</style>
+{% endblock head %}
+{% block actions %}
+{% if isadmin %}
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#match-modal">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    新增場次
+</button>
+{% endif %}
+{% endblock actions %}
+{% block content %}
+<div class="row mb-3">
+    <div class="col">
+        <div class="input-group flex-nowrap">
+            <span class="input-group-text">階段</span>
+            <select class="form-select" id="select-round">
+                <option value="0">All</option>
+                {% for r in rounds %}
+                <option value="{{r.id}}">{{r.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="col">
+        <div class="input-icon mb-3">
+            <input type="text" id="search-code" class="form-control" placeholder="Search for code..">
+            <span class="input-icon-addon">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><circle cx="10" cy="10" r="7"></circle><line x1="21" y1="21" x2="15" y2="15"></line></svg>
+            </span>
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="form-selectgroup">
+            <label class="form-selectgroup-item" data-bs-toggle="tooltip" data-bs-placement="top" title="顯示已結束及棄賽的場次">
+              <input type="checkbox" class="form-selectgroup-input" id="view-completed">
+              <span class="form-selectgroup-label">顯示已結束</span>
+            </label>
+          </div>
+    </div>
 </div>
-{% endblock main %}
+<div class="card pt-0">
+    <!-- <div class="card-header">
+        <h3 class="card-title">Table</h3>
+    </div> -->
+    <!-- <div class="card-body border-bottom py-3">
+        <div class="d-flex">
+            <div class="text-muted">
+                Show
+                <div class="mx-2 d-inline-block">
+                    <input type="text" class="form-control form-control-sm" value="8" size="3" aria-label="Invoices count">
+                </div>
+                entries
+            </div>
+            <div class="ms-auto text-muted">
+                Search:
+                <div class="ms-2 d-inline-block">
+                    <input type="text" class="form-control form-control-sm" aria-label="Search invoice">
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div class="table-responsive mb-0">
+        <table class="table card-table table-vcenter text-nowrap js-sort-table" id="main-table">
+            <thead>
+                <tr>
+                    <th style="display: none;">ID</th>
+                    <th class="js-sort-last">Code</th>
+                    <th>Round</th>
+                    <th></th>
+                    <th colspan="2">Team1</th>
+                    <th class="text-end" colspan="2">Team2</th>
+                    <th></th>
+                    <th>Status</th>
+                    <th>Ref</th>
+                    <th>Streamer</th>
+                    <th>Comm1</th>
+                    <th>Comm2</th>
+                    <th class="js-sort-none"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in matchs %}
+                <tr {% if m.stats in (1,2) %}class="filter-view-completed"{% endif %} data-stats="{{ m.stats }}">
+                    <td class="w-1" style="display: none;">{{m.id}}</td>
+                    <td class="w-1" data-code="{{m.code}}">{{m.code}}</td>
+                    <td class="w-1" data-round="{{m.round.id}}">
+                        <span>{{m.round.name}} {% if m.loser %}<span class="badge bg-orange">LB</span>{% endif %}</span><br>
+                        <span>{{m.date if m.date is not none else 'no set'}}</span>
+                    </td>
+                    <td class="w-1">
+                        <span class="avatar avatar-sm" style="background-image: url({{m.team1.flag_name|flag_url}});"></span>
+                    </td>
+                    <td class="ps-0">
+                        {{m.team1.full_name if m.team1.full_name is not none else ''}}
+                    </td>
+                    <td>
+                        <span class="badge {% if (m.team1.score > m.team2.score or m.team2.score == -1) and m.stats in (1,2) %}bg-red{% else %}bg-secondary{% endif %} ms-2">{{ m.team1.score }}</span>
+                    </td>
+                    <td>
+                        <span class="badge {% if (m.team1.score < m.team2.score or m.team1.score == -1) and m.stats in (1,2) %}bg-blue{% else %}bg-secondary{% endif %} ms-2">{{ m.team2.score }}</span>
+                    </td>
+                    <td class="text-end pe-0">
+                        {{m.team2.full_name if m.team2.full_name is not none else ''}}
+                    </td>
+                    <td class="w-1 text-end">
+                        <span class="avatar avatar-sm" style="background-image: url({{m.team2.flag_name|flag_url}});"></span>
+                    </td>
+                    <td>{% if m.stats == 0 %}
+                        <span class="badge bg-secondary">未開始</span>
+                        {% elif m.stats == 1 %}
+                        <span class="badge bg-success">已結束</span>
+                        {% elif m.stats == 2 %}
+                        <span class="badge bg-warning">棄賽</span>
+                        {% else %}
+                        <span class="badge">未知</span>
+                        {% endif %}
+                    </td>
+                    <td>{{m.referee.username if m.referee.username is not none else ''}}</td>
+                    <td>{{m.streamer.username if m.streamer.username is not none else ''}}</td>
+                    <td>{{m.commentator.username if m.commentator.username is not none else ''}}</td>
+                    <td>{{m.commentator2.username if m.commentator2.username is not none else ''}}</td>
+                    <td>
+                        <div class="text-end">
+                            <button type="button" class="btn dropdown-toggle align-text-top" id="staff-menu" data-bs-toggle="dropdown"
+                                aria-expanded="false" {% if m.stats> 0 and not isadmin %}disabled{% endif %}>
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="icon icon-tabler icon-tabler-adjustments-horizontal" width="44" height="44"
+                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <circle cx="14" cy="6" r="2" />
+                                        <line x1="4" y1="6" x2="12" y2="6" />
+                                        <line x1="16" y1="6" x2="20" y2="6" />
+                                        <circle cx="8" cy="12" r="2" />
+                                        <line x1="4" y1="12" x2="6" y2="12" />
+                                        <line x1="10" y1="12" x2="20" y2="12" />
+                                        <circle cx="17" cy="18" r="2" />
+                                        <line x1="4" y1="18" x2="15" y2="18" />
+                                        <line x1="19" y1="18" x2="20" y2="18" />
+                                    </svg>
+                                </span>
+                                <span>
+                                    選項
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" data-id="{{ m.id }}" aria-labelledby="staff-menu">
+                                {% if m.stats < 1 %} {% if m.referee.username and m.streamer.username and
+                                    m.commentator.username and m.commentator2.username %} <span
+                                    class="px-3 py-1 text-muted">該場次沒有工作可接</span>
+                                    {% endif %}
+                                    {% if m.referee.username is none %}
+                                    <li><button class="dropdown-item job_action ref get" type="button">接裁判工作</button></li>
+                                    {% endif %}
+                                    {% if m.streamer.username is none %}
+                                    <li><button class="dropdown-item job_action stream get" type="button">接直播工作</button>
+                                    </li>
+                                    {% endif %}
+                                    {% if (m.commentator.username is none) or (m.commentator2.username is none) %}
+                                    <li><button class="dropdown-item job_action comm get" type="button">接賽評工作</button></li>
+                                    {% endif %}
+                                    {% if m.referee.id == cur_user.id %}
+                                    <li><button class="dropdown-item job_action ref remove text-danger"
+                                            type="button">解除裁判工作</button></li>
+                                    {% endif %}
+                                    {% if m.streamer.id == cur_user.id %}
+                                    <li><button class="dropdown-item job_action stream remove text-danger"
+                                            type="button">解除直播工作</button></li>
+                                    {% endif %}
+                                    {% if (m.commentator.id == cur_user.id) or (m.commentator2.id == cur_user.id) %}
+                                    <li><button class="dropdown-item job_action comm remove text-danger"
+                                            type="button">解除賽評工作</button></li>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="px-3 py-1 text-muted">該場次已結束</span>
+                                    {% endif %}
+                                    {% if isadmin %}
+                                    <li><button class="dropdown-item modify-match text-primary" type="button"
+                                            data-bs-toggle="modal" data-bs-target="#modify-match-modal">修改場次資料</button></li>
+                                    {% endif %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% if isadmin %}
+<div class="modal fade" tabindex="-1" id="match-modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">新增場次</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <form id="match-action" action="match/" method="post" autocomplete="off">
+                    <div class="mb-2">
+                        <label class="form-label">場次代碼</label>
+                        <input type="text" name="code" class="form-control" id="m-code" maxlength="10" placeholder="10字以內，不可重複" required>
+
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">階段</label>
+                        <select class="form-select" name="round" id="m-round">
+                            {% for r in rounds %}
+                            <option value="{{r.id}}">{{r.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">隊伍1(玩家1)</label>
+                        <select type="text" name="team1" class="form-select" id="m-team1" value="" required>
+                            <option value="" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot;&gt;?&lt;/span&gt;">請選擇隊伍1</option>
+                            {% for team in teams %}
+                            <option value="{{team.id}}" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot; style=&quot;background-image: url({{ team.flag_name | flag_url }})&quot;&gt;&lt;/span&gt;">{{team.full_name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">隊伍2(玩家2)</label>
+                        <select type="text" name="team2" class="form-select" id="m-team2" value="" required>
+                            <option value="" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot;&gt;?&lt;/span&gt;">請選擇隊伍1</option>
+                            {% for team in teams %}
+                            <option value="{{team.id}}" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot; style=&quot;background-image: url({{ team.flag_name | flag_url }})&quot;&gt;&lt;/span&gt;">{{team.full_name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">時間</label>
+                        <input type="datetime-local" name="date" class="form-control" id="m-date" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-check">
+                            <input class="form-check-input" type="checkbox" name="loser" value="1" id="m-loser">
+                            <span class="form-check-label">敗部場</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" form="match-action" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="match-action" class="btn btn-success">新增</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="modify-match-modal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">修改場次</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="modify-match" action="match" method="post" autocomplete="off">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">場次代碼</label>
+                                <input type="text" name="code" class="form-control" id="mo-code" maxlength="10"
+                                    required>
+                                <span class="form-text">10字以內，不可重複</span>
+                            </div>
+                            <div class="mb-3">
+                                <label for="mo-round" class="form-label">階段</label>
+                                <select class="form-select" name="round_id" id="mo-round" value="">
+                                    {% for r in rounds %}
+                                    <option value="{{r.id}}">{{r.name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <label class="form-label">隊伍1(玩家1)</label>
+                                        <select type="text" name="team1" class="form-select" id="mo-team1" required>
+                                            <option value="" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot;&gt;?&lt;/span&gt;">請選擇隊伍1</option>
+                                            {% for team in teams %}
+                                            <option value="{{team.id}}" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot; style=&quot;background-image: url({{ team.flag_name | flag_url }})&quot;&gt;&lt;/span&gt;">{{team.full_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-4 ps-0">
+                                        <label class="form-label">分數</label>
+                                        <input type="number" name="team1_score" id="mo-team1_score" class="form-control"
+                                            min="-1" max="100" required>
+                                        <span class="form-text">-1=棄賽者</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <label class="form-label">隊伍2(玩家2)</label>
+                                        <select type="text" name="team2" class="form-select" id="mo-team2" required>
+                                            <option value="" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot;&gt;?&lt;/span&gt;">請選擇隊伍2</option>
+                                            {% for team in teams %}
+                                            <option value="{{team.id}}" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot; style=&quot;background-image: url({{ team.flag_name | flag_url }})&quot;&gt;&lt;/span&gt;">{{team.full_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-4 ps-0">
+                                        <label class="form-label">分數</label>
+                                        <input type="number" name="team2_score" id="mo-team2_score" class="form-control"
+                                            min="-1" max="100" required>
+                                        <span class="form-text">-1=棄賽者</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">時間</label>
+                                <input type="datetime-local" name="date" class="form-control" id="mo-date" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">場次狀態</label>
+                                <select name="stats" id="mo-stats" class="form-select" required>
+                                    <option value="0">未開始</option>
+                                    <option value="1">已結束</option>
+                                    <option value="2">棄賽</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">裁判</label>
+                                <select name="referee" id="mo-ref" class="form-select">
+                                    <option value="" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot;&gt;?&lt;/span&gt;"></option>
+                                    {% for ref in staffs['REFEREE'] %}
+                                    <option value="{{ref.id}}" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot; style=&quot;background-image: url(https://a.ppy.sh/{{ref.user_id}})&quot;&gt;&lt;/span&gt;">{{ref.username}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">直播</label>
+                                <select name="streamer" id="mo-stream" class="form-select">
+                                    <option value="" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot;&gt;?&lt;/span&gt;"></option>
+                                    {% for stream in staffs['STREAMER'] %}
+                                    <option value="{{stream.id}}" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot; style=&quot;background-image: url(https://a.ppy.sh/{{stream.user_id}})&quot;&gt;&lt;/span&gt;">{{stream.username}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">賽評</label>
+                                <select name="commentator" id="mo-comm" class="form-select">
+                                    <option value="" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot;&gt;?&lt;/span&gt;"></option>
+                                    {% for comm in staffs['COMMENTATOR'] %}
+                                    <option value="{{comm.id}}" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot; style=&quot;background-image: url(https://a.ppy.sh/{{comm.user_id}})&quot;&gt;&lt;/span&gt;">{{comm.username}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">賽評2</label>
+                                <select name="commentator2" id="mo-comm2" class="form-select">
+                                    <option value="" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot;&gt;?&lt;/span&gt;"></option>
+                                    {% for comm2 in staffs['COMMENTATOR'] %}
+                                    <option value="{{comm2.id}}" data-custom-properties="&lt;span class=&quot;avatar avatar-xs&quot; style=&quot;background-image: url(https://a.ppy.sh/{{comm2.user_id}})&quot;&gt;&lt;/span&gt;">{{comm2.username}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">mp link</label>
+                                <input type="text" name="mp_link" class="form-control" id="mo-mplink">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">video link</label>
+                                <input type="text" name="video_link" class="form-control" id="mo-videolink">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">備註</label>
+                                <input type="text" name="note" class="form-control" id="mo-note">
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <label class="form-check-label">敗部場</label>
+                                    <input class="form-check-input" type="checkbox" name="loser" value="1"
+                                        id="mo-loser">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" form="modify-match" class="btn btn-danger" data-bs-dismiss="modal"
+                    data-bs-toggle="modal" data-bs-target="#delete-match-modal">刪除場次</button>
+                <button type="reset" form="modify-match" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="modify-match" class="btn btn-success">更新</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="delete-match-modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>你確定要刪除 <span id="md-check-text"></span> 場次嗎?</p>
+                <form method="post" id="md-form">
+                    <input type="hidden" id="mb-id">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">否</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-match">是(點兩次)</span></button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock content %}
 
 {% block script %}
 <script>
+    function view_completed() {
+        return document.getElementById('view-completed').checked;
+    }
+
     function job_action(id, job, action) {
         var vform = document.createElement("form");
         vform.method = "post";
+        vform.action = "job";
         vform.style.display = "none";
 
         var opt = document.createElement("input");
@@ -97,13 +464,161 @@
         vform.submit();
     }
 
-    $(document).ready(function(){
-        $(".job_action").click(function(){
+    $(document).ready(function () {
+        $('#view-completed').click(function(){
+            var table, tr, i;
+            table = document.getElementById("main-table");
+            tr = table.getElementsByTagName("tr");
+            for (i = 1; i < tr.length; i++) {
+                var stats = tr[i].getAttribute('data-stats');
+                if ((stats == 1 || stats == 2)) {
+                    tr[i].classList.toggle('filter-view-completed')
+                }
+            }
+        });
+
+        $('#select-round').change(function () {
+            var input, table, tr, td, i;
+            input = document.getElementById("select-round");
+            table = document.getElementById("main-table");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[2];
+                if (td) {
+                    if (input.value == 0) {
+                        tr[i].classList.remove("filter-round");
+                        continue;
+                    }
+                    if (input.value == td.getAttribute('data-round')) {
+                        tr[i].classList.remove("filter-round");
+                    } else {
+                        tr[i].classList.add("filter-round");
+                    }
+                }
+            }
+        });
+
+        $('#search-code').keyup(function (){
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search-code");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("main-table");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    txtValue = td.getAttribute('data-code').toUpperCase();
+                    if (txtValue.indexOf(filter) > -1) {
+                        tr[i].classList.remove("filter-code");
+                    } else {
+                        tr[i].classList.add("filter-code");
+                    }
+                }
+            }
+        });
+
+        $(".job_action").click(function () {
             var id = $(this)[0].parentElement.parentElement.dataset.id;
             var job = $(this)[0].classList[2];
             var action = $(this)[0].classList[3];
             job_action(id, job, action);
         });
+
+        $(".modify-match").click(function () {
+            var id = $(this)[0].parentElement.parentElement.dataset.id;
+            document.getElementById('modify-match').action = `match/${id}/update`
+            $.getJSON(`/api/data/match/${id}`).done(function (data) {
+                $('#mo-code').val(data.data.code);
+                mo_round.setChoiceByValue(String(data.data.round_id));
+                mo_team1.setChoiceByValue(String(data.data.team1));
+                $('#mo-team1_score').val(data.data.team1_score);
+                mo_team2.setChoiceByValue(String(data.data.team2));
+                $('#mo-team2_score').val(data.data.team2_score);
+                $('#mo-date').val(data.data.date);
+                mo_stats.setChoiceByValue(String(data.data.stats));
+                mo_ref.setChoiceByValue(String(data.data.referee));
+                mo_stream.setChoiceByValue(String(data.data.streamer));
+                mo_comm.setChoiceByValue(String(data.data.commentator));
+                mo_comm2.setChoiceByValue(String(data.data.commentator2));
+                $('#mo-mplink').val(data.data.mp_link);
+                $('#mo-videolink').val(data.data.video_link);
+                $('#mo-note').val(data.data.note);
+                $('#mo-loser')[0].checked = data.data.loser ? true : false;
+                $('#md-check-text').text(`${data.data.code} (${id})`);
+                $('#mb-id').val(id);
+            });
+        });
+
+        $('#confirm-delete-match').dblclick(function () {
+            var id = $('#mb-id').val();
+            $('#md-form')[0].action = `match/${id}/delete`;
+            $('#md-form').submit();
+        });
     });
+</script>
+
+<script>
+    function createaAvaChioces(id) {
+        return new Choices(el = document.getElementById(id), {
+    		classNames: {
+    			containerInner: el.className,
+    			input: 'form-control',
+    			inputCloned: 'form-control-sm',
+    			listDropdown: 'dropdown-menu',
+    			itemChoice: 'dropdown-item',
+    			activeState: 'show',
+    			selectedState: 'active',
+    		},
+    		shouldSort: false,
+    		searchEnabled: false,
+    		callbackOnCreateTemplates: function(template) {
+    			var classNames = this.config.className,
+    			itemSelectText = this.config.itemSelectText;
+    			return {
+    				item: function(classNames, data) {
+    					return template('<div class="' + String(classNames.item) + ' ' + String( data.highlighted ? classNames.highlightedState : classNames.itemSelectable ) + '" data-item data-id="' + String(data.id) + '" data-value="' + String(data.value) + '"' + String(data.active ? 'aria-selected="true"' : '') + '' + String(data.disabled ? 'aria-disabled="true"' : '') + '><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + String(data.label) + '</div>');
+    				},
+    				choice: function(classNames, data) {
+    					return template('<div class="' + String(classNames.item) + ' ' + String(classNames.itemChoice) + ' ' + String( data.disabled ? classNames.itemDisabled : classNames.itemSelectable ) + '" data-select-text="' + String(itemSelectText) + '" data-choice  ' + String( data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable' ) + ' data-id="' + String(data.id) + '" data-value="' + String(data.value) + '" ' + String( data.groupId > 0 ? 'role="treeitem"' : 'role="option"' ) + ' ><span class="dropdown-item-indicator">' + data.customProperties + '</span>' + String(data.label) + '</div>');
+    				},
+    			};
+    		},
+    	})
+    }
+
+    const m_team1 = createaAvaChioces('m-team1');
+    const m_team2 = createaAvaChioces('m-team2');
+    const mo_team1 = createaAvaChioces('mo-team1');
+    const mo_team2 = createaAvaChioces('mo-team2');
+    const mo_ref = createaAvaChioces('mo-ref');
+    const mo_stream = createaAvaChioces('mo-stream');
+    const mo_comm = createaAvaChioces('mo-comm');
+    const mo_comm2 = createaAvaChioces('mo-comm2');
+</script>
+
+<script>
+    function selectChioces(id) {
+    	return new Choices(el = document.getElementById(id), {
+    		classNames: {
+    			containerInner: el.className,
+    			input: 'form-control',
+    			inputCloned: 'form-control-sm',
+    			listDropdown: 'dropdown-menu',
+    			itemChoice: 'dropdown-item',
+    			activeState: 'show',
+    			selectedState: 'active',
+    		},
+    		shouldSort: false,
+    		searchEnabled: false,
+    	})
+    }
+
+    const m_round = selectChioces('m-round');
+    const mo_round = selectChioces('mo-round');
+    const mo_stats = selectChioces('mo-stats');
 </script>
 {% endblock script %}

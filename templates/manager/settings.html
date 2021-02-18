@@ -1,8 +1,6 @@
-{% extends 'manager/dashboard.html' %}
+{% extends 'manager/base.html' %}
 {% block title %}比賽基本設定{% endblock title %}
-{% block main %}
-<h1>比賽基本設定</h1>
-<hr>
+{% block content %}
 <form autocomplete="off" method="POST">
     <div class="row mb-3">
         <label for="full_name" class="col-sm-2 col-form-label">比賽全名</label>
@@ -121,5 +119,4 @@
 
     <button type="submit" class="btn btn-success">Save</button>
 </form>
-
-{% endblock main %}
+{% endblock content %}

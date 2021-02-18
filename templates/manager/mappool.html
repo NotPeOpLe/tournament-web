@@ -1,7 +1,6 @@
-{% extends 'manager/dashboard.html' %}
-{% block title %}圖池{% endblock title %}
-{% block main %}
-    <h1>圖池管理</h1>
+{% extends 'manager/base.html' %}
+{% block title %}圖池管理{% endblock title %}
+{% block content %}
     <div class="row">
         <div class="col">
             <div class="input-group">
@@ -17,7 +16,6 @@
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add-map-modal">Add Map</button>
         </div>
     </div>
-    <hr>
     <div class="table-responsive">
         <table class="table text-center text-nowrap">
             <thead>
@@ -37,15 +35,15 @@
             </thead>
             <tbody>
                 {% for m in mappool %}
-                <tr style="background-color: rgb({{m.color}});">
+                <tr style="background-color: #{{m.hex_color}};">
                     <td style="
-                        background: -webkit-linear-gradient(right, rgba({{m.color}},1), rgba({{m.color}}, 0.2)),
+                        background: -webkit-linear-gradient(right, #{{m.hex_color}}, #{{m.hex_color}}30),
                         url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
-                        background: -moz-linear-gradient(right, rgba({{m.color}},1), rgba({{m.color}}, 0.2)),
+                        background: -moz-linear-gradient(right, #{{m.hex_color}}, #{{m.hex_color}}30),
                         url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
-                        background: -o-linear-gradient(right, rgba({{m.color}},1), rgba({{m.color}}, 0.2)),
+                        background: -o-linear-gradient(right, #{{m.hex_color}}, #{{m.hex_color}}30),
                         url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
-                        background: linear-gradient(right, rgba({{m.color}},1), rgba({{m.color}}, 0.2)),
+                        background: linear-gradient(right, #{{m.hex_color}}, #{{m.hex_color}}30),
                         url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
                         background-size: cover;
                     ">
@@ -169,11 +167,9 @@
         </div>   
     </div>
          
-{% endblock main %}
+{% endblock content %}
 {% block script %}
     <script>
-        var add_map_modal = new bootstrap.Modal(document.getElementById('add-map-modal'))
-
         //std mods
         var mod_ez = document.getElementById('ez');
         var mod_nf = document.getElementById('nf');

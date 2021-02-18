@@ -1,0 +1,84 @@
+{% extends 'manager/base.html' %}
+{% block title %}階段設定{% endblock title %}
+{% block actions %}
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#round-modal">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    新增階段
+</button>
+{% endblock actions %}
+{% block content %}
+<div class="card pt-0">
+    <div class="table-responsive mb-0">
+        <table class="table card-table table-vcenter" id="main-table">
+            <thead>
+                <tr class="text-nowrap">
+                    <th class="w-1">Id</th>
+                    <th>Name</th>
+                    <th class="w-1">Best Of</th>
+                    <th>Start Date</th>
+                    <th>Pool Overview</th>
+                    <th class="w-1">Publish</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in rounds %}
+                <tr>
+                    <td class="w-1">{{r.id}}</td>
+                    <td>
+                        <div class="font-weight-medium">{{ r.name }}</div>
+                        <div class="text-muted">{{ r.description }}</div>
+                    </td>
+                    <td>{{ r.best_of }}</td>
+                    <td>{{ r.start_date | strdtf(sep=' ') }}</td>
+                    <td>
+                        <div class="d-flex">
+                            {% for g in r.pool_overview %}
+                            <div class="w-4 me-2">
+                                <span class="badge {% if g.badge_color %}bg-{{ g.badge_color }}{% endif %} w-4">{{g.group}}</span>
+                                <div class="text-center">{{g.count}}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td class="w-1">{{ r.pool_publish == 1 }}</td>
+                    <td class="w-1">
+                        <div class="text-end">
+                            <button type="button" class="btn dropdown-toggle align-text-top" id="staff-menu" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-adjustments-horizontal" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                    <circle cx="14" cy="6" r="2"></circle>
+                                    <line x1="4" y1="6" x2="12" y2="6"></line>
+                                    <line x1="16" y1="6" x2="20" y2="6"></line>
+                                    <circle cx="8" cy="12" r="2"></circle>
+                                    <line x1="4" y1="12" x2="6" y2="12"></line>
+                                    <line x1="10" y1="12" x2="20" y2="12"></line>
+                                    <circle cx="17" cy="18" r="2"></circle>
+                                    <line x1="4" y1="18" x2="15" y2="18"></line>
+                                    <line x1="19" y1="18" x2="20" y2="18"></line>
+                                </svg>
+                            </span>
+                                <span>選項</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" data-id="32" aria-labelledby="staff-menu">
+                                <li><button class="dropdown-item" type="button">公佈圖池</button></li>
+                                <li><button class="dropdown-item text-primary" type="button" data-bs-toggle="modal" data-bs-target="#round-modal">修改</button></li>
+                                <li><button class="dropdown-item text-danger" type="button">刪除</button></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}
+
+{% block script %}
+<script>
+    var rounds = {{ rounds | tojson }};
+    console.log(rounds);
+</script>
+{% endblock script %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Index{% endblock title %}
+{% block styles %}
+<!-- <style>
+body {
+    /*background-image: url(static/img/bb.jpg)*/
+    background-color: #000;
+}
+</style> -->
+{% endblock styles %}
+
+{% block header %}
+
+{% endblock header %}
+
+{% block main %}
+<div class="position-absolute top-50 start-50 translate-middle text-center">
+    <div class="user-select-none">
+        <video name="media" autoplay>
+            <source src="/static/angery.mp4" type="video/mp4">
+        </video>
+    </div>
+</div>
+{% endblock main %}
+
+{% block footer %}
+{% endblock footer %}
