@@ -1,13 +1,23 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, session, request
+from pymysql.err import *
+from blueprints.api import getdata
+from flask import Blueprint, render_template, redirect, url_for, flash, session, request, jsonify
 from logger import log
 from flag import Staff, Mods
 from rich.console import Console
 from functools import wraps
-import osuapi, mysql, json
+import osuapi, mysql, json, re
 
 tourney = Blueprint('tourney', __name__)
 db = mysql.DB()
 console = Console()
+
+def get(table_name: str, id: str):
+    data = getdata(table_name, id).get_data()
+    return json.loads(data).get('data', None)
+
+def dict_cmp(a: dict, b: dict):
+    cmp = a.items() - b.items()
+    return dict(cmp)
 
 @tourney.context_processor
 def context():
@@ -51,6 +61,10 @@ def check_privilege(id, privilege: Staff):
     user = db.get_staff(staff_id=id)
     user_privilege = Staff(user['privileges'])
     return bool(privilege in user_privilege)
+
+@tourney.route('/base')
+def base():
+    return render_template('/manager/base.html')
 
 @tourney.route('/')
 @login_required
