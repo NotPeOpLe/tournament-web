@@ -2,7 +2,7 @@ from enum import Flag
 
 class Staff(Flag):
     STAFF           = 1
-    REFFEREE        = 2
+    REFEREE         = 2
     COMMENTATOR     = 4
     STREAMER        = 8
     MAPPOOLER       = 16
