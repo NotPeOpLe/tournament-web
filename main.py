@@ -1,9 +1,22 @@
 from flag import Staff
+from flask.json import JSONEncoder
 from flask import Flask, render_template, url_for, redirect, send_from_directory, jsonify, request, session
 from blueprints import tourney, api
 from logger import log
-from datetime import datetime
+from datetime import date, datetime
 import re, os, mysql, osuapi
+
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        try:
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            iterable = iter(obj)
+        except TypeError:
+            pass
+        else:
+            return list(iterable)
+        return JSONEncoder.default(self, obj)
 
 test = 'ABC TEST'
 sql = mysql.DB()
@@ -12,6 +25,7 @@ app.secret_key = b'840' # os.urandom(16)
 app.register_blueprint(tourney, url_prefix='/manager')
 app.register_blueprint(api, url_prefix='/api')
 app.config['JSON_SORT_KEYS'] = False
+app.json_encoder = CustomJSONEncoder
 
 @app.route('/favicon.ico')
 def faviconico():
