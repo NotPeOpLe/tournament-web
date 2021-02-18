@@ -127,6 +127,7 @@ def matchs():
 
 @tourney.route('/schedule/match/', methods=['POST'])
 @login_required
+@need_privilege(Staff.ADMIN)
 def matchs_add():
     round_id = int(request.form['round'])
     code = request.form['code']
@@ -144,6 +145,8 @@ def matchs_add():
         return redirect(url_for('tourney.matchs'))
 
 @tourney.route('/schedule/match/<id>/update', methods=['POST'])
+@login_required
+@need_privilege(Staff.ADMIN)
 def match_update(id):
     match: dict = get('match', id)
     match.pop('id')
@@ -183,6 +186,8 @@ def match_update(id):
         return redirect(url_for('tourney.matchs'))
 
 @tourney.route('/schedule/match/<id>/delete', methods=['POST'])
+@login_required
+@need_privilege(Staff.ADMIN)
 def match_delete(id):
     try:
         db.query("DELETE FROM `match` WHERE id = %s;", [id])
@@ -287,6 +292,8 @@ def teams():
     return render_template('manager/teams.html')
 
 @tourney.route('/rounds/', methods=['GET', 'POST'])
+@login_required
+@need_privilege(Staff.ADMIN)
 def rounds():
     if request.method == 'GET':
         pool_group_count = db.query_all("""
@@ -322,6 +329,8 @@ def rounds():
 
 
 @tourney.route('/rounds/<round_id>/update', methods=['POST'])
+@login_required
+@need_privilege(Staff.ADMIN)
 def rounds_update(round_id):
     s_round = get('round', round_id)
     c_round = dict(
@@ -342,6 +351,8 @@ def rounds_update(round_id):
         return redirect(url_for('tourney.rounds'))
 
 @tourney.route('/rounds/<round_id>/delete', methods=['POST'])
+@login_required
+@need_privilege(Staff.ADMIN)
 def rounds_delete(round_id):
     try:
         db.query("DELETE FROM `round` WHERE id = %s;", [round_id])
