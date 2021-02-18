@@ -93,7 +93,7 @@ class DB(object):
         # 從資料庫取得階段資訊
         round = self.query_one(f"SELECT * FROM round WHERE id = {round_id}")
         # 從資料庫取得圖池
-        pooldata = self.query_all(f"SELECT m.*, mg.color, s.user_id, s.username FROM mappool AS m LEFT JOIN staff AS s ON s.id=m.nominator LEFT JOIN map_group AS mg ON mg.name=m.group WHERE round_id = {round_id} ORDER BY FIELD(`group`, 'FM', 'NM', 'HD', 'HR', 'DT', 'Roll', 'EZ', 'TB'), code")
+        pooldata = self.query_all(f"SELECT m.*, mg.hex_color, s.user_id, s.username FROM mappool AS m LEFT JOIN staff AS s ON s.id=m.nominator LEFT JOIN map_group AS mg ON mg.name=m.group WHERE round_id = {round_id} ORDER BY FIELD(`group`, 'FM', 'NM', 'HD', 'HR', 'DT', 'Roll', 'EZ', 'TB'), code")
         # 檢查此階段的圖池是否已公布
         if round['pool_publish'] or ingore_pool_publish:
             if format:

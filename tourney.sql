@@ -11,7 +11,7 @@
  Target Server Version : 50731
  File Encoding         : 65001
 
- Date: 12/02/2021 15:52:38
+ Date: 18/02/2021 20:07:38
 */
 
 SET NAMES utf8mb4;
@@ -52,16 +52,16 @@ CREATE TABLE `group`  (
 -- ----------------------------
 -- Records of group
 -- ----------------------------
-INSERT INTO `group` VALUES (1, 'host', '主辦');
-INSERT INTO `group` VALUES (2, 'admin', '管理員');
-INSERT INTO `group` VALUES (3, 'referee', '裁判');
-INSERT INTO `group` VALUES (4, 'commentator', '賽評');
-INSERT INTO `group` VALUES (5, 'steamer', '直播');
-INSERT INTO `group` VALUES (6, 'mappooler', '圖池');
+INSERT INTO `group` VALUES (1, 'Host', '主辦');
+INSERT INTO `group` VALUES (2, 'Admin', '管理員');
+INSERT INTO `group` VALUES (3, 'Referee', '裁判');
+INSERT INTO `group` VALUES (4, 'Commentator', '賽評');
+INSERT INTO `group` VALUES (5, 'Steamer', '直播');
+INSERT INTO `group` VALUES (6, 'Mappooler', '圖池');
 INSERT INTO `group` VALUES (7, 'GFX', '美術');
-INSERT INTO `group` VALUES (8, 'tester', '測試員');
-INSERT INTO `group` VALUES (9, 'tech', '技術員');
-INSERT INTO `group` VALUES (10, 'staff', '工作人員');
+INSERT INTO `group` VALUES (8, 'Tester', '測試員');
+INSERT INTO `group` VALUES (9, 'Tech', '技術員');
+INSERT INTO `group` VALUES (10, 'Staff', '工作人員');
 
 -- ----------------------------
 -- Table structure for map_group
@@ -69,22 +69,23 @@ INSERT INTO `group` VALUES (10, 'staff', '工作人員');
 DROP TABLE IF EXISTS `map_group`;
 CREATE TABLE `map_group`  (
   `name` char(6) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `color` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `hex_color` char(8) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `badge_color` char(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '圖譜的分類' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of map_group
 -- ----------------------------
-INSERT INTO `map_group` VALUES ('DT', '201, 218, 248');
-INSERT INTO `map_group` VALUES ('EZ', '174, 237, 201');
-INSERT INTO `map_group` VALUES ('FL', '130, 130, 130');
-INSERT INTO `map_group` VALUES ('FM', '217, 210, 233');
-INSERT INTO `map_group` VALUES ('HD', '255, 242, 204');
-INSERT INTO `map_group` VALUES ('HR', '244, 204, 204');
-INSERT INTO `map_group` VALUES ('NM', '255, 255, 255');
-INSERT INTO `map_group` VALUES ('Roll', '232, 174, 237');
-INSERT INTO `map_group` VALUES ('TB', '217, 234, 211');
+INSERT INTO `map_group` VALUES ('DT', 'C9DAF8', 'purple');
+INSERT INTO `map_group` VALUES ('EZ', 'AEEDC9', 'green');
+INSERT INTO `map_group` VALUES ('FL', '828282', 'dark');
+INSERT INTO `map_group` VALUES ('FM', 'D9D2E9', 'azure');
+INSERT INTO `map_group` VALUES ('HD', 'FFF2CC', 'yellow');
+INSERT INTO `map_group` VALUES ('HR', 'F4CCCC', 'red');
+INSERT INTO `map_group` VALUES ('NM', 'FFFFFF', 'muted');
+INSERT INTO `map_group` VALUES ('Roll', 'E8AEED', 'dark-lt');
+INSERT INTO `map_group` VALUES ('TB', 'D9EAD3', 'lime');
 
 -- ----------------------------
 -- Table structure for mappool
@@ -176,39 +177,43 @@ CREATE TABLE `match`  (
   `code` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '自訂代碼',
   `round_id` int(11) NULL DEFAULT NULL COMMENT '階段 ID',
   `team1` int(11) NULL DEFAULT NULL COMMENT '隊伍1 ID',
-  `team1_score` int(11) NULL DEFAULT NULL COMMENT '隊伍1 分數',
+  `team1_score` int(3) NOT NULL DEFAULT 0 COMMENT '隊伍1 分數',
   `team2` int(11) NULL DEFAULT NULL COMMENT '隊伍2 ID',
-  `team2_score` int(11) NULL DEFAULT NULL COMMENT '隊伍2 分數',
+  `team2_score` int(3) NOT NULL DEFAULT 0 COMMENT '隊伍2 分數',
   `date` datetime NULL DEFAULT NULL COMMENT '比賽日期',
   `referee` int(11) NULL DEFAULT NULL COMMENT '裁判',
   `streamer` int(11) NULL DEFAULT NULL COMMENT '直播',
   `commentator` int(11) NULL DEFAULT NULL COMMENT '賽評',
   `commentator2` int(11) NULL DEFAULT NULL COMMENT '賽評',
-  `mp_link` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'MP連結',
-  `video_link` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'VOD連結',
+  `mp_link` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'MP連結',
+  `video_link` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'VOD連結',
   `loser` tinyint(1) NULL DEFAULT 0 COMMENT '是否為敗部',
   `stats` tinyint(1) NULL DEFAULT 0 COMMENT '狀態(0 未開始,1 結束,2 棄賽)',
-  `note` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+  `note` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `code`(`code`) USING BTREE,
   INDEX `team1`(`team1`) USING BTREE,
   INDEX `team2`(`team2`) USING BTREE,
   CONSTRAINT `team1` FOREIGN KEY (`team1`) REFERENCES `team` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `team2` FOREIGN KEY (`team2`) REFERENCES `team` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '賽程' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '賽程' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of match
 -- ----------------------------
-INSERT INTO `match` VALUES (1, 'WB 1.1', 1, 14, 1, 11, 5, '2020-01-17 18:00:00', 17, 15, 7, 24, 'https://osu.ppy.sh/community/matches/57775533', 'https://www.twitch.tv/videos/537299487', 0, 1, NULL);
-INSERT INTO `match` VALUES (23, 'WB 1.2', 1, 17, 3, 23, 5, '2020-01-17 19:30:00', NULL, 15, 7, 24, 'https://osu.ppy.sh/community/matches/57776359', 'https://www.twitch.tv/videos/537316498', 0, 1, NULL);
-INSERT INTO `match` VALUES (24, 'WB 1.3', 1, 27, 2, 26, 5, '2020-01-17 21:00:00', 12, NULL, 24, NULL, 'https://osu.ppy.sh/community/matches/57777643', 'https://www.twitch.tv/videos/537338158', 0, 1, NULL);
-INSERT INTO `match` VALUES (25, 'WB 1.4', 1, 13, 0, 5, NULL, '2020-01-18 23:30:00', NULL, NULL, NULL, NULL, NULL, NULL, 0, 2, '_kyuu 未於時間內現身，MiyazonoKuma 直接晉級至 WB Round 2');
-INSERT INTO `match` VALUES (26, 'WB 1.5', 1, 9, 5, 6, 4, '2020-01-19 22:00:00', 14, NULL, 9, 6, 'https://osu.ppy.sh/community/matches/57835682', 'https://www.twitch.tv/videos/538507542', 0, 1, NULL);
-INSERT INTO `match` VALUES (27, 'WB 1.6', 1, 10, NULL, 8, 0, '2020-01-19 13:30:00', NULL, NULL, NULL, NULL, NULL, NULL, 0, 2, 'NashiKari 未於時間內現身，Music Lord 直接晉級至 WB Round 2');
-INSERT INTO `match` VALUES (28, 'WB 1.7', 1, 7, 3, 24, 5, '2020-01-19 14:00:00', 13, 20, 8, 6, 'https://osu.ppy.sh/community/matches/57827865', 'https://www.twitch.tv/videos/538349979', 0, 1, NULL);
-INSERT INTO `match` VALUES (29, 'WB 1.8', 1, 1, 2, 18, 5, '2020-01-19 20:00:00', 19, NULL, NULL, 6, 'https://osu.ppy.sh/mp/57833014', 'https://www.twitch.tv/videos/538439444', 0, 0, NULL);
-INSERT INTO `match` VALUES (30, 'WB 1.9', 1, 20, NULL, 3, 0, '2020-01-19 15:00:00', NULL, NULL, NULL, NULL, NULL, NULL, 0, 2, 'XzCraftP 棄賽，Imokora 直接晉級至 WB Round 2');
-INSERT INTO `match` VALUES (31, 'WB 1.10', 1, 16, NULL, 19, 0, '2020-01-19 16:30:00', NULL, NULL, NULL, NULL, NULL, NULL, 0, 2, 'GfMRT 未於時間內現身，[ MILK_Jiang] 直接晉級至 WB Round 2');
+INSERT INTO `match` VALUES (1, 'WB 1.1', 1, 14, 1, 11, 5, '2020-01-17 18:00:00', 17, 15, 7, 24, 'https://osu.ppy.sh/community/matches/57775533', 'https://www.twitch.tv/videos/537299487', 0, 1, '');
+INSERT INTO `match` VALUES (23, 'WB 1.2', 1, 17, 3, 23, 5, '2020-01-17 19:30:00', NULL, 15, 7, 24, 'https://osu.ppy.sh/community/matches/57776359', 'https://www.twitch.tv/videos/537316498', 0, 1, '');
+INSERT INTO `match` VALUES (24, 'WB 1.3', 1, 27, 2, 26, 5, '2020-01-17 21:00:00', 12, NULL, 24, NULL, 'https://osu.ppy.sh/community/matches/57777643', 'https://www.twitch.tv/videos/537338158', 0, 1, '');
+INSERT INTO `match` VALUES (25, 'WB 1.4', 1, 13, 0, 5, -1, '2020-01-18 23:30:00', NULL, NULL, NULL, NULL, '', '', 0, 2, '_kyuu 未於時間內現身，MiyazonoKuma 直接晉級至 WB Round 2');
+INSERT INTO `match` VALUES (26, 'WB 1.5', 1, 9, 5, 6, 4, '2020-01-19 22:00:00', 14, NULL, 9, 6, 'https://osu.ppy.sh/community/matches/57835682', 'https://www.twitch.tv/videos/538507542', 0, 1, '');
+INSERT INTO `match` VALUES (27, 'WB 1.6', 1, 10, -1, 8, 0, '2020-01-19 13:30:00', NULL, NULL, NULL, NULL, '', '', 0, 2, 'NashiKari 未於時間內現身，Music Lord 直接晉級至 WB Round 2');
+INSERT INTO `match` VALUES (28, 'WB 1.7', 1, 7, 3, 24, 5, '2020-01-19 14:00:00', 13, 20, 8, 6, 'https://osu.ppy.sh/community/matches/57827865', 'https://www.twitch.tv/videos/538349979', 0, 1, '');
+INSERT INTO `match` VALUES (29, 'WB 1.8', 1, 1, 2, 18, 5, '2020-01-19 20:00:00', 19, 1, NULL, 6, 'https://osu.ppy.sh/mp/57833014', 'https://www.twitch.tv/videos/538439444', 0, 1, '');
+INSERT INTO `match` VALUES (30, 'WB 1.9', 1, 20, -1, 3, 0, '2020-01-19 15:00:00', NULL, NULL, NULL, NULL, '', '', 0, 2, 'XzCraftP 棄賽，Imokora 直接晉級至 WB Round 2');
+INSERT INTO `match` VALUES (31, 'WB 1.10', 1, 16, -1, 19, 0, '2020-01-19 16:30:00', NULL, NULL, NULL, NULL, '', '', 0, 2, 'GfMRT 未於時間內現身，[ MILK_Jiang] 直接晉級至 WB Round 2');
+INSERT INTO `match` VALUES (32, 'LB 1.1', 1, 2, 13, 7, 7, '2021-02-12 19:00:00', 1, NULL, NULL, NULL, '', '', 1, 0, '');
+INSERT INTO `match` VALUES (35, 'L-GF-1', 6, 7, -1, 1, 0, '2021-02-27 17:27:00', 18, 4, 7, 6, '123123123123', '3123123123213123', 1, 2, '12313312');
+INSERT INTO `match` VALUES (37, 'WB 2.5', 5, 4, 18, 3, 14, '2021-02-20 21:14:00', 10, 15, 6, 6, '0.', '0..', 0, 1, '123213123123453453453434');
 
 -- ----------------------------
 -- Table structure for player
@@ -300,12 +305,12 @@ CREATE TABLE `staff`  (
   UNIQUE INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `group_id`(`group_id`) USING BTREE,
   CONSTRAINT `group_id` FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '工作人員' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '工作人員' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of staff
 -- ----------------------------
-INSERT INTO `staff` VALUES (1, 6008293, 1, '_CHIMERA', 1023, '0000-00-00 00:00:00', 1);
+INSERT INTO `staff` VALUES (1, 6008293, 1, '_CHIMERA', 1023, '2021-02-15 22:03:18', 1);
 INSERT INTO `staff` VALUES (2, 7633130, 4, 'Poyoyo', 4, '2021-01-31 23:11:37', 1);
 INSERT INTO `staff` VALUES (3, 7172340, 3, 'NekoKamui', 2, '0000-00-00 00:00:00', 1);
 INSERT INTO `staff` VALUES (4, 1593180, 5, 'XzCraftP', 8, '0000-00-00 00:00:00', 1);
@@ -319,7 +324,7 @@ INSERT INTO `staff` VALUES (11, 2317789, 3, 'Diaostrophism', 2, '0000-00-00 00:0
 INSERT INTO `staff` VALUES (12, 9539163, 3, 'EthanTC', 2, '0000-00-00 00:00:00', 1);
 INSERT INTO `staff` VALUES (13, 4438362, 3, 'YinyinMeiDaiZi', 2, '0000-00-00 00:00:00', 1);
 INSERT INTO `staff` VALUES (14, 11047052, 3, '[ Guai ]', 2, '0000-00-00 00:00:00', 1);
-INSERT INTO `staff` VALUES (15, 4783406, 3, '[ small black ]', 2, '0000-00-00 00:00:00', 1);
+INSERT INTO `staff` VALUES (15, 4783406, 3, '[ small black ]', 10, '2021-02-13 19:34:23', 1);
 INSERT INTO `staff` VALUES (16, 8878107, 3, 'gggiantguygirl', 2, '0000-00-00 00:00:00', 1);
 INSERT INTO `staff` VALUES (17, 12676270, 3, 'ostriich_LEN', 2, '0000-00-00 00:00:00', 1);
 INSERT INTO `staff` VALUES (18, 1028615, 3, 'Y e c h I', 2, '0000-00-00 00:00:00', 1);
@@ -334,8 +339,9 @@ INSERT INTO `staff` VALUES (27, 1952803, 10, 'Oktavia', 1, '0000-00-00 00:00:00'
 INSERT INTO `staff` VALUES (28, 6720545, 9, 'jun112561', 256, '2021-01-31 23:11:55', 1);
 INSERT INTO `staff` VALUES (29, 3759860, 3, 'Raniemi', 2, '2021-01-31 17:51:21', 0);
 INSERT INTO `staff` VALUES (30, 3, 10, 'BanchoBot', 1, '2021-01-30 02:53:53', 0);
-INSERT INTO `staff` VALUES (31, 9502522, 6, '[ TNTlealu ]', 16, '2021-01-31 23:55:40', 0);
+INSERT INTO `staff` VALUES (31, 9502522, 6, '[ TNTlealu ]', 16, '2021-02-16 03:00:18', 1);
 INSERT INTO `staff` VALUES (32, 2, 9, 'peppy', 256, '2021-02-01 00:07:49', 1);
+INSERT INTO `staff` VALUES (33, 9834516, 2, 'Himeno Sena', 64, '2021-02-15 21:40:25', 1);
 
 -- ----------------------------
 -- Table structure for team
@@ -401,12 +407,19 @@ CREATE TABLE `tourney`  (
   `timer` int(11) NOT NULL DEFAULT 90 COMMENT '預設房間倒數時間',
   `live_link` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '直播網址',
   `map_sort` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `1v1` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否為1v1',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '比賽資訊' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of tourney
 -- ----------------------------
-INSERT INTO `tourney` VALUES (1, '840 Peculiar Person Cup', '8PPC', '2019-12-01 00:00:00', '2020-01-10 23:59:59', 0, 3, 1, 1, 1, 0, 3, 0, 80, 'https://www.twitch.tv/840tourney', '');
+INSERT INTO `tourney` VALUES (1, '840 Peculiar Person Cup', '8PPC', '2019-12-01 00:00:00', '2020-01-10 23:59:59', 0, 3, 1, 1, 1, 0, 3, 0, 80, 'https://www.twitch.tv/840tourney', '', 0);
+
+-- ----------------------------
+-- View structure for view_staff
+-- ----------------------------
+DROP VIEW IF EXISTS `view_staff`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `view_staff` AS select `s`.`id` AS `id`,`s`.`user_id` AS `user_id`,`s`.`group_id` AS `group_id`,`s`.`username` AS `username`,`s`.`privileges` AS `privileges`,`s`.`join_date` AS `join_date`,`s`.`active` AS `active`,`g`.`name` AS `group_name`,`g`.`ch_name` AS `group_chname` from (`staff` `s` left join `group` `g` on((`g`.`id` = `s`.`group_id`)));
 
 SET FOREIGN_KEY_CHECKS = 1;
