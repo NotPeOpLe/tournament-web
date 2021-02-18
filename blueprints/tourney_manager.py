@@ -10,9 +10,16 @@ db = mysql.DB()
 console = Console()
 
 @tourney.context_processor
-def rounds():
-    return dict(rounds=db.query_all("select * from round"))
+def context():
+    if session == {}:
+        user = None
+    else:
+        user = get('view_staff', str(session['id']))
 
+    return dict(
+        cur_user=user,
+        rounds=db.query_all("select * from round"),
+    )
 
 def login_required(f):
     @wraps(f)
@@ -71,11 +78,14 @@ def callback():
         try:
             user = osuapi.get2(u['access_token'], me='')
             sql = db.get_staff(user_id=user['id'])
-            if user['id'] == sql['user_id']:
+            if sql:
                 login(sql)
                 return redirect(url_for('tourney.dashboard'))
+            else:
+                flash('看來你不是工作人員，請回吧')
+                log.debug(user)
+                return redirect(url_for('index'))
         except Exception as e:
-            log.debug(locals())
             log.exception(e)
     return redirect(url_for('index'))
 
@@ -88,8 +98,7 @@ def logout():
 
 @tourney.route('/schedule/', methods=['GET', 'POST'])
 @login_required
-def matchs():
-    if request.method == 'POST':
+def matchs_job():
         mid = int(request.form['id'])
         uid = session['id']
         job = request.form['job']
@@ -118,7 +127,7 @@ def matchs():
                     if job == 'ref':
                         update_query = update_query.replace('$x', 'referee = %d' % uid)
                         success_msg='你已接下場次 %d 的裁判工作' % mid
-                        privilege = Staff.REFFEREE
+                    privilege = Staff.REFEREE
                     elif job == 'stream':
                         update_query = update_query.replace('$x', 'streamer = %d' % uid)
                         success_msg='你已接下場次 %d 的直播工作' % mid
@@ -138,7 +147,6 @@ def matchs():
                     else:
                         flash('job的值"%s"不是有效的值' % job, 'danger')
                         return redirect(url_for('tourney.matchs'))
-
                     return update(uid, privilege, update_query, success_msg=success_msg)
                 elif action == 'remove':
                     success_msg = ''
@@ -146,7 +154,7 @@ def matchs():
                     if job == 'ref' and match['referee'] == uid:
                         success_msg = '你已解除場次 %d 的裁判工作' % mid
                         update_query = update_query.replace('$x', 'referee = NULL')
-                        privilege = Staff.REFFEREE
+                    privilege = Staff.REFEREE
                     elif job == 'stream' and match['streamer'] == uid:
                         success_msg = '你已解除場次 %d 的直播工作' % mid
                         update_query = update_query.replace('$x', 'streamer = NULL')
@@ -177,13 +185,9 @@ def matchs():
             flash('match_id: %d 找不到對應的場次!' % mid, 'danger')
             return redirect(url_for('tourney.matchs'))
 
-    return render_template('manager/schedule.html', matchs=db.get_matchs(), staff=dict(session))
-
-
 @tourney.route('/teams/')
 @login_required
 def teams():
-    if session == {}: return redirect(url_for('tourney.gologin'))
     return render_template('manager/teams.html')
 
 
@@ -191,9 +195,6 @@ def teams():
 @login_required
 @need_privilege(Staff.ADMIN)
 def staff():
-    view_all = False
-    if 'view_all' in request.args:
-        view_all = True
     if request.method == 'POST':
         try:
             console.log(dict(request.form))
@@ -220,7 +221,7 @@ def staff():
         finally:
             return redirect(url_for('tourney.staff'))
 
-    return render_template('manager/staff.html', staff=db.get_staff(format=False,viewall=view_all), cur_user=db.get_staff(user_id=session['user_id']))
+    return render_template('manager/staff.html', staff=get('view_staff', '*'))
 
 
 @tourney.route('/settings/', methods=['GET', 'POST'])
