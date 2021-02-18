@@ -56,6 +56,24 @@ class DB(object):
             return self.query_one(query, args)
         return self.query_all(query, args)
 
+    def update(self, table, id, **kargs):
+        """
+        更新資料
+        :param table: 表格名稱
+        :param id: (識別欄位, id)
+        :param one: **dict 或者 key=value
+        """
+        params = []
+        for k, v in kargs.items():
+            if v is not None:
+                params.append(f"{k}='{v}'")
+            else:
+                params.append(f"{k}=NULL")
+
+        self.connect.ping(reconnect=True)
+        self.cursor.execute("update `{}` set {} where {} = '{}'".format(table, ', '.join(params), *id))
+        self.connect.commit()
+
     def close(self):
         """
         关闭
