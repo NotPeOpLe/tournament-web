@@ -109,8 +109,90 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
+@tourney.route('/schedule/')
+@login_required
+def matchs():
+    teams = db.query_all('select * from team')
+    if check_privilege(session['id'], Staff.ADMIN): isadmin = True
+    else: isadmin = False
 
-@tourney.route('/schedule/', methods=['GET', 'POST'])
+    staffs = {}
+    for s in get('view_staff', '*'):
+        for a in str(Staff(s['privileges']))[6:].split('|'):
+            if not staffs.get(a):
+                staffs[a] = []
+            staffs[a].append(s)
+
+    return render_template('manager/schedule.html', matchs=db.get_matchs(), isadmin=isadmin, teams=teams, staffs=staffs)
+
+@tourney.route('/schedule/match/', methods=['POST'])
+@login_required
+def matchs_add():
+    round_id = int(request.form['round'])
+    code = request.form['code']
+    team1_id = int(request.form['team1'])
+    team2_id = int(request.form['team2'])
+    date = request.form['date']
+    loser = int(request.form.get('loser', 0))
+
+    try:
+        db.query('Insert into `match` (`round_id`, `code`, `team1`, `team2`, `date`, `loser`) values (%s, %s, %s, %s, %s, %s)', (round_id, code, team1_id, team2_id, date, loser))
+        flash('%s 新增成功' % code, 'success')
+        return redirect(url_for('tourney.matchs'))
+    except Exception as e:
+        flash(e, 'danger')
+        return redirect(url_for('tourney.matchs'))
+
+@tourney.route('/schedule/match/<id>/update', methods=['POST'])
+def match_update(id):
+    match: dict = get('match', id)
+    match.pop('id')
+    cmatch = dict(
+        code = request.form.get('code'),
+        round_id = request.form.get('round_id', type=int),
+        team1 = request.form.get('team1', type=int),
+        team1_score = request.form.get('team1_score', type=int),
+        team2 = request.form.get('team2', type=int),
+        team2_score = request.form.get('team2_score', type=int),
+        date = request.form.get('date'),
+        referee = request.form.get('referee', None, type=int),
+        streamer = request.form.get('streamer', None, type=int),
+        commentator = request.form.get('commentator', None, type=int),
+        commentator2 = request.form.get('commentator2', None, type=int),
+        mp_link = request.form.get('mp_link'),
+        video_link = request.form.get('video_link'),
+        stats = request.form.get('stats', type=int),
+        loser = request.form.get('loser', 0, type=int),
+        note = request.form.get('note'),
+    )
+
+    print(dict_cmp(cmatch,match))
+
+    try:
+        db.update('match', ('id', id), **dict_cmp(cmatch,match))
+        flash('MathId: %s 已更新' % id, 'success')
+        return redirect(url_for('tourney.matchs'))
+    except IntegrityError as e:
+        if e.args[0] == 1062 and re.match(r"Duplicate entry '(.+)' for key 'code'",e.args[1]):
+            flash('你要修改的 Code 已經存在', 'danger')
+        else:
+            flash(e, 'danger')
+        return redirect(url_for('tourney.matchs'))
+    except Exception as e:
+        flash(e, 'danger')
+        return redirect(url_for('tourney.matchs'))
+
+@tourney.route('/schedule/match/<id>/delete', methods=['POST'])
+def match_delete(id):
+    try:
+        db.query("DELETE FROM `match` WHERE id = %s;", [id])
+        flash('MathId: %s 已刪除' % id, 'success')
+        return redirect(url_for('tourney.matchs'))
+    except Exception as e:
+        flash(e, 'danger')
+        return redirect(url_for('tourney.matchs'))
+
+@tourney.route('/schedule/job', methods=['POST'])
 @login_required
 def matchs_job():
         mid = int(request.form['id'])
