@@ -195,97 +195,123 @@ def match_delete(id):
 @tourney.route('/schedule/job', methods=['POST'])
 @login_required
 def matchs_job():
-        mid = int(request.form['id'])
-        uid = session['id']
-        job = request.form['job']
-        action = request.form['action']
-        match = db.query_one("select * from `match` where id = %s", [mid])
+    mid = int(request.form['id'])
+    uid = session['id']
+    job = request.form['job']
+    action = request.form['action']
+    match = db.query_one("select * from `match` where id = %s", [mid])
 
-        def update(id, privilege: Staff, ctx, args=None, success_msg=''):
-            if check_privilege(id, privilege):
-                try:
-                    db.query(ctx, args)
-                    flash(success_msg,'success')
-                except Exception as e:
-                    flash(e, 'danger')
-                finally:
-                    return redirect(url_for('tourney.matchs'))
-            else:
-                flash('你沒有 %s 權限' % privilege.name, 'danger')
-                return redirect(url_for('tourney.matchs'))
-
-        if match:
-            if match['stats'] == 0:
-                update_query = "Update `match` Set $x Where id = %d" % mid
-                privilege = Staff.STAFF
-                if action == 'get':
-                    success_msg = ''
-                    if job == 'ref':
-                        update_query = update_query.replace('$x', 'referee = %d' % uid)
-                        success_msg='你已接下場次 %d 的裁判工作' % mid
-                    privilege = Staff.REFEREE
-                    elif job == 'stream':
-                        update_query = update_query.replace('$x', 'streamer = %d' % uid)
-                        success_msg='你已接下場次 %d 的直播工作' % mid
-                        privilege = Staff.STREAMER
-                    elif job == 'comm':
-                        if match['commentator']:
-                            update_query = update_query.replace('$x', 'commentator2 = %d' % uid)
-                            success_msg='你已接下場次 %d 的賽評工作' % mid
-                            privilege = Staff.COMMENTATOR
-                        elif match['commentator'] and match['commentator2']:
-                            flash('該場次已經塞不下更多的賽評了!', 'danger')
-                            return redirect(url_for('tourney.matchs'))
-                        else:
-                            update_query = update_query.replace('$x', 'commentator = %d' % uid)
-                            success_msg='你已接下場次 %d 的賽評工作' % mid
-                            privilege = Staff.COMMENTATOR
-                    else:
-                        flash('job的值"%s"不是有效的值' % job, 'danger')
-                        return redirect(url_for('tourney.matchs'))
-                    return update(uid, privilege, update_query, success_msg=success_msg)
-                elif action == 'remove':
-                    success_msg = ''
-                    privilege = Staff.STAFF
-                    if job == 'ref' and match['referee'] == uid:
-                        success_msg = '你已解除場次 %d 的裁判工作' % mid
-                        update_query = update_query.replace('$x', 'referee = NULL')
-                    privilege = Staff.REFEREE
-                    elif job == 'stream' and match['streamer'] == uid:
-                        success_msg = '你已解除場次 %d 的直播工作' % mid
-                        update_query = update_query.replace('$x', 'streamer = NULL')
-                        privilege = Staff.STREAMER
-                    elif job == 'comm':
-                        if match['commentator'] == uid:
-                            update_query = update_query.replace('$x', 'commentator = NULL')
-                        elif match['commentator2'] == uid:
-                            update_query = update_query.replace('$x', 'commentator2 = NULL')
-                        success_msg = '你已解除場次 %d 的賽評工作' % mid
-                        privilege = Staff.COMMENTATOR
-                    else:
-                        if job not in ('ref', 'stream', 'comm'):
-                            flash('job 的值"%s"不是有效的值' % job, 'danger')
-                            return redirect(url_for('tourney.matchs'))
-                        else:
-                            flash('你沒有接過該場次的工作', 'danger')
-                            return redirect(url_for('tourney.matchs'))
-                            
-                    return update(uid, privilege, update_query, success_msg=success_msg)
-                else:
-                    flash('action 的值"%s"不是有效的值' % action, 'danger')
-                    return redirect(url_for('tourney.matchs'))
-            else:
-                flash('match_id: %d 改場次已結束!' % mid, 'danger')
+    def update(id, privilege: Staff, ctx, args=None, success_msg=''):
+        if check_privilege(id, privilege):
+            try:
+                db.query(ctx, args)
+                flash(success_msg,'success')
+            except Exception as e:
+                flash(e, 'danger')
+            finally:
                 return redirect(url_for('tourney.matchs'))
         else:
-            flash('match_id: %d 找不到對應的場次!' % mid, 'danger')
+            flash('你沒有 %s 權限' % privilege.name, 'danger')
             return redirect(url_for('tourney.matchs'))
+
+    if match:
+        if match['stats'] == 0:
+            update_query = "Update `match` Set $x Where id = %d" % mid
+            privilege = Staff.STAFF
+            if action == 'get':
+                success_msg = ''
+                if job == 'ref':
+                    update_query = update_query.replace('$x', 'referee = %d' % uid)
+                    success_msg='你已接下場次 %d 的裁判工作' % mid
+                    privilege = Staff.REFEREE
+                elif job == 'stream':
+                    update_query = update_query.replace('$x', 'streamer = %d' % uid)
+                    success_msg='你已接下場次 %d 的直播工作' % mid
+                    privilege = Staff.STREAMER
+                elif job == 'comm':
+                    if match['commentator']:
+                        update_query = update_query.replace('$x', 'commentator2 = %d' % uid)
+                        success_msg='你已接下場次 %d 的賽評工作' % mid
+                        privilege = Staff.COMMENTATOR
+                    elif match['commentator'] and match['commentator2']:
+                        flash('該場次已經塞不下更多的賽評了!', 'danger')
+                        return redirect(url_for('tourney.matchs'))
+                    else:
+                        update_query = update_query.replace('$x', 'commentator = %d' % uid)
+                        success_msg='你已接下場次 %d 的賽評工作' % mid
+                        privilege = Staff.COMMENTATOR
+                else:
+                    flash('job的值"%s"不是有效的值' % job, 'danger')
+                    return redirect(url_for('tourney.matchs'))
+                return update(uid, privilege, update_query, success_msg=success_msg)
+            elif action == 'remove':
+                success_msg = ''
+                privilege = Staff.STAFF
+                if job == 'ref' and match['referee'] == uid:
+                    success_msg = '你已解除場次 %d 的裁判工作' % mid
+                    update_query = update_query.replace('$x', 'referee = NULL')
+                    privilege = Staff.REFEREE
+                elif job == 'stream' and match['streamer'] == uid:
+                    success_msg = '你已解除場次 %d 的直播工作' % mid
+                    update_query = update_query.replace('$x', 'streamer = NULL')
+                    privilege = Staff.STREAMER
+                elif job == 'comm':
+                    if match['commentator'] == uid:
+                        update_query = update_query.replace('$x', 'commentator = NULL')
+                    elif match['commentator2'] == uid:
+                        update_query = update_query.replace('$x', 'commentator2 = NULL')
+                    success_msg = '你已解除場次 %d 的賽評工作' % mid
+                    privilege = Staff.COMMENTATOR
+                else:
+                    if job not in ('ref', 'stream', 'comm'):
+                        flash('job 的值"%s"不是有效的值' % job, 'danger')
+                        return redirect(url_for('tourney.matchs'))
+                    else:
+                        flash('你沒有接過該場次的工作', 'danger')
+                        return redirect(url_for('tourney.matchs'))
+                        
+                return update(uid, privilege, update_query, success_msg=success_msg)
+            else:
+                flash('action 的值"%s"不是有效的值' % action, 'danger')
+                return redirect(url_for('tourney.matchs'))
+        else:
+            flash('match_id: %d 改場次已結束!' % mid, 'danger')
+            return redirect(url_for('tourney.matchs'))
+    else:
+        flash('match_id: %d 找不到對應的場次!' % mid, 'danger')
+        return redirect(url_for('tourney.matchs'))
 
 @tourney.route('/teams/')
 @login_required
 def teams():
     return render_template('manager/teams.html')
 
+@tourney.route('/rounds/', methods=['GET', 'POST'])
+def rounds():
+    pool_group_count = db.query_all("""
+        SELECT m.round_id, m.`group`, COUNT(m.`group`) 'count', g.badge_color
+        FROM mappool m
+        LEFT JOIN map_group g ON g.`name` = m.`group`
+        GROUP BY m.round_id, m.`group`
+        ORDER BY FIELD(m.`group`, 'TB', 'EZ', 'Roll', 'DT', 'HR', 'HD', 'NM', 'FM') DESC""")
+    rounds=get('round','*')
+
+    for p in pool_group_count:
+        for r in rounds:
+            if not r.get('pool_overview'):
+                r['pool_overview'] = []
+            if r['id'] == p['round_id']:
+                r['pool_overview'].append({'group': p['group'], 'count': p['count'], 'badge_color': p['badge_color']})
+
+    return render_template('manager/rounds.html', rounds=rounds)
+
+@tourney.route('/rounds/<round_id>/update', methods=['POST'])
+def rounds_update(round_id):
+    return
+
+@tourney.route('/rounds/<round_id>/delete', methods=['POST'])
+def rounds_delete(round_id):
+    return
 
 @tourney.route('/staff/', methods=['GET', 'POST'])
 @login_required
