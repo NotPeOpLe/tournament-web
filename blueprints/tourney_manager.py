@@ -496,7 +496,7 @@ def mappool_add(round):
 @tourney.route('/mappool/<round>/update', methods=['POST'])
 def mappool_add(round):
     try:
-        db.query("Update `mappool` set () values ()")
+        db.update('mappool', ('id', id), dict_cmp())
         flash(info, 'success')
     except Exception as e:
         flash(e.args[0], 'danger')
@@ -507,7 +507,7 @@ def mappool_add(round):
 @tourney.route('/mappool/<round>/del', methods=['POST'])
 def mappool_add(round):
     try:
-        db.query("Update `mappool` set () values ()")
+        db.query("delete from `mappool` where id = %s")
         flash(info, 'success')
     except Exception as e:
         flash(e.args[0], 'danger')
