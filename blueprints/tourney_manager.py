@@ -459,7 +459,7 @@ def mappool(round_id=None):
             # debug
             log.debug(dict(request.form))
             # 圖譜插入至SQL
-            db.query('insert into mappool (`round_id`, `beatmap_id`, `group`, `code`, `mods`, `info`, `note`, `nominator`) values (%s, %s, %s, %s, %s, %s, %s, %s)',
+            db.query('insert into `mappool` (`round_id`, `beatmap_id`, `group`, `code`, `mods`, `info`, `note`, `nominator`) values (%s, %s, %s, %s, %s, %s, %s, %s)',
                 (int(round_id), int(beatmap_id), group, modcount['count']+1, use_mods, json.dumps(beatmap), note, poster))
             
             # 成功訊息
@@ -475,3 +475,43 @@ def mappool(round_id=None):
     # GET: 查看網頁
     mappool = db.get_mappool(round_id, ingore_pool_publish=True, format=False)
     return render_template('manager/mappool.html', round_id=round_id, mappool=mappool)
+
+# view
+@tourney.route('/mappool/')
+def mappool():
+    mappool = get('mappool', '*')
+    return render_template('manager/mappool.html', mappool=mappool)
+
+# action
+@tourney.route('/mappool/<round>/add', methods=['POST'])
+def mappool_add(round):
+    try:
+        db.query("Insert into `mappool` () values ()")
+    except Exception as e:
+        flash(e.args[0], 'danger')
+        log.exception(e)
+    finally:
+        return redirect(url_for('tourney.mappool'))
+            
+@tourney.route('/mappool/<round>/update', methods=['POST'])
+def mappool_add(round):
+    try:
+        db.query("Update `mappool` set () values ()")
+        flash(info, 'success')
+    except Exception as e:
+        flash(e.args[0], 'danger')
+        log.exception(e)
+    finally:
+        return redirect(url_for('tourney.mappool'))
+
+@tourney.route('/mappool/<round>/del', methods=['POST'])
+def mappool_add(round):
+    try:
+        db.query("Update `mappool` set () values ()")
+        flash(info, 'success')
+    except Exception as e:
+        flash(e.args[0], 'danger')
+        log.exception(e)
+    finally:
+        return redirect(url_for('tourney.mappool'))
+
