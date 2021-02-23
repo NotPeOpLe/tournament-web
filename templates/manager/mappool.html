@@ -1,70 +1,99 @@
 {% extends 'manager/base.html' %}
 {% block title %}圖池管理{% endblock title %}
+{% block actions %}
+<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add-map-modal">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-plus" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+    Add Map
+</button>
+{% endblock actions %}
 {% block content %}
-    <div class="row">
-        <div class="col">
-            <div class="input-group">
-                <span class="input-group-text">Round</span>
-                <select class="form-select" name="round" id="select-round">
-                    {% for r in rounds %}
-                    <option value="{{r.id}}" {% if r.id == round_id | int %}selected{% endif %}>{{r.name}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-        <div class="col-auto">
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add-map-modal">Add Map</button>
-        </div>
-    </div>
-    <div class="table-responsive">
-        <table class="table text-center text-nowrap">
-            <thead>
-                <tr>
-                    <th>Song</th>
-                    <th width="50">CS</th>
-                    <th width="50">AR</th>
-                    <th width="50">HP</th>
-                    <th width="50">OD</th>
-                    <th width="50">Stars</th>
-                    <th width="50">BPM</th>
-                    <th width="70">Length</th>
-                    <th width="100">Group</th>
-                    <th width="150">提名人</th>
-                    <th width="1">備註</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for m in mappool %}
-                <tr style="background-color: #{{m.hex_color}};">
-                    <td style="
-                        background: -webkit-linear-gradient(right, #{{m.hex_color}}, #{{m.hex_color}}30),
-                        url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
-                        background: -moz-linear-gradient(right, #{{m.hex_color}}, #{{m.hex_color}}30),
-                        url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
-                        background: -o-linear-gradient(right, #{{m.hex_color}}, #{{m.hex_color}}30),
-                        url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
-                        background: linear-gradient(right, #{{m.hex_color}}, #{{m.hex_color}}30),
-                        url('https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg') no-repeat left;
-                        background-size: cover;
-                    ">
-                    <a href="https://osu.ppy.sh/b/{{m.beatmap_id}}" class="text-dark">{{m.info.artist}} - {{m.info.title}} [{{m.info.version}}]</a>
-                    </td>
-                    <td>{{m.info.diff_size}}</td>
-                    <td>{{m.info.diff_approach}}</td>
-                    <td>{{m.info.diff_drain}}</td>
-                    <td>{{m.info.diff_overall}}</td>
-                    <td>{{m.info.difficultyrating | floatfix}}</td>
-                    <td>{{m.info.bpm}}</td>
-                    <td>{{m.info.total_length | timef}}</td>
-                    <td>{{m.group}}</td>
-                    <td>{{m.username}}</td>
-                    <td class="text-start">{{m.note}}</td>
-                </tr>
+<div class="row mb-3">
+    <div class="col">
+        <div class="input-group  flex-nowrap">
+            <span class="input-group-text">階段</span>
+            <select class="form-select" name="round" id="select-round">
+                {% for r in rounds %}
+                <option value="{{r.id}}">{{r.name}}</option>
                 {% endfor %}
-            </tbody>
-        </table>
+            </select>
+        </div>
     </div>
-
+</div>
+    <div class="card">
+        <div class="table-responsive mb-0">
+            <table class="table card-table table-vcenter text-center text-nowrap" id="main-table">
+                <thead>
+                    <tr>
+                        <th>Song</th>
+                        <th>CS</th>
+                        <th>AR</th>
+                        <th>HP</th>
+                        <th>OD</th>
+                        <th>Stars</th>
+                        <th>BPM</th>
+                        <th>Length</th>
+                        <th>Mods</th>
+                        <th>提名人</th>
+                        <th>備註</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in mappool %}
+                    <tr class="hover-dark">
+                        <td class="p-0">
+                            <div class="card song-banner" style="background-image: url(https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg); background-size:cover; background-clip: content-box;">
+                                <div style="background-color: rgba(0, 0, 0, 0.753);"></div>
+                                <div class="card-body" style="background-color: rgba(0, 0, 0, 0.3);">
+                                    <a href="https://osu.ppy.sh/b/{{m.beatmap_id}}" class="text-white">{{m.info.artist}} - {{m.info.title}} [{{m.info.version}}]</a>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{m.info.diff_size}}</td>
+                        <td>{{m.info.diff_approach}}</td>
+                        <td>{{m.info.diff_drain}}</td>
+                        <td>{{m.info.diff_overall}}</td>
+                        <td>{{m.info.difficultyrating | floatfix}}</td>
+                        <td>{{m.info.bpm}}</td>
+                        <td>{{m.info.total_length | timef}}</td>
+                        <td>{{m.group}}</td>
+                        <td>{{m.username}}</td>
+                        <td class="text-start">{{m.note}}</td>
+                        <td>
+                            <div class="text-end">
+                                <button type="button" class="btn dropdown-toggle align-text-top" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-adjustments-horizontal" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <circle cx="14" cy="6" r="2"></circle>
+                                        <line x1="4" y1="6" x2="12" y2="6"></line>
+                                        <line x1="16" y1="6" x2="20" y2="6"></line>
+                                        <circle cx="8" cy="12" r="2"></circle>
+                                        <line x1="4" y1="12" x2="6" y2="12"></line>
+                                        <line x1="10" y1="12" x2="20" y2="12"></line>
+                                        <circle cx="17" cy="18" r="2"></circle>
+                                        <line x1="4" y1="18" x2="15" y2="18"></line>
+                                        <line x1="19" y1="18" x2="20" y2="18"></line>
+                                    </svg>
+                                </span>
+                                    <span>選項</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" data-id="32" aria-labelledby="menu">
+                                    <li><button class="dropdown-item text-primary ubtn" type="button" data-bs-toggle="modal" data-bs-target="#update-round-modal" data-id="{{m.id}}">修改</button></li>
+                                    <li><button class="dropdown-item text-danger dbtn" type="button" data-bs-toggle="modal" data-bs-target="#del-round-modal" data-id="{{m.id}}">刪除</button></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div class="modal fade"  tabindex="-1" id="add-map-modal" aria-labelledby="add-map-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-dialog">
@@ -169,6 +198,9 @@
          
 {% endblock content %}
 {% block script %}
+    <script>
+        {{mappool | tojson}}
+    </script>
     <script>
         //std mods
         var mod_ez = document.getElementById('ez');

@@ -1,0 +1,31 @@
+.dark-background {
+    background-color: rgb(0,0,0,0.4);
+    transition: background-color 160ms;
+}
+
+.dark-background:hover {
+    background-color: rgb(0,0,0,0.6);
+}
+
+.hover-dark {
+    background-color: rgb(0,0,0,0);
+    transition: background-color 160ms;
+}
+
+.hover-dark:hover {
+    background-color: rgb(0,0,0,0.1);
+}
+
+.hover-light {
+    background-color: rgba(255, 255, 255, 0);
+    transition: background-color 160ms;
+}
+
+.hover-light:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.song-banner {
+    background-color: rgb(178, 178, 178);
+    transition: background-image 160ms;
+}
