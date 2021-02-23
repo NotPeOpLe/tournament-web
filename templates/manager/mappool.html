@@ -60,6 +60,7 @@
                         <td>{{m.info.difficultyrating | floatfix}}</td>
                         <td>{{m.info.bpm}}</td>
                         <td>{{m.info.total_length | timef}}</td>
+                        <td><span class="badge bg-{{ m.colour.badge | default('none') }} w-4">{{m.group}}</span></td>
                         <td>{{m.nominator.username}}</td>
                         <td class="text-start">{{m.note}}</td>
                         <td>
