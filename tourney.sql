@@ -11,7 +11,7 @@
  Target Server Version : 50731
  File Encoding         : 65001
 
- Date: 18/02/2021 20:07:38
+ Date: 24/02/2021 01:26:09
 */
 
 SET NAMES utf8mb4;
@@ -71,21 +71,23 @@ CREATE TABLE `map_group`  (
   `name` char(6) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
   `hex_color` char(8) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `badge_color` char(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `enabled_mods` int(255) NULL DEFAULT 0,
+  `freemod` tinyint(1) NULL DEFAULT 0,
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '圖譜的分類' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of map_group
 -- ----------------------------
-INSERT INTO `map_group` VALUES ('DT', 'C9DAF8', 'purple');
-INSERT INTO `map_group` VALUES ('EZ', 'AEEDC9', 'green');
-INSERT INTO `map_group` VALUES ('FL', '828282', 'dark');
-INSERT INTO `map_group` VALUES ('FM', 'D9D2E9', 'azure');
-INSERT INTO `map_group` VALUES ('HD', 'FFF2CC', 'yellow');
-INSERT INTO `map_group` VALUES ('HR', 'F4CCCC', 'red');
-INSERT INTO `map_group` VALUES ('NM', 'FFFFFF', 'muted');
-INSERT INTO `map_group` VALUES ('Roll', 'E8AEED', 'dark-lt');
-INSERT INTO `map_group` VALUES ('TB', 'D9EAD3', 'lime');
+INSERT INTO `map_group` VALUES ('DT', 'C9DAF8', 'purple', 65, 0);
+INSERT INTO `map_group` VALUES ('EZ', 'AEEDC9', 'green', 3, 0);
+INSERT INTO `map_group` VALUES ('FL', '828282', 'dark', 1025, 0);
+INSERT INTO `map_group` VALUES ('FM', 'D9D2E9', 'azure', 0, 1);
+INSERT INTO `map_group` VALUES ('HD', 'FFF2CC', 'yellow', 9, 0);
+INSERT INTO `map_group` VALUES ('HR', 'F4CCCC', 'red', 17, 0);
+INSERT INTO `map_group` VALUES ('NM', 'FFFFFF', 'muted', 1, 0);
+INSERT INTO `map_group` VALUES ('Roll', 'E8AEED', 'dark-lt', 0, 1);
+INSERT INTO `map_group` VALUES ('TB', 'D9EAD3', 'lime', 0, 1);
 
 -- ----------------------------
 -- Table structure for mappool
@@ -287,7 +289,7 @@ INSERT INTO `round` VALUES (3, 'Quarterfinals', '8強賽', 9, '2021-01-18 00:00:
 INSERT INTO `round` VALUES (4, 'Semifinals', '半決賽', 11, '2021-01-18 00:00:00', 0);
 INSERT INTO `round` VALUES (5, 'Finals', '決賽', 11, '2021-01-18 00:00:00', 0);
 INSERT INTO `round` VALUES (6, 'Grand Final', '總決賽', 13, '2021-01-18 00:00:00', 0);
-INSERT INTO `round` VALUES (7, 'Test', '測試', 9, '2021-01-24 02:43:09', 1);
+INSERT INTO `round` VALUES (7, 'Test', '測試', 11, '2021-01-24 02:43:09', 0);
 
 -- ----------------------------
 -- Table structure for staff
@@ -415,6 +417,30 @@ CREATE TABLE `tourney`  (
 -- Records of tourney
 -- ----------------------------
 INSERT INTO `tourney` VALUES (1, '840 Peculiar Person Cup', '8PPC', '2019-12-01 00:00:00', '2020-01-10 23:59:59', 0, 3, 1, 1, 1, 0, 3, 0, 80, 'https://www.twitch.tv/840tourney', '', 0);
+
+-- ----------------------------
+-- View structure for json_mappool
+-- ----------------------------
+DROP VIEW IF EXISTS `json_mappool`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_mappool` AS select `m`.`id` AS `id`,`m`.`round_id` AS `round_id`,json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = TRUE),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)) AS `json` from ((`mappool` `m` left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`)));
+
+-- ----------------------------
+-- View structure for json_round
+-- ----------------------------
+DROP VIEW IF EXISTS `json_round`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_round` AS select `r`.`id` AS `id`,`r`.`pool_publish` AS `pool_publish`,json_object('id',`r`.`id`,'name',`r`.`name`,'description',`r`.`description`,'best_of',`r`.`best_of`,'start_date',`r`.`start_date`,'pool_publish',`r`.`pool_publish`,'mappool',json_arrayagg(json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = TRUE),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)))) AS `json` from (((`round` `r` left join `mappool` `m` on((`m`.`round_id` = `r`.`id`))) left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`))) group by `r`.`id`;
+
+-- ----------------------------
+-- View structure for json_teams
+-- ----------------------------
+DROP VIEW IF EXISTS `json_teams`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_teams` AS select json_arrayagg(json_object('id',`t`.`id`,'full_name',`t`.`full_name`,'acronym',`t`.`acronym`,'flag_name',`t`.`flag_name`,'players',`p`.`players`)) AS `json` from (`tourney`.`team` `t` left join (select `tourney`.`player`.`team` AS `id`,json_arrayagg(json_object('id',`tourney`.`player`.`id`,'team_id',`tourney`.`player`.`team`,'user_id',`tourney`.`player`.`user_id`,'username',`tourney`.`player`.`username`,'register_date',`tourney`.`player`.`register_date`,'info',`tourney`.`player`.`info`,'bp1',`tourney`.`player`.`bp1`,'active',`tourney`.`player`.`active`)) AS `players` from `tourney`.`player` group by `tourney`.`player`.`team`) `p` on((`p`.`id` = `t`.`id`)));
+
+-- ----------------------------
+-- View structure for view_mappool
+-- ----------------------------
+DROP VIEW IF EXISTS `view_mappool`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `view_mappool` AS select `mappool`.`id` AS `id`,`mappool`.`round_id` AS `round_id`,`mappool`.`beatmap_id` AS `beatmap_id`,`map_group`.`name` AS `map_group`,`map_group`.`badge_color` AS `badge_color`,`map_group`.`hex_color` AS `hex_color`,`mappool`.`code` AS `code`,`mappool`.`mods` AS `mods`,`mappool`.`info` AS `info`,`mappool`.`note` AS `note`,`mappool`.`add_date` AS `add_date`,`view_staff`.`id` AS `nominator_id`,`view_staff`.`user_id` AS `nominator_uid`,`view_staff`.`group_id` AS `nominator_gid`,`view_staff`.`username` AS `nominator_name` from ((`mappool` left join `view_staff` on((`view_staff`.`id` = `mappool`.`nominator`))) left join `map_group` on((`map_group`.`name` = `mappool`.`group`)));
 
 -- ----------------------------
 -- View structure for view_staff
