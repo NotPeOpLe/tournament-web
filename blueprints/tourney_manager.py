@@ -419,8 +419,8 @@ def settings():
 @login_required
 @need_privilege(Staff.MAPPOOLER)
 def mappool(round_id):
-    mappool = db.get_mappool(round_id, ingore_pool_publish=True, format=False)
-    return render_template('manager/mappool.html', mappool=mappool)
+    mappool = db.query("SELECT JSON_ARRAYAGG(json) json FROM json_mappool WHERE round_id = %s GROUP BY round_id", round_id)['json']
+    return render_template('manager/mappool.html', mappool=json.loads(mappool))
 
 # action
 @tourney.route('/mappool/<round>/add', methods=['POST'])
