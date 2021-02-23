@@ -289,7 +289,7 @@ def matchs_job():
 @tourney.route('/team/')
 @login_required
 def teams():
-    teams = db.query_one('SELECT json FROM json_team')['json']
+    teams = db.query_one('SELECT json FROM json_teams')['json']
     
     return render_template('manager/team.html', teams=json.loads(teams))
 
