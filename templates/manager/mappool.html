@@ -17,7 +17,8 @@
             <span class="input-group-text">階段</span>
             <select class="form-select" name="round" id="select-round">
                 {% for r in rounds %}
-                <option value="{{r.id}}">{{r.name}}</option>
+                {% set rid = '{}'.format(r.id) %}
+                <option value="{{r.id}}" {% if rid == request.view_args.round_id %}selected{% endif %}>{{r.name}}</option>
                 {% endfor %}
             </select>
         </div>
