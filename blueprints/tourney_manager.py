@@ -286,10 +286,12 @@ def matchs_job():
         flash('match_id: %d 找不到對應的場次!' % mid, 'danger')
         return redirect(url_for('tourney.matchs'))
 
-@tourney.route('/teams/')
+@tourney.route('/team/')
 @login_required
 def teams():
-    return render_template('manager/teams.html')
+    teams = db.query_one('SELECT json FROM json_team')['json']
+    
+    return render_template('manager/team.html', teams=json.loads(teams))
 
 @tourney.route('/rounds/', methods=['GET', 'POST'])
 @login_required
