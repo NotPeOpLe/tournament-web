@@ -1,7 +1,7 @@
 import pymysql, os, json
 from datetime import datetime
 from pymysql.cursors import DictCursor
-
+from config import Config
 class DB(object):
     """
     初始化数据库
@@ -9,11 +9,11 @@ class DB(object):
     # 也可以继承 Connection 这里没有选择继承
     def __init__(self):
         self.connect = pymysql.connect(
-            host=os.getenv('MYSQL_HOST'),
-            port=int(os.getenv('MYSQL_PORT')),
-            user=os.getenv('MYSQL_USER'),
-            password=os.getenv('MYSQL_PASSWORD'),
-            database=os.getenv('MYSQL_DB'),
+            host=Config.MYSQL_HOST,
+            port=Config.MYSQL_PORT,
+            user=Config.MYSQL_USER,
+            password=Config.MYSQL_PASSWORD,
+            database=Config.MYSQL_DB,
             cursorclass=DictCursor,
             autocommit=True
         )

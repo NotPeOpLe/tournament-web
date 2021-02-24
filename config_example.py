@@ -1,4 +1,5 @@
 class BaseConfig(object):
+    ENV = 'production'
     DEBUG = False  # 是否開啟Debug模式
     TESTING = False  # 是否開啟測試模式
     # 異常傳播(是否在控制檯列印LOG) 當Debug或者testing開啟後,自動為True
