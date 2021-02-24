@@ -1,0 +1,92 @@
+{% extends 'manager/base.html' %}
+{% block title %}隊伍管理{% endblock title %}
+{% block actions %}
+<button class="btn btn-primary add-staff-btn" data-bs-toggle="modal" data-bs-target="#staff-manager-modal">
+    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    Add team
+</button>
+<label class="form-selectgroup-item">
+    <input type="checkbox" id="view-all" class="form-selectgroup-input">
+    <span class="form-selectgroup-label">顯示已停用的隊伍</span>
+</label>
+{% endblock actions %}
+{% block content %}
+<div class="card">
+    <div class="table-responsive mb-0">
+        <table class="table card-table table-vcenter" id="main-table">
+            <thead>
+                <tr>
+                    <th>隊伍</th>
+                    <th>成員</th>
+                    <th>狀態</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in teams %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span class="avatar me-2" style="background-image: url({{ t.flag_name | flag_url }});"></span>
+                            <div class="flex-fill">
+                                <div class="font-weight-medium">{{ t.full_name }}</div>
+                                <div class="text-muted">{{ t.acronym }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="w-50">
+                        {% if t.players %}
+                        {% for p in t.players %}
+                        <a class="avatar" style="background-image: url(https://a.ppy.sh/{{p.user_id}})" href="https://osu.ppy.sh/u/{{p.user_id}}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="{{p.username}}"></a>
+                        {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="text-green">PASS</span>
+                    </td>
+                    <td>
+                        <div class="text-end">
+                            <button type="button" class="btn dropdown-toggle align-text-top" id="menu" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="icon icon-tabler icon-tabler-adjustments-horizontal" width="44" height="44"
+                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <circle cx="14" cy="6" r="2" />
+                                        <line x1="4" y1="6" x2="12" y2="6" />
+                                        <line x1="16" y1="6" x2="20" y2="6" />
+                                        <circle cx="8" cy="12" r="2" />
+                                        <line x1="4" y1="12" x2="6" y2="12" />
+                                        <line x1="10" y1="12" x2="20" y2="12" />
+                                        <circle cx="17" cy="18" r="2" />
+                                        <line x1="4" y1="18" x2="15" y2="18" />
+                                        <line x1="19" y1="18" x2="20" y2="18" />
+                                    </svg>
+                                </span>
+                                <span>
+                                    選項
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" data-id="{{ t.id }}" aria-labelledby="menu">
+                                <li>
+                                    <button class="dropdown-item">編輯</button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item text-danger">停用</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}
+{% block script %}
+<script>
+    {{teams | tojson}}
+</script>
+{% endblock script %}
