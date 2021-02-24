@@ -68,12 +68,12 @@
                                     選項
                                 </span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end" data-id="{{ t.id }}" aria-labelledby="menu">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
                                 <li>
-                                    <button class="dropdown-item">編輯</button>
+                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#update-modal" data-id="{{ t.id }}">編輯</button>
                                 </li>
                                 <li>
-                                    <button class="dropdown-item text-danger">停用</button>
+                                    <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#del-modal" data-id="{{ t.id }}">停用</button>
                                 </li>
                             </ul>
                         </div>
@@ -82,6 +82,73 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+<div class="modal modal-blur fade" id="update-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">修改 Team</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post" id="update-form" autocomplete="off">
+                    <input type="hidden" name="id" id="u-id">
+                    <div class="mb-3">
+                        <label class="form-label required">隊伍全名</label>
+                        <input type="text" class="form-control" id="u-fullname" name="full_name" maxlength="50" placeholder="full_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">隊名縮寫</label>         
+                        <input type="text" class="form-control" id="u-acronym" name="acronym" maxlength="4" placeholder="(可選) 最多4字">
+                    </div>                                                                                                                                                                                                                                                                                            
+                    <div class="mb-3">
+                        <label class="form-label required">旗幟/頭像</label>
+                        <input type="text" class="form-control" id="u-flagname" name="flag_name"  required>
+                    </div>
+                    <div id="spinner" style="display: none;">
+                        <div class="spinner-border" role="status"></div>Loading...
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" form="update-round-form" class="btn me-auto" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="update-round-form" class="btn btn-primary">修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal modal-blur fade" id="del-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-status bg-danger"></div>
+            <div class="modal-body text-center py-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-triangle mb-2 text-danger icon-lg" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M12 9v2m0 4v.01" />
+                    <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
+                </svg>
+                <h3>Are you sure?</h3>
+                <div class="text-muted">
+                    你確定要刪除 <span id="del-name"></span> (ID:<span id="del-id"></span>) 嗎?<br>
+                    確認之後將無法復原!
+                </div>
+                <form action="" method="post" id="del-form"></form>
+            </div>
+            <div class="modal-footer">
+                <div class="w-100">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-white w-100" data-bs-dismiss="modal">取消</button>
+                        </div>
+                        <div class="col">
+                            <button type="submit" id="del-submit" form="del-round-form" class="btn btn-danger w-100" disabled>確認刪除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}
