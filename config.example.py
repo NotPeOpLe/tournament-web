@@ -56,4 +56,4 @@ class BaseConfig(object):
     OSU_REDIRECT_URL = None
     
 class DebugConfig(BaseConfig):
-    pass
+    DEBUG = True
