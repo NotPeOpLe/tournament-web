@@ -316,7 +316,13 @@ def team_update(id):
 @tourney.route('/team/<id>/delete', methods=['POST'])
 @login_required
 def team_delete(id):
-    return '', 200
+    try:
+        db.query("DELETE FROM `team` WHERE id = %s;", [id])
+        flash('TeamID: {} 已刪除'.format(id), 'success')
+        return redirect(url_for('tourney.teams'))
+    except Exception as e:
+        flash('發生錯誤: {}'.format(e.args), 'danger')
+        return redirect(url_for('tourney.teams'))
 
 
 @tourney.route('/team/<id>/players/add', methods=['POST'])
