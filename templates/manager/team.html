@@ -1,5 +1,40 @@
 {% extends 'manager/base.html' %}
 {% block title %}隊伍管理{% endblock title %}
+{% block head %}
+<style>
+    .form-select-g {
+        display: block;
+        width: auto;
+        padding: 0.4375rem 2.25rem 0.4375rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.4285714;
+        color: #232e3c;
+        background-color: #ffffff;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23dadcde' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+        border: 1px solid #dadcde;
+        border-radius: 4px;
+        -webkit-appearance: none;
+           -moz-appearance: none;
+                appearance: none; }
+        .form-select-g:focus {
+          border-color: #90b5e2;
+          outline: 0;
+          box-shadow: 0 0 0 0.25rem rgba(32, 107, 196, 0.25); }
+        .form-select-g[multiple], .form-select-g[size]:not([size="1"]) {
+          padding-right: 0.75rem;
+          background-image: none; }
+        .form-select-g:disabled {
+          color: #a0a6ae;
+          background-color: #f0f2f6; }
+        .form-select-g:-moz-focusring {
+          color: transparent;
+          text-shadow: 0 0 0 #232e3c; }
+</style>
+{% endblock head %}
 {% block actions %}
 <button class="btn btn-primary add-staff-btn" data-bs-toggle="modal" data-bs-target="#staff-manager-modal">
     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -70,10 +105,10 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="menu">
                                 <li>
-                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#update-modal" data-id="{{ t.id }}">編輯</button>
+                                    <button class="dropdown-item ubtn" data-bs-toggle="modal" data-bs-target="#update-modal" data-id="{{ t.id }}">編輯</button>
                                 </li>
                                 <li>
-                                    <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#del-modal" data-id="{{ t.id }}">停用</button>
+                                    <button class="dropdown-item text-danger dbtn" data-bs-toggle="modal" data-bs-target="#del-modal" data-id="{{ t.id }}">停用</button>
                                 </li>
                             </ul>
                         </div>
@@ -104,7 +139,14 @@
                     </div>                                                                                                                                                                                                                                                                                            
                     <div class="mb-3">
                         <label class="form-label required">旗幟/頭像</label>
-                        <input type="text" class="form-control" id="u-flagname" name="flag_name"  required>
+                        <div class="input-group">
+                            <select name="flag_type" id="u-flagtype" class="form-select-g">
+                                <option value="avatar">Avatar</option>
+                                <option value="url">URL</option>
+                                <option value="local">Local</option>
+                            </select>
+                            <input type="text" class="form-control" id="u-flagname" name="flag_name" aria-label="Text input with dropdown button">
+                        </div>
                     </div>
                     <div id="spinner" style="display: none;">
                         <div class="spinner-border" role="status"></div>Loading...
@@ -155,5 +197,32 @@
 {% block script %}
 <script>
     {{teams | tojson}}
+</script>
+<script>
+    $(".dbtn").click(function(){
+        var id = $(this).data('id');
+        $.getJSON(`/api/data/team/${id}`).done(function(data){
+            $("#del-name").text(data.data.full_name);
+            $("#del-id").text(data.data.id);
+            $("#del-form")[0].action = `./${id}/delete`;
+            $("#del-submit").removeAttr('disabled');
+        });
+    });
+
+    $(".ubtn").click(function(){
+        $("#spinner").show();
+        var id = $(this).data('id');
+        $("#update-form")[0].action = `./${id}/update`;
+        $.getJSON(`/api/data/team/${id}`)
+        .done(function(data){
+            $("#u-id").val(data.data.id);
+            $("#u-fullname").val(data.data.full_name);
+            $("#u-acronym").val(data.data.acronym);
+            $("#u-flagname").val(data.data.flag_name);
+        })
+        .always(function(){
+            $("#spinner").hide();
+        });
+    });
 </script>
 {% endblock script %}
