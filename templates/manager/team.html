@@ -71,11 +71,11 @@
                     </td>
                     <td class="w-50">
                         <div class="d-none d-sm-block text-nowrap">
-                        {% if t.players %}
-                        {% for p in t.players %}
-                        <a class="avatar" style="background-image: url(https://a.ppy.sh/{{p.user_id}})" href="https://osu.ppy.sh/u/{{p.user_id}}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="{{p.username}}"></a>
-                        {% endfor %}
-                        {% endif %}
+                            {% if t.players %}
+                            {% for p in t.players %}
+                            <a class="avatar" style="background-image: url(https://a.ppy.sh/{{p.user_id}})" href="https://osu.ppy.sh/u/{{p.user_id}}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="{{p.username}}"></a>
+                            {% endfor %}
+                            {% endif %}
                         </div>
                         <div class="d-sm-none">
                             {% if t.players %}<span class="avatar">+{{ t.players | length }}</span>{% endif %}
@@ -139,9 +139,9 @@
                         <input type="text" class="form-control" id="u-fullname" name="full_name" maxlength="50" placeholder="full_name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">隊名縮寫</label>         
-                        <input type="text" class="form-control" id="u-acronym" name="acronym" maxlength="4" placeholder="(可選) 最多4字">
-                    </div>                                                                                                                                                                                                                                                                                            
+                        <label class="form-label">隊名縮寫</label>
+                        <input type="text" class="form-control" id="u-acronym" name="acronym">
+                    </div>
                     <div class="mb-3">
                         <label class="form-label required">旗幟/頭像</label>
                         <div class="input-group">
@@ -159,8 +159,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="reset" form="update-round-form" class="btn me-auto" data-bs-dismiss="modal">取消</button>
-                <button type="submit" form="update-round-form" class="btn btn-primary">修改</button>
+                <button type="reset" form="update-form" class="btn me-auto" data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="update-form" class="btn btn-primary">修改</button>
             </div>
         </div>
     </div>
@@ -190,7 +190,7 @@
                             <button type="button" class="btn btn-white w-100" data-bs-dismiss="modal">取消</button>
                         </div>
                         <div class="col">
-                            <button type="submit" id="del-submit" form="del-round-form" class="btn btn-danger w-100" disabled>確認刪除</button>
+                            <button type="submit" id="del-submit" form="del-form" class="btn btn-danger w-100" disabled>確認刪除</button>
                         </div>
                     </div>
                 </div>
