@@ -293,6 +293,47 @@ def teams():
     
     return render_template('manager/team.html', teams=json.loads(teams))
 
+@tourney.route('/team/<id>/update', methods=['POST'])
+@login_required
+def team_update(id):
+    s_team = get('team', id)
+    c_team = dict(
+        id=int(id),
+        full_name=request.form.get('full_name'),
+        flag_name="{}.{}".format(request.form.get('flag_type'),request.form.get('flag_name')),
+        acronym=request.form.get('acronym')
+    )
+    
+    try:
+        db.update('team', ('id', id), **dict_cmp(c_team, s_team))
+        flash('TeamID: {} 已更新'.format(id), 'success')
+        return redirect(url_for('tourney.teams'))
+    except Exception as e:
+        flash('發生錯誤: {}'.format(e.args), 'danger')
+        return redirect(url_for('tourney.teams'))
+
+
+@tourney.route('/team/<id>/delete', methods=['POST'])
+@login_required
+def team_delete(id):
+    return '', 200
+
+
+@tourney.route('/team/<id>/players/add', methods=['POST'])
+@login_required
+def team_players_add(id):
+    return '', 200
+
+@tourney.route('/team/<id>/players/<uid>/delete', methods=['POST'])
+@login_required
+def team_players_update(id, uid):
+    return '', 200
+
+@tourney.route('/team/<id>/players/<uid>/update', methods=['POST'])
+@login_required
+def team_players_delete(id):
+    return '', 200
+
 @tourney.route('/rounds/', methods=['GET', 'POST'])
 @login_required
 @need_privilege(Staff.ADMIN)
