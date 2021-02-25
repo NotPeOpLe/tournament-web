@@ -70,11 +70,16 @@
                         </div>
                     </td>
                     <td class="w-50">
+                        <div class="d-none d-sm-block text-nowrap">
                         {% if t.players %}
                         {% for p in t.players %}
                         <a class="avatar" style="background-image: url(https://a.ppy.sh/{{p.user_id}})" href="https://osu.ppy.sh/u/{{p.user_id}}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="{{p.username}}"></a>
                         {% endfor %}
                         {% endif %}
+                        </div>
+                        <div class="d-sm-none">
+                            {% if t.players %}<span class="avatar">+{{ t.players | length }}</span>{% endif %}
+                        </div>
                     </td>
                     <td>
                         <span class="text-green">PASS</span>
