@@ -1,6 +1,7 @@
 from functools import wraps
 from types import resolve_bases
 from flask import Blueprint, render_template, jsonify, Response, abort, session, redirect, url_for
+from flask.globals import request
 from werkzeug.exceptions import HTTPException
 from pymysql.err import *
 import mysql
@@ -52,6 +53,13 @@ def getdata(table_name:str, id:str):
             abort(404)
     else:
         abort(404)
+        
+@api.route('/check_round')
+def check_round():
+    if request.args.get('id'):
+        return db.query("SELECT COUNT(*) as match_count from `match` WHERE round_id = %s", (request.args.get('id'),))
+    else:
+        abort(400, 'id?')
 
 @api.errorhandler(HTTPException)
 def handle_exception(e):
