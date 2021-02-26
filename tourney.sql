@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : localhost
+ Source Server         : LOCALSERVER
  Source Server Type    : MySQL
- Source Server Version : 50731
+ Source Server Version : 80022
  Source Host           : localhost:3306
  Source Schema         : tourney
 
  Target Server Type    : MySQL
- Target Server Version : 50731
+ Target Server Version : 80022
  File Encoding         : 65001
 
- Date: 24/02/2021 01:26:09
+ Date: 26/02/2021 16:46:15
 */
 
 SET NAMES utf8mb4;
@@ -22,17 +22,17 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `game`;
 CREATE TABLE `game`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `match_id` int(11) NOT NULL,
-  `map` int(11) NOT NULL,
-  `team1_score` int(11) NOT NULL,
-  `team2_score` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `match_id` int NOT NULL,
+  `map` int NOT NULL,
+  `team1_score` int NOT NULL,
+  `team2_score` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `match`(`match_id`) USING BTREE,
   INDEX `map`(`map`) USING BTREE,
   CONSTRAINT `map` FOREIGN KEY (`map`) REFERENCES `mappool` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `match` FOREIGN KEY (`match_id`) REFERENCES `match` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of game
@@ -43,11 +43,11 @@ CREATE TABLE `game`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `group`;
 CREATE TABLE `group`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '群組 ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '群組 ID',
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '群組名稱 (英)',
   `ch_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '群組名稱 (中)',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '群組' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '群組' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of group
@@ -68,13 +68,13 @@ INSERT INTO `group` VALUES (10, 'Staff', '工作人員');
 -- ----------------------------
 DROP TABLE IF EXISTS `map_group`;
 CREATE TABLE `map_group`  (
-  `name` char(6) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `name` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `hex_color` char(8) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `badge_color` char(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `enabled_mods` int(255) NULL DEFAULT 0,
+  `enabled_mods` int NULL DEFAULT 0,
   `freemod` tinyint(1) NULL DEFAULT 0,
   PRIMARY KEY (`name`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '圖譜的分類' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '圖譜的分類' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of map_group
@@ -94,21 +94,21 @@ INSERT INTO `map_group` VALUES ('TB', 'D9EAD3', 'lime', 0, 1);
 -- ----------------------------
 DROP TABLE IF EXISTS `mappool`;
 CREATE TABLE `mappool`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `round_id` int(11) NOT NULL COMMENT '階段 ID',
-  `beatmap_id` int(11) NOT NULL COMMENT '圖譜 ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `round_id` int NOT NULL COMMENT '階段 ID',
+  `beatmap_id` int NOT NULL COMMENT '圖譜 ID',
   `group` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '圖譜分類',
   `code` varchar(6) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '圖譜代碼',
   `mods` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '使用Mod(s)',
   `info` json NULL COMMENT '圖譜資訊',
   `note` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '備註',
-  `nominator` int(11) NULL DEFAULT NULL COMMENT '提名人',
+  `nominator` int NULL DEFAULT NULL COMMENT '提名人',
   `add_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `round_id`(`round_id`) USING BTREE,
   INDEX `Nominator`(`nominator`) USING BTREE,
-  CONSTRAINT `round_id` FOREIGN KEY (`round_id`) REFERENCES `round` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 59 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '圖池' ROW_FORMAT = Dynamic;
+  CONSTRAINT `round_id` FOREIGN KEY (`round_id`) REFERENCES `round` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 59 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '圖池' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mappool
@@ -153,18 +153,6 @@ INSERT INTO `mappool` VALUES (37, 3, 1616928, 'EZ', '1', 'EZ', '{\"bpm\": 177, \
 INSERT INTO `mappool` VALUES (38, 3, 2024314, 'Roll', '1A', 'Freemod', '{\"bpm\": 140, \"mode\": 0, \"tags\": \"contagious deviouspanda electronic japanese treow ヒステリシス rolniczy collab\", \"packs\": \"S800\", \"title\": \"Hysteresis\", \"video\": 0, \"artist\": \"ELECTROCUTICA feat. yanaginagi\", \"rating\": 9.72727, \"source\": \"\", \"creator\": \"Melwoine\", \"version\": \"Melwoine x Rolniczy\'s Distortion\", \"approved\": 1, \"diff_aim\": 2.93107, \"file_md5\": \"1ef4045627b598dbfc5d7401a868df6b\", \"genre_id\": 10, \"diff_size\": 4, \"max_combo\": 2301, \"passcount\": 1926, \"playcount\": 21834, \"beatmap_id\": 2024314, \"creator_id\": 12091109, \"diff_drain\": 5.5, \"diff_speed\": 2.71602, \"hit_length\": 334, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2019-07-27 16:58:30\", \"submit_date\": \"2019-05-05 18:55:19\", \"count_normal\": 917, \"count_slider\": 632, \"diff_overall\": 8.5, \"total_length\": 378, \"approved_date\": \"2019-08-01 08:40:01\", \"beatmapset_id\": 967237, \"count_spinner\": 0, \"diff_approach\": 9.3, \"title_unicode\": \"Hysteresis\", \"artist_unicode\": \"ELECTROCUTICA feat. やなぎなぎ\", \"favourite_count\": 139, \"difficultyrating\": 5.75461, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 1, '2021-01-24 04:26:23');
 INSERT INTO `mappool` VALUES (39, 3, 1939270, 'Roll', '1B', 'Freemod', '{\"bpm\": 140, \"mode\": 0, \"tags\": \"treow ヒステリシス naturale japanese electronic\", \"packs\": \"S814\", \"title\": \"Hysteresis\", \"video\": 0, \"artist\": \"ELECTROCUTICA feat. yanaginagi\", \"rating\": 9.12903, \"source\": \"\", \"creator\": \"UndeadCapulet\", \"version\": \"Ashen Rain\", \"approved\": 1, \"diff_aim\": 2.76195, \"file_md5\": \"3ce896582cb28145d59c892878e81a92\", \"genre_id\": 10, \"diff_size\": 4, \"max_combo\": 2151, \"passcount\": 819, \"playcount\": 13734, \"beatmap_id\": 1939270, \"creator_id\": 2523533, \"diff_drain\": 5, \"diff_speed\": 2.76651, \"hit_length\": 321, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2019-08-23 02:29:27\", \"submit_date\": \"2019-02-19 03:13:10\", \"count_normal\": 950, \"count_slider\": 528, \"diff_overall\": 8.5, \"total_length\": 378, \"approved_date\": \"2019-09-08 04:40:01\", \"beatmapset_id\": 928457, \"count_spinner\": 1, \"diff_approach\": 9, \"title_unicode\": \"Hysteresis\", \"artist_unicode\": \"ELECTROCUTICA feat. やなぎなぎ\", \"favourite_count\": 44, \"difficultyrating\": 5.53074, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 1, '2021-01-24 04:26:23');
 INSERT INTO `mappool` VALUES (40, 3, 1985210, 'TB', '1', 'Freemod', '{\"bpm\": 150, \"mode\": 0, \"tags\": \"hanasaki yukina hanasaki_yukina stirup club edition v3 | diaphanser reincarnation quantum rosta quantum_rosta -tochi _lai suzuki_1112 alliumproject compllege c85 otosaka-yu 1112deng vocaloid\", \"packs\": \"S789\", \"title\": \"Scaler\", \"video\": 0, \"artist\": \"Taishi feat. Hatsune Miku (Eng ver)\", \"rating\": 9.23158, \"source\": \"\", \"creator\": \"Necho\", \"version\": \"Necho$[Yukina*Rosta]\'s ReExploration\", \"approved\": 1, \"diff_aim\": 3.46137, \"file_md5\": \"683efedd00b8bb94d113e11bf62792f6\", \"genre_id\": 10, \"diff_size\": 4, \"max_combo\": 2220, \"passcount\": 1287, \"playcount\": 13104, \"beatmap_id\": 1985210, \"creator_id\": 4086593, \"diff_drain\": 5, \"diff_speed\": 2.78562, \"hit_length\": 320, \"storyboard\": 1, \"language_id\": 2, \"last_update\": \"2019-06-29 06:48:58\", \"submit_date\": \"2019-03-13 14:25:05\", \"count_normal\": 366, \"count_slider\": 797, \"diff_overall\": 8, \"total_length\": 349, \"approved_date\": \"2019-07-06 08:00:27\", \"beatmapset_id\": 939511, \"count_spinner\": 1, \"diff_approach\": 9.6, \"title_unicode\": \"Scaler\", \"artist_unicode\": \"Taishi　feat.初音ミク（Eng ver）\", \"favourite_count\": 120, \"difficultyrating\": 6.58486, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 1, '2021-01-24 04:26:23');
-INSERT INTO `mappool` VALUES (43, 7, 2800844, 'HD', '3', '9', '{\"bpm\": 167, \"mode\": 0, \"tags\": \"\", \"packs\": null, \"title\": \"Bad for Me\", \"video\": 0, \"artist\": \"Official HIGE DANdism\", \"rating\": 0, \"source\": \"\", \"creator\": \"_CHIMERA\", \"version\": \"Yo\", \"approved\": -1, \"diff_aim\": 3.21851, \"file_md5\": \"95b6afd531ae0a108472541e087b1267\", \"genre_id\": 14, \"diff_size\": 4, \"max_combo\": 1592, \"passcount\": 1, \"playcount\": 10, \"beatmap_id\": 2800844, \"creator_id\": 6008293, \"diff_drain\": 6, \"diff_speed\": 2.96151, \"hit_length\": 212, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2021-01-22 16:15:46\", \"submit_date\": \"2020-09-09 17:54:37\", \"count_normal\": 555, \"count_slider\": 443, \"diff_overall\": 6, \"total_length\": 225, \"approved_date\": null, \"beatmapset_id\": 1254501, \"count_spinner\": 7, \"diff_approach\": 9.5, \"title_unicode\": \"Bad for Me\", \"artist_unicode\": \"Official HIGE DANdism\", \"favourite_count\": 5, \"difficultyrating\": 6.30852, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 1, '2021-01-24 05:11:07');
-INSERT INTO `mappool` VALUES (44, 7, 2485186, 'NM', '3', '1', '{\"bpm\": 194, \"mode\": 0, \"tags\": \"touhou project i softly gently kissed the pink jellyfish 2hu 東方project th17 17 wbawc ebisu eika theme カリスマ煉獄天神 あよ ayo kaztora c98 comiket 98 charisma rengoku tenshin tenjin charismatic purgatory goddess 地蔵だけが知る哀嘆 the lamentations known only by jizo ジェリーストーン jelly stone pinkukurageto kisswoshita kissoshita kisuwoshita kisuoshita japanese video game rock bongo -ametori\", \"packs\": \"S952\", \"title\": \"Pink Kurage to, Sotto, Kiss o Shita.\", \"video\": 0, \"artist\": \"ShinRa-Bansho\", \"rating\": 9.61257, \"source\": \"東方鬼形獣　～ Wily Beast and Weakest Creature.\", \"creator\": \"UberFazz\", \"version\": \"bongo\'s Extra Stage.\", \"approved\": 1, \"diff_aim\": 3.30901, \"file_md5\": \"19349b35806e0c039de75d6cf0e4abb9\", \"genre_id\": 4, \"diff_size\": 4, \"max_combo\": 1428, \"passcount\": 4182, \"playcount\": 41311, \"beatmap_id\": 2485186, \"creator_id\": 8646059, \"diff_drain\": 6, \"diff_speed\": 2.70119, \"hit_length\": 221, \"storyboard\": 1, \"language_id\": 3, \"last_update\": \"2020-11-04 22:39:36\", \"submit_date\": \"2020-05-29 00:56:36\", \"count_normal\": 779, \"count_slider\": 313, \"diff_overall\": 9, \"total_length\": 229, \"approved_date\": \"2020-11-12 08:02:39\", \"beatmapset_id\": 1180982, \"count_spinner\": 0, \"diff_approach\": 9.4, \"title_unicode\": \"ピンククラゲと、そっと、キスをした。\", \"artist_unicode\": \"森羅万象\", \"favourite_count\": 189, \"difficultyrating\": 6.31411, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 20, '2021-01-24 20:11:46');
-INSERT INTO `mappool` VALUES (45, 7, 1152893, 'NM', '3', '1', '{\"bpm\": 202, \"mode\": 0, \"tags\": \"\", \"packs\": null, \"title\": \"over the top\", \"video\": 0, \"artist\": \"xi\", \"rating\": 0, \"source\": \"\", \"creator\": \"-Hwangbo\", \"version\": \"Sanctimonious\", \"approved\": -2, \"diff_aim\": 2.87959, \"file_md5\": \"b85ddcbfed7da9682ade9fefdc427111\", \"genre_id\": 1, \"diff_size\": 4, \"max_combo\": 1184, \"passcount\": 136, \"playcount\": 994, \"beatmap_id\": 1152893, \"creator_id\": 7467183, \"diff_drain\": 6.2, \"diff_speed\": 3.12044, \"hit_length\": 115, \"storyboard\": 0, \"language_id\": 1, \"last_update\": \"2016-12-15 13:20:21\", \"submit_date\": \"2016-12-11 01:36:47\", \"count_normal\": 604, \"count_slider\": 170, \"diff_overall\": 9.3, \"total_length\": 121, \"approved_date\": null, \"beatmapset_id\": 544006, \"count_spinner\": 0, \"diff_approach\": 9.7, \"title_unicode\": \"over the top\", \"artist_unicode\": \"xi\", \"favourite_count\": 3, \"difficultyrating\": 6.12046, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 20, '2021-01-24 20:12:09');
-INSERT INTO `mappool` VALUES (46, 7, 2248613, 'DT', '1', '513', '{\"bpm\": 140, \"mode\": 0, \"tags\": \"gurasan kitaouji mizuki beatrice ryukishi07 07th expansion when the seagulls cry umineko no naku koro ni chiru chapter 6 neko ds 北大路 瑞希 they sing vol.3\", \"packs\": null, \"title\": \"Ruriair\", \"video\": 0, \"artist\": \"grasun cat\", \"rating\": 0, \"source\": \"うみねこのなく頃に散\", \"creator\": \"Dada\", \"version\": \"Ceremony\", \"approved\": -2, \"diff_aim\": 2.30941, \"file_md5\": \"d26821c4e54024285ba9dc392e18d164\", \"genre_id\": 2, \"diff_size\": 4, \"max_combo\": 1226, \"passcount\": 23, \"playcount\": 78, \"beatmap_id\": 2248613, \"creator_id\": 9119507, \"diff_drain\": 5, \"diff_speed\": 2.07212, \"hit_length\": 231, \"storyboard\": 0, \"language_id\": 5, \"last_update\": \"2020-09-07 19:28:15\", \"submit_date\": \"2019-12-05 11:13:13\", \"count_normal\": 833, \"count_slider\": 193, \"diff_overall\": 8, \"total_length\": 264, \"approved_date\": null, \"beatmapset_id\": 1074503, \"count_spinner\": 1, \"diff_approach\": 8, \"title_unicode\": \"Ruriair\", \"artist_unicode\": \"グラサンねこ\", \"favourite_count\": 6, \"difficultyrating\": 4.50017, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 20, '2021-01-24 20:12:45');
-INSERT INTO `mappool` VALUES (47, 7, 2667783, 'HR', '2', '17', '{\"bpm\": 185, \"mode\": 0, \"tags\": \"opening op long riders! heart kilometer per hour kmh full ver version japanese anime\", \"packs\": null, \"title\": \"km/h\", \"video\": 0, \"artist\": \"Ray\", \"rating\": 0, \"source\": \"ろんぐらいだぁす！\", \"creator\": \"Keqing\", \"version\": \"asa/wari\'s ex/pert\", \"approved\": -2, \"diff_aim\": 3.1073, \"file_md5\": \"84b5529ff4bffc1a1176af263f38b9a8\", \"genre_id\": 5, \"diff_size\": 4, \"max_combo\": 1352, \"passcount\": 15, \"playcount\": 151, \"beatmap_id\": 2667783, \"creator_id\": 8501291, \"diff_drain\": 5.6, \"diff_speed\": 2.41725, \"hit_length\": 221, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2020-11-28 19:47:41\", \"submit_date\": \"2020-08-30 22:13:54\", \"count_normal\": 627, \"count_slider\": 350, \"diff_overall\": 8.6, \"total_length\": 226, \"approved_date\": null, \"beatmapset_id\": 1248042, \"count_spinner\": 1, \"diff_approach\": 9.2, \"title_unicode\": \"♡km/h\", \"artist_unicode\": \"Ray\", \"favourite_count\": 15, \"difficultyrating\": 5.86958, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 20, '2021-01-24 20:13:02');
-INSERT INTO `mappool` VALUES (48, 7, 2684062, 'FM', '6', 'fm', '{\"bpm\": 120, \"mode\": 0, \"tags\": \"kpop k-pop korean pop jyp entertainment ent tzuyu sana jihyo dahyun nayeon jeongyeon chaeyoung momo mina 쯔위 나연 정연 모모 사나 지효 미나 다현 채영 쯔위 twice 트와이스 fragmented charmcaster futser im eyes wide open full album bside b side girl group doraemonelf dora-\", \"packs\": null, \"title\": \"UP NO MORE\", \"video\": 0, \"artist\": \"TWICE\", \"rating\": 9.8, \"source\": \"\", \"creator\": \"Nabori\", \"version\": \"Sleepless\", \"approved\": 1, \"diff_aim\": 2.07115, \"file_md5\": \"aded818da961212f517308275cb72980\", \"genre_id\": 5, \"diff_size\": 3.8, \"max_combo\": 1125, \"passcount\": 165, \"playcount\": 1387, \"beatmap_id\": 2684062, \"creator_id\": 8668139, \"diff_drain\": 5, \"diff_speed\": 1.95647, \"hit_length\": 201, \"storyboard\": 0, \"language_id\": 6, \"last_update\": \"2021-01-17 01:49:23\", \"submit_date\": \"2020-11-04 23:01:51\", \"count_normal\": 359, \"count_slider\": 346, \"diff_overall\": 8, \"total_length\": 209, \"approved_date\": \"2021-01-24 02:23:44\", \"beatmapset_id\": 1293377, \"count_spinner\": 0, \"diff_approach\": 9, \"title_unicode\": \"UP NO MORE\", \"artist_unicode\": \"트와이스\", \"favourite_count\": 38, \"difficultyrating\": 4.08495, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 1, '2021-01-24 20:22:06');
-INSERT INTO `mappool` VALUES (49, 7, 2610929, 'TB', '2', 'tb', '{\"bpm\": 174, \"mode\": 0, \"tags\": \"electronic instrumental dance there goes your money drumstep dubstep neurofunk cool zer0- reform kujinn xenon- xenon xen xehn zinedinezidane zizou\", \"packs\": \"S949\", \"title\": \"Prove Them Wrong\", \"video\": 0, \"artist\": \"Virtual Riot\", \"rating\": 9.52105, \"source\": \"\", \"creator\": \"C00L\", \"version\": \"Reform\'s Extra\", \"approved\": 1, \"diff_aim\": 2.93299, \"file_md5\": \"7b7593e22fa8e6b2fbcdbb9608a85768\", \"genre_id\": 10, \"diff_size\": 4, \"max_combo\": 1154, \"passcount\": 1784, \"playcount\": 14446, \"beatmap_id\": 2610929, \"creator_id\": 4930630, \"diff_drain\": 5.3, \"diff_speed\": 2.53236, \"hit_length\": 145, \"storyboard\": 0, \"language_id\": 5, \"last_update\": \"2020-10-24 16:26:21\", \"submit_date\": \"2020-07-18 11:30:33\", \"count_normal\": 245, \"count_slider\": 449, \"diff_overall\": 8.4, \"total_length\": 177, \"approved_date\": \"2020-11-02 06:02:20\", \"beatmapset_id\": 1216594, \"count_spinner\": 0, \"diff_approach\": 9.4, \"title_unicode\": \"Prove Them Wrong\", \"artist_unicode\": \"Virtual Riot\", \"favourite_count\": 94, \"difficultyrating\": 5.66567, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 20, '2021-01-24 20:22:41');
-INSERT INTO `mappool` VALUES (50, 7, 2610929, 'FM', '6', 'fm', '{\"bpm\": 174, \"mode\": 0, \"tags\": \"electronic instrumental dance there goes your money drumstep dubstep neurofunk cool zer0- reform kujinn xenon- xenon xen xehn zinedinezidane zizou\", \"packs\": \"S949\", \"title\": \"Prove Them Wrong\", \"video\": 0, \"artist\": \"Virtual Riot\", \"rating\": 9.52105, \"source\": \"\", \"creator\": \"C00L\", \"version\": \"Reform\'s Extra\", \"approved\": 1, \"diff_aim\": 2.93299, \"file_md5\": \"7b7593e22fa8e6b2fbcdbb9608a85768\", \"genre_id\": 10, \"diff_size\": 4, \"max_combo\": 1154, \"passcount\": 1784, \"playcount\": 14446, \"beatmap_id\": 2610929, \"creator_id\": 4930630, \"diff_drain\": 5.3, \"diff_speed\": 2.53236, \"hit_length\": 145, \"storyboard\": 0, \"language_id\": 5, \"last_update\": \"2020-10-24 16:26:21\", \"submit_date\": \"2020-07-18 11:30:33\", \"count_normal\": 245, \"count_slider\": 449, \"diff_overall\": 8.4, \"total_length\": 177, \"approved_date\": \"2020-11-02 06:02:20\", \"beatmapset_id\": 1216594, \"count_spinner\": 0, \"diff_approach\": 9.4, \"title_unicode\": \"Prove Them Wrong\", \"artist_unicode\": \"Virtual Riot\", \"favourite_count\": 94, \"difficultyrating\": 5.66567, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 20, '2021-01-24 20:22:56');
-INSERT INTO `mappool` VALUES (51, 7, 2606278, 'NM', '3', '0', '{\"bpm\": 175, \"mode\": 0, \"tags\": \"fatsune miku vocaloid\", \"packs\": null, \"title\": \"RAINBOW GIRL\", \"video\": 0, \"artist\": \"Tonasa\", \"rating\": 0, \"source\": \"\", \"creator\": \"Respirte\", \"version\": \"Expert\", \"approved\": -1, \"diff_aim\": 2.78372, \"file_md5\": \"359297e76bb6ec7fd66213f70f877e86\", \"genre_id\": 4, \"diff_size\": 4.5, \"max_combo\": 802, \"passcount\": 0, \"playcount\": 0, \"beatmap_id\": 2606278, \"creator_id\": 9870167, \"diff_drain\": 6, \"diff_speed\": 2.25091, \"hit_length\": 147, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2021-01-24 07:23:45\", \"submit_date\": \"2020-09-09 01:32:51\", \"count_normal\": 525, \"count_slider\": 137, \"diff_overall\": 8, \"total_length\": 147, \"approved_date\": null, \"beatmapset_id\": 1254110, \"count_spinner\": 0, \"diff_approach\": 8, \"title_unicode\": \"RAINBOW GIRL\", \"artist_unicode\": \"Tonasa\", \"favourite_count\": 0, \"difficultyrating\": 5.30104, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 20, '2021-01-24 20:26:56');
-INSERT INTO `mappool` VALUES (52, 7, 2606278, 'HRHDSDNCFL', '1', '18008', '{\"bpm\": 175, \"mode\": 0, \"tags\": \"fatsune miku vocaloid\", \"packs\": null, \"title\": \"RAINBOW GIRL\", \"video\": 0, \"artist\": \"Tonasa\", \"rating\": 0, \"source\": \"\", \"creator\": \"Respirte\", \"version\": \"Expert\", \"approved\": -1, \"diff_aim\": 2.78372, \"file_md5\": \"359297e76bb6ec7fd66213f70f877e86\", \"genre_id\": 4, \"diff_size\": 4.5, \"max_combo\": 802, \"passcount\": 0, \"playcount\": 0, \"beatmap_id\": 2606278, \"creator_id\": 9870167, \"diff_drain\": 6, \"diff_speed\": 2.25091, \"hit_length\": 147, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2021-01-24 07:23:45\", \"submit_date\": \"2020-09-09 01:32:51\", \"count_normal\": 525, \"count_slider\": 137, \"diff_overall\": 8, \"total_length\": 147, \"approved_date\": null, \"beatmapset_id\": 1254110, \"count_spinner\": 0, \"diff_approach\": 8, \"title_unicode\": \"RAINBOW GIRL\", \"artist_unicode\": \"Tonasa\", \"favourite_count\": 0, \"difficultyrating\": 5.30104, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 20, '2021-01-24 20:27:23');
-INSERT INTO `mappool` VALUES (53, 7, 2712916, 'EZHDNCFLAP', '1', '9803', '{\"bpm\": 120, \"mode\": 0, \"tags\": \"kpop k-pop korean pop jyp entertainment ent tzuyu sana jihyo dahyun nayeon jeongyeon chaeyoung momo mina 쯔위 나연 정연 모모 사나 지효 미나 다현 채영 쯔위 twice 트와이스 fragmented charmcaster futser im eyes wide open full album bside b side girl group doraemonelf dora-\", \"packs\": null, \"title\": \"UP NO MORE\", \"video\": 0, \"artist\": \"TWICE\", \"rating\": 9.8, \"source\": \"\", \"creator\": \"Nabori\", \"version\": \"Fragmented\'s Hard\", \"approved\": 1, \"diff_aim\": 1.46324, \"file_md5\": \"d075b3654861072bd50b722c037eea13\", \"genre_id\": 5, \"diff_size\": 3.5, \"max_combo\": 790, \"passcount\": 322, \"playcount\": 1153, \"beatmap_id\": 2712916, \"creator_id\": 8668139, \"diff_drain\": 5, \"diff_speed\": 1.52844, \"hit_length\": 197, \"storyboard\": 0, \"language_id\": 6, \"last_update\": \"2021-01-17 01:49:23\", \"submit_date\": \"2020-11-04 23:01:51\", \"count_normal\": 234, \"count_slider\": 253, \"diff_overall\": 7, \"total_length\": 209, \"approved_date\": \"2021-01-24 02:23:44\", \"beatmapset_id\": 1293377, \"count_spinner\": 3, \"diff_approach\": 8, \"title_unicode\": \"UP NO MORE\", \"artist_unicode\": \"트와이스\", \"favourite_count\": 39, \"difficultyrating\": 3.02428, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 1, '2021-01-24 20:35:25');
-INSERT INTO `mappool` VALUES (54, 7, 2709018, 'EZHDSDDTFLRX', '1', '18058', '{\"bpm\": 175, \"mode\": 0, \"tags\": \"bandmaid world domination japanese english rock owc o!wc osu world cup 2020 finals hd2\", \"packs\": null, \"title\": \"Spirit!!\", \"video\": 0, \"artist\": \"BAND-MAID\", \"rating\": 8.91667, \"source\": \"\", \"creator\": \"Lasse\", \"version\": \"Resolve!!\", \"approved\": 1, \"diff_aim\": 2.96548, \"file_md5\": \"7f2f05c9766b655eb4bef6a477dae709\", \"genre_id\": 4, \"diff_size\": 4.5, \"max_combo\": 1501, \"passcount\": 85, \"playcount\": 1729, \"beatmap_id\": 2709018, \"creator_id\": 896613, \"diff_drain\": 5, \"diff_speed\": 2.79134, \"hit_length\": 216, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2021-01-15 18:10:18\", \"submit_date\": \"2020-11-22 15:21:18\", \"count_normal\": 1159, \"count_slider\": 171, \"diff_overall\": 9, \"total_length\": 216, \"approved_date\": \"2021-01-23 17:03:19\", \"beatmapset_id\": 1306578, \"count_spinner\": 0, \"diff_approach\": 9, \"title_unicode\": \"Spirit!!\", \"artist_unicode\": \"BAND-MAID\", \"favourite_count\": 29, \"difficultyrating\": 5.84389, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 1, '2021-01-24 20:54:11');
 INSERT INTO `mappool` VALUES (55, 2, 2719875, 'NM', '3', '0', '{\"bpm\": 185, \"mode\": 0, \"tags\": \"rent-a-girlfriend i\'d like to borrow a girlfriend kanokari kanojo okarishimasu ed ending 2 full anime japanese pop jpop j-pop uniform devinl flowziee\", \"packs\": null, \"title\": \"Kokuhaku Bungee Jump\", \"video\": 0, \"artist\": \"halca\", \"rating\": 9.47059, \"source\": \"彼女、お借りします\", \"creator\": \"Yogurtt\", \"version\": \"Sentimental Crisis\", \"approved\": 1, \"diff_aim\": 3.19489, \"file_md5\": \"2caf1bd28d40c6119b10e7238c30783b\", \"genre_id\": 3, \"diff_size\": 4.2, \"max_combo\": 1533, \"passcount\": 1065, \"playcount\": 10612, \"beatmap_id\": 2719875, \"creator_id\": 2649717, \"diff_drain\": 6, \"diff_speed\": 2.65106, \"hit_length\": 232, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2021-01-18 23:00:36\", \"submit_date\": \"2020-11-29 23:36:44\", \"count_normal\": 789, \"count_slider\": 367, \"diff_overall\": 9, \"total_length\": 246, \"approved_date\": \"2021-01-26 18:21:40\", \"beatmapset_id\": 1312335, \"count_spinner\": 1, \"diff_approach\": 9.3, \"title_unicode\": \"告白バンジージャンプ\", \"artist_unicode\": \"halca\", \"favourite_count\": 54, \"difficultyrating\": 6.11786, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 1, '2021-01-30 02:32:04');
 INSERT INTO `mappool` VALUES (56, 5, 2788471, 'NM', '3', '0', '{\"bpm\": 110, \"mode\": 0, \"tags\": \"japanese pop love live! school idol festival perfect dream project 大西亜玖璃 上原歩夢 相良茉優 中須かすみ 前田佳織里 桜坂しずく 久保田未夢 朝香果林 村上奈津実 宮下 愛 鬼頭明里 近江彼方 楠木ともり 優木せつ菜 指出毬亜 エマ ヴェルデ 田中ちえ美 天王寺璃奈\", \"packs\": null, \"title\": \"Just Believe!!!\", \"video\": 0, \"artist\": \"Nijigasaki High School Idol Club\", \"rating\": 0, \"source\": \"\", \"creator\": \"[ TNTlealu ]\", \"version\": \"Never Give Up!!!\", \"approved\": -1, \"diff_aim\": 3.25056, \"file_md5\": \"118aba7e3034a53194103a9f4b5b32f0\", \"genre_id\": 5, \"diff_size\": 3.8, \"max_combo\": 1294, \"passcount\": 0, \"playcount\": 8, \"beatmap_id\": 2788471, \"creator_id\": 9502522, \"diff_drain\": 6, \"diff_speed\": 2.50261, \"hit_length\": 205, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2021-01-30 18:14:53\", \"submit_date\": \"2021-01-12 15:29:17\", \"count_normal\": 559, \"count_slider\": 361, \"diff_overall\": 9, \"total_length\": 237, \"approved_date\": null, \"beatmapset_id\": 1346467, \"count_spinner\": 1, \"diff_approach\": 9.3, \"title_unicode\": \"Just Believe!!!\", \"artist_unicode\": \"虹ヶ咲学園スクールアイドル同好会\", \"favourite_count\": 1, \"difficultyrating\": 6.12714, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 31, '2021-01-31 23:54:10');
 INSERT INTO `mappool` VALUES (57, 5, 2788471, 'NM', '3', '0', '{\"bpm\": 110, \"mode\": 0, \"tags\": \"japanese pop love live! school idol festival perfect dream project 大西亜玖璃 上原歩夢 相良茉優 中須かすみ 前田佳織里 桜坂しずく 久保田未夢 朝香果林 村上奈津実 宮下 愛 鬼頭明里 近江彼方 楠木ともり 優木せつ菜 指出毬亜 エマ ヴェルデ 田中ちえ美 天王寺璃奈\", \"packs\": null, \"title\": \"Just Believe!!!\", \"video\": 0, \"artist\": \"Nijigasaki High School Idol Club\", \"rating\": 0, \"source\": \"\", \"creator\": \"[ TNTlealu ]\", \"version\": \"Never Give Up!!!\", \"approved\": -1, \"diff_aim\": 3.25056, \"file_md5\": \"118aba7e3034a53194103a9f4b5b32f0\", \"genre_id\": 5, \"diff_size\": 3.8, \"max_combo\": 1294, \"passcount\": 0, \"playcount\": 8, \"beatmap_id\": 2788471, \"creator_id\": 9502522, \"diff_drain\": 6, \"diff_speed\": 2.50261, \"hit_length\": 205, \"storyboard\": 0, \"language_id\": 3, \"last_update\": \"2021-01-30 18:14:53\", \"submit_date\": \"2021-01-12 15:29:17\", \"count_normal\": 559, \"count_slider\": 361, \"diff_overall\": 9, \"total_length\": 237, \"approved_date\": null, \"beatmapset_id\": 1346467, \"count_spinner\": 1, \"diff_approach\": 9.3, \"title_unicode\": \"Just Believe!!!\", \"artist_unicode\": \"虹ヶ咲学園スクールアイドル同好会\", \"favourite_count\": 1, \"difficultyrating\": 6.12714, \"audio_unavailable\": 0, \"download_unavailable\": 0}', '', 31, '2021-01-31 23:54:12');
@@ -175,56 +163,60 @@ INSERT INTO `mappool` VALUES (58, 5, 2788471, 'NM', '3', '0', '{\"bpm\": 110, \"
 -- ----------------------------
 DROP TABLE IF EXISTS `match`;
 CREATE TABLE `match`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `code` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '自訂代碼',
-  `round_id` int(11) NULL DEFAULT NULL COMMENT '階段 ID',
-  `team1` int(11) NULL DEFAULT NULL COMMENT '隊伍1 ID',
-  `team1_score` int(3) NOT NULL DEFAULT 0 COMMENT '隊伍1 分數',
-  `team2` int(11) NULL DEFAULT NULL COMMENT '隊伍2 ID',
-  `team2_score` int(3) NOT NULL DEFAULT 0 COMMENT '隊伍2 分數',
+  `round_id` int NULL DEFAULT NULL COMMENT '階段 ID',
+  `team1` int NULL DEFAULT NULL COMMENT '隊伍1 ID',
+  `team1_score` int NOT NULL DEFAULT 0 COMMENT '隊伍1 分數',
+  `team2` int NULL DEFAULT NULL COMMENT '隊伍2 ID',
+  `team2_score` int NOT NULL DEFAULT 0 COMMENT '隊伍2 分數',
   `date` datetime NULL DEFAULT NULL COMMENT '比賽日期',
-  `referee` int(11) NULL DEFAULT NULL COMMENT '裁判',
-  `streamer` int(11) NULL DEFAULT NULL COMMENT '直播',
-  `commentator` int(11) NULL DEFAULT NULL COMMENT '賽評',
-  `commentator2` int(11) NULL DEFAULT NULL COMMENT '賽評',
+  `referee` int NULL DEFAULT NULL COMMENT '裁判',
+  `streamer` int NULL DEFAULT NULL COMMENT '直播',
+  `commentator` int NULL DEFAULT NULL COMMENT '賽評',
+  `commentator2` int NULL DEFAULT NULL COMMENT '賽評',
   `mp_link` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'MP連結',
   `video_link` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'VOD連結',
   `loser` tinyint(1) NULL DEFAULT 0 COMMENT '是否為敗部',
   `stats` tinyint(1) NULL DEFAULT 0 COMMENT '狀態(0 未開始,1 結束,2 棄賽)',
   `note` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `winto` int NULL DEFAULT NULL,
+  `losto` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `code`(`code`) USING BTREE,
-  INDEX `team1`(`team1`) USING BTREE,
-  INDEX `team2`(`team2`) USING BTREE,
-  CONSTRAINT `team1` FOREIGN KEY (`team1`) REFERENCES `team` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `team2` FOREIGN KEY (`team2`) REFERENCES `team` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '賽程' ROW_FORMAT = Dynamic;
+  INDEX `FK_TEAM1`(`team1`) USING BTREE,
+  INDEX `FK_TEAM2`(`team2`) USING BTREE,
+  INDEX `FK_ROUND`(`round_id`) USING BTREE,
+  CONSTRAINT `FK_ROUND` FOREIGN KEY (`round_id`) REFERENCES `round` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `FK_TEAM1` FOREIGN KEY (`team1`) REFERENCES `team` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
+  CONSTRAINT `FK_TEAM2` FOREIGN KEY (`team2`) REFERENCES `team` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 38 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '賽程' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of match
 -- ----------------------------
-INSERT INTO `match` VALUES (1, 'WB 1.1', 1, 14, 1, 11, 5, '2020-01-17 18:00:00', 17, 15, 7, 24, 'https://osu.ppy.sh/community/matches/57775533', 'https://www.twitch.tv/videos/537299487', 0, 1, '');
-INSERT INTO `match` VALUES (23, 'WB 1.2', 1, 17, 3, 23, 5, '2020-01-17 19:30:00', NULL, 15, 7, 24, 'https://osu.ppy.sh/community/matches/57776359', 'https://www.twitch.tv/videos/537316498', 0, 1, '');
-INSERT INTO `match` VALUES (24, 'WB 1.3', 1, 27, 2, 26, 5, '2020-01-17 21:00:00', 12, NULL, 24, NULL, 'https://osu.ppy.sh/community/matches/57777643', 'https://www.twitch.tv/videos/537338158', 0, 1, '');
-INSERT INTO `match` VALUES (25, 'WB 1.4', 1, 13, 0, 5, -1, '2020-01-18 23:30:00', NULL, NULL, NULL, NULL, '', '', 0, 2, '_kyuu 未於時間內現身，MiyazonoKuma 直接晉級至 WB Round 2');
-INSERT INTO `match` VALUES (26, 'WB 1.5', 1, 9, 5, 6, 4, '2020-01-19 22:00:00', 14, NULL, 9, 6, 'https://osu.ppy.sh/community/matches/57835682', 'https://www.twitch.tv/videos/538507542', 0, 1, '');
-INSERT INTO `match` VALUES (27, 'WB 1.6', 1, 10, -1, 8, 0, '2020-01-19 13:30:00', NULL, NULL, NULL, NULL, '', '', 0, 2, 'NashiKari 未於時間內現身，Music Lord 直接晉級至 WB Round 2');
-INSERT INTO `match` VALUES (28, 'WB 1.7', 1, 7, 3, 24, 5, '2020-01-19 14:00:00', 13, 20, 8, 6, 'https://osu.ppy.sh/community/matches/57827865', 'https://www.twitch.tv/videos/538349979', 0, 1, '');
-INSERT INTO `match` VALUES (29, 'WB 1.8', 1, 1, 2, 18, 5, '2020-01-19 20:00:00', 19, 1, NULL, 6, 'https://osu.ppy.sh/mp/57833014', 'https://www.twitch.tv/videos/538439444', 0, 1, '');
-INSERT INTO `match` VALUES (30, 'WB 1.9', 1, 20, -1, 3, 0, '2020-01-19 15:00:00', NULL, NULL, NULL, NULL, '', '', 0, 2, 'XzCraftP 棄賽，Imokora 直接晉級至 WB Round 2');
-INSERT INTO `match` VALUES (31, 'WB 1.10', 1, 16, -1, 19, 0, '2020-01-19 16:30:00', NULL, NULL, NULL, NULL, '', '', 0, 2, 'GfMRT 未於時間內現身，[ MILK_Jiang] 直接晉級至 WB Round 2');
-INSERT INTO `match` VALUES (32, 'LB 1.1', 1, 2, 13, 7, 7, '2021-02-12 19:00:00', 1, NULL, NULL, NULL, '', '', 1, 0, '');
-INSERT INTO `match` VALUES (35, 'L-GF-1', 6, 7, -1, 1, 0, '2021-02-27 17:27:00', 18, 4, 7, 6, '123123123123', '3123123123213123', 1, 2, '12313312');
-INSERT INTO `match` VALUES (37, 'WB 2.5', 5, 4, 18, 3, 14, '2021-02-20 21:14:00', 10, 15, 6, 6, '0.', '0..', 0, 1, '123213123123453453453434');
+INSERT INTO `match` VALUES (1, 'WB 1.1', 1, 14, 1, 11, 5, '2020-01-17 18:00:00', 17, 15, 7, 24, 'https://osu.ppy.sh/community/matches/57775533', 'https://www.twitch.tv/videos/537299487', 0, 1, '', NULL, NULL);
+INSERT INTO `match` VALUES (23, 'WB 1.2', 1, 17, 3, 23, 5, '2020-01-17 19:30:00', NULL, 15, 7, 24, 'https://osu.ppy.sh/community/matches/57776359', 'https://www.twitch.tv/videos/537316498', 0, 1, '', NULL, NULL);
+INSERT INTO `match` VALUES (24, 'WB 1.3', 1, 27, 2, 26, 5, '2020-01-17 21:00:00', 12, NULL, 24, NULL, 'https://osu.ppy.sh/community/matches/57777643', 'https://www.twitch.tv/videos/537338158', 0, 1, '', NULL, NULL);
+INSERT INTO `match` VALUES (25, 'WB 1.4', 1, 13, 0, 5, -1, '2020-01-18 23:30:00', NULL, NULL, NULL, NULL, '', '', 0, 2, '_kyuu 未於時間內現身，MiyazonoKuma 直接晉級至 WB Round 2', NULL, NULL);
+INSERT INTO `match` VALUES (26, 'WB 1.5', 1, 9, 5, 6, 4, '2020-01-19 22:00:00', 14, NULL, 9, 6, 'https://osu.ppy.sh/community/matches/57835682', 'https://www.twitch.tv/videos/538507542', 0, 1, '', NULL, NULL);
+INSERT INTO `match` VALUES (27, 'WB 1.6', 1, 10, -1, 8, 0, '2020-01-19 13:30:00', NULL, NULL, NULL, NULL, '', '', 0, 2, 'NashiKari 未於時間內現身，Music Lord 直接晉級至 WB Round 2', NULL, NULL);
+INSERT INTO `match` VALUES (28, 'WB 1.7', 1, 7, 3, 24, 5, '2020-01-19 14:00:00', 13, 20, 8, 6, 'https://osu.ppy.sh/community/matches/57827865', 'https://www.twitch.tv/videos/538349979', 0, 1, '', NULL, NULL);
+INSERT INTO `match` VALUES (29, 'WB 1.8', 1, 1, 2, 18, 5, '2020-01-19 20:00:00', 19, 1, NULL, 6, 'https://osu.ppy.sh/mp/57833014', 'https://www.twitch.tv/videos/538439444', 0, 1, '', NULL, NULL);
+INSERT INTO `match` VALUES (30, 'WB 1.9', 1, 20, -1, 3, 0, '2020-01-19 15:00:00', NULL, NULL, NULL, NULL, '', '', 0, 2, 'XzCraftP 棄賽，Imokora 直接晉級至 WB Round 2', NULL, NULL);
+INSERT INTO `match` VALUES (31, 'WB 1.10', 1, 16, -1, 19, 0, '2020-01-19 16:30:00', NULL, NULL, NULL, NULL, '', '', 0, 2, 'GfMRT 未於時間內現身，[ MILK_Jiang] 直接晉級至 WB Round 2', NULL, NULL);
+INSERT INTO `match` VALUES (32, 'LB 1.1', 1, 2, 13, 7, 7, '2021-02-12 19:00:00', 1, NULL, NULL, NULL, '', '', 1, 0, '', NULL, NULL);
+INSERT INTO `match` VALUES (35, 'L-GF-1', 6, 7, -1, 1, 0, '2021-02-27 17:27:00', 18, 4, 7, 6, '123123123123', '3123123123213123', 1, 2, '12313312', NULL, NULL);
+INSERT INTO `match` VALUES (37, 'WB 2.5', 5, 4, 18, 3, 14, '2021-02-20 21:14:00', 10, 15, 6, 6, '0.', '0..', 0, 1, '123213123123453453453434', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for player
 -- ----------------------------
 DROP TABLE IF EXISTS `player`;
 CREATE TABLE `player`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '玩家 ID',
-  `team` int(11) NOT NULL COMMENT '隊伍 ID',
-  `user_id` int(11) NOT NULL COMMENT 'OSU ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '玩家 ID',
+  `team` int NOT NULL COMMENT '隊伍 ID',
+  `user_id` int NOT NULL COMMENT 'OSU ID',
   `username` varchar(16) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'OSU 用戶名',
   `register_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '報名時間',
   `info` json NULL COMMENT '玩家資料',
@@ -233,8 +225,8 @@ CREATE TABLE `player`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `FK1_team`(`team`) USING BTREE,
-  CONSTRAINT `FK1_team` FOREIGN KEY (`team`) REFERENCES `team` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '玩家' ROW_FORMAT = Dynamic;
+  CONSTRAINT `FK1_team` FOREIGN KEY (`team`) REFERENCES `team` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '玩家' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of player
@@ -271,14 +263,14 @@ INSERT INTO `player` VALUES (26, 26, 8660293, 'willy0214', '2021-01-15 02:17:50'
 -- ----------------------------
 DROP TABLE IF EXISTS `round`;
 CREATE TABLE `round`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '階段 ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '階段 ID',
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '階段名稱',
   `description` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '備註',
-  `best_of` int(11) NOT NULL DEFAULT 9 COMMENT '預設Base Of',
+  `best_of` int NOT NULL DEFAULT 9 COMMENT '預設Base Of',
   `start_date` datetime NULL DEFAULT NULL COMMENT '預設開始時間',
-  `pool_publish` tinyint(4) NOT NULL DEFAULT 0 COMMENT '圖池是否已公開',
+  `pool_publish` tinyint NOT NULL DEFAULT 0 COMMENT '圖池是否已公開',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '階段' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '階段' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of round
@@ -289,25 +281,24 @@ INSERT INTO `round` VALUES (3, 'Quarterfinals', '8強賽', 9, '2021-01-18 00:00:
 INSERT INTO `round` VALUES (4, 'Semifinals', '半決賽', 11, '2021-01-18 00:00:00', 0);
 INSERT INTO `round` VALUES (5, 'Finals', '決賽', 11, '2021-01-18 00:00:00', 0);
 INSERT INTO `round` VALUES (6, 'Grand Final', '總決賽', 13, '2021-01-18 00:00:00', 0);
-INSERT INTO `round` VALUES (7, 'Test', '測試', 11, '2021-01-24 02:43:09', 0);
 
 -- ----------------------------
 -- Table structure for staff
 -- ----------------------------
 DROP TABLE IF EXISTS `staff`;
 CREATE TABLE `staff`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '工作人員 ID',
-  `user_id` int(11) NOT NULL COMMENT 'OSU ID',
-  `group_id` int(11) NOT NULL COMMENT '群組 ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '工作人員 ID',
+  `user_id` int NOT NULL COMMENT 'OSU ID',
+  `group_id` int NOT NULL COMMENT '群組 ID',
   `username` varchar(16) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'OSU 用戶名',
-  `privileges` int(11) NOT NULL DEFAULT 1,
+  `privileges` int NOT NULL DEFAULT 1,
   `join_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `active` tinyint(4) NOT NULL DEFAULT 1,
+  `active` tinyint NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `group_id`(`group_id`) USING BTREE,
   CONSTRAINT `group_id` FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '工作人員' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '工作人員' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of staff
@@ -350,12 +341,12 @@ INSERT INTO `staff` VALUES (33, 9834516, 2, 'Himeno Sena', 64, '2021-02-15 21:40
 -- ----------------------------
 DROP TABLE IF EXISTS `team`;
 CREATE TABLE `team`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '隊伍 ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '隊伍 ID',
   `full_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '隊伍全名',
   `flag_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '隊伍旗幟名',
   `acronym` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '隊伍簡稱',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '隊伍' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '隊伍' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of team
@@ -393,59 +384,66 @@ INSERT INTO `team` VALUES (27, 'Hibiki', 'avatar.5413624', 'Hibiki');
 -- ----------------------------
 DROP TABLE IF EXISTS `tourney`;
 CREATE TABLE `tourney`  (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '比賽 ID',
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '比賽 ID',
   `full_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '比賽全名',
   `acronym` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '比賽簡稱',
   `register_start_date` datetime NULL DEFAULT NULL COMMENT '比賽註冊開始時間',
   `register_end_date` datetime NULL DEFAULT NULL COMMENT '比賽註冊截止時間',
-  `max_team` int(11) NOT NULL DEFAULT 0 COMMENT '註冊隊伍上限(0=無限)',
-  `room_size` int(11) NOT NULL DEFAULT 9 COMMENT '預設房間大小',
-  `team_size` int(11) NOT NULL DEFAULT 4 COMMENT '預設房間每隊人數',
-  `per_team_players_min` int(11) NOT NULL DEFAULT 4 COMMENT '每隊最少人數',
-  `per_team_players_max` int(11) NOT NULL DEFAULT 8 COMMENT '每隊最多人數',
-  `game_mode` int(11) NOT NULL DEFAULT 0 COMMENT '預設房間遊戲模式',
-  `win_condition` int(11) NOT NULL DEFAULT 0 COMMENT '預設房間勝利條件',
-  `team_mode` int(11) NOT NULL DEFAULT 0 COMMENT '預設房間分組方式',
-  `timer` int(11) NOT NULL DEFAULT 90 COMMENT '預設房間倒數時間',
+  `max_team` int NOT NULL DEFAULT 0 COMMENT '註冊隊伍上限(0=無限)',
+  `room_size` int NOT NULL DEFAULT 9 COMMENT '預設房間大小',
+  `team_size` int NOT NULL DEFAULT 4 COMMENT '預設房間每隊人數',
+  `per_team_players_min` int NOT NULL DEFAULT 4 COMMENT '每隊最少人數',
+  `per_team_players_max` int NOT NULL DEFAULT 8 COMMENT '每隊最多人數',
+  `game_mode` int NOT NULL DEFAULT 0 COMMENT '預設房間遊戲模式',
+  `win_condition` int NOT NULL DEFAULT 0 COMMENT '預設房間勝利條件',
+  `team_mode` int NOT NULL DEFAULT 0 COMMENT '預設房間分組方式',
+  `timer` int NOT NULL DEFAULT 90 COMMENT '預設房間倒數時間',
   `live_link` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '直播網址',
   `map_sort` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `1v1` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否為1v1',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '比賽資訊' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '比賽資訊' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tourney
 -- ----------------------------
 INSERT INTO `tourney` VALUES (1, '840 Peculiar Person Cup', '8PPC', '2019-12-01 00:00:00', '2020-01-10 23:59:59', 0, 3, 1, 1, 1, 0, 3, 0, 80, 'https://www.twitch.tv/840tourney', '', 0);
 
--- ----------------------------
--- View structure for json_mappool
--- ----------------------------
-DROP VIEW IF EXISTS `json_mappool`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_mappool` AS select `m`.`id` AS `id`,`m`.`round_id` AS `round_id`,json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = TRUE),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)) AS `json` from ((`mappool` `m` left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`)));
-
--- ----------------------------
--- View structure for json_round
--- ----------------------------
-DROP VIEW IF EXISTS `json_round`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_round` AS select `r`.`id` AS `id`,`r`.`pool_publish` AS `pool_publish`,json_object('id',`r`.`id`,'name',`r`.`name`,'description',`r`.`description`,'best_of',`r`.`best_of`,'start_date',`r`.`start_date`,'pool_publish',`r`.`pool_publish`,'mappool',json_arrayagg(json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = TRUE),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)))) AS `json` from (((`round` `r` left join `mappool` `m` on((`m`.`round_id` = `r`.`id`))) left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`))) group by `r`.`id`;
-
--- ----------------------------
--- View structure for json_teams
--- ----------------------------
-DROP VIEW IF EXISTS `json_teams`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_teams` AS select json_arrayagg(json_object('id',`t`.`id`,'full_name',`t`.`full_name`,'acronym',`t`.`acronym`,'flag_name',`t`.`flag_name`,'players',`p`.`players`)) AS `json` from (`tourney`.`team` `t` left join (select `tourney`.`player`.`team` AS `id`,json_arrayagg(json_object('id',`tourney`.`player`.`id`,'team_id',`tourney`.`player`.`team`,'user_id',`tourney`.`player`.`user_id`,'username',`tourney`.`player`.`username`,'register_date',`tourney`.`player`.`register_date`,'info',`tourney`.`player`.`info`,'bp1',`tourney`.`player`.`bp1`,'active',`tourney`.`player`.`active`)) AS `players` from `tourney`.`player` group by `tourney`.`player`.`team`) `p` on((`p`.`id` = `t`.`id`)));
-
--- ----------------------------
--- View structure for view_mappool
--- ----------------------------
-DROP VIEW IF EXISTS `view_mappool`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `view_mappool` AS select `mappool`.`id` AS `id`,`mappool`.`round_id` AS `round_id`,`mappool`.`beatmap_id` AS `beatmap_id`,`map_group`.`name` AS `map_group`,`map_group`.`badge_color` AS `badge_color`,`map_group`.`hex_color` AS `hex_color`,`mappool`.`code` AS `code`,`mappool`.`mods` AS `mods`,`mappool`.`info` AS `info`,`mappool`.`note` AS `note`,`mappool`.`add_date` AS `add_date`,`view_staff`.`id` AS `nominator_id`,`view_staff`.`user_id` AS `nominator_uid`,`view_staff`.`group_id` AS `nominator_gid`,`view_staff`.`username` AS `nominator_name` from ((`mappool` left join `view_staff` on((`view_staff`.`id` = `mappool`.`nominator`))) left join `map_group` on((`map_group`.`name` = `mappool`.`group`)));
 
 -- ----------------------------
 -- View structure for view_staff
 -- ----------------------------
 DROP VIEW IF EXISTS `view_staff`;
 CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `view_staff` AS select `s`.`id` AS `id`,`s`.`user_id` AS `user_id`,`s`.`group_id` AS `group_id`,`s`.`username` AS `username`,`s`.`privileges` AS `privileges`,`s`.`join_date` AS `join_date`,`s`.`active` AS `active`,`g`.`name` AS `group_name`,`g`.`ch_name` AS `group_chname` from (`staff` `s` left join `group` `g` on((`g`.`id` = `s`.`group_id`)));
+
+-- ----------------------------
+-- View structure for json_mappool
+-- ----------------------------
+DROP VIEW IF EXISTS `json_mappool`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_mappool` AS select `m`.`id` AS `id`,`m`.`round_id` AS `round_id`,json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = true),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)) AS `json` from ((`mappool` `m` left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`)));
+
+-- ----------------------------
+-- View structure for json_round
+-- ----------------------------
+DROP VIEW IF EXISTS `json_round`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_round` AS select `r`.`id` AS `id`,`r`.`pool_publish` AS `pool_publish`,json_object('id',`r`.`id`,'name',`r`.`name`,'description',`r`.`description`,'best_of',`r`.`best_of`,'start_date',`r`.`start_date`,'pool_publish',`r`.`pool_publish`,'mappool',json_arrayagg(json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = true),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)))) AS `json` from (((`round` `r` left join `mappool` `m` on((`m`.`round_id` = `r`.`id`))) left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`))) group by `r`.`id`;
+
+-- ----------------------------
+-- View structure for json_team
+-- ----------------------------
+DROP VIEW IF EXISTS `json_team`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_team` AS select json_arrayagg(json_object('id',`t`.`id`,'full_name',`t`.`full_name`,'acronym',`t`.`acronym`,'flag_name',`t`.`flag_name`,'players',`p`.`players`)) AS `json` from (`team` `t` left join (select `player`.`team` AS `id`,json_arrayagg(json_object('id',`player`.`id`,'team_id',`player`.`team`,'user_id',`player`.`user_id`,'username',`player`.`username`,'register_date',`player`.`register_date`,'info',`player`.`info`,'bp1',`player`.`bp1`,'active',`player`.`active`)) AS `players` from `player` group by `player`.`team`) `p` on((`p`.`id` = `t`.`id`)));
+
+-- ----------------------------
+-- View structure for json_teams
+-- ----------------------------
+DROP VIEW IF EXISTS `json_teams`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_teams` AS select json_arrayagg(json_object('id',`t`.`id`,'full_name',`t`.`full_name`,'acronym',`t`.`acronym`,'flag_name',`t`.`flag_name`,'players',`p`.`players`)) AS `json` from (`team` `t` left join (select `player`.`team` AS `id`,json_arrayagg(json_object('id',`player`.`id`,'team_id',`player`.`team`,'user_id',`player`.`user_id`,'username',`player`.`username`,'register_date',`player`.`register_date`,'info',`player`.`info`,'bp1',`player`.`bp1`,'active',`player`.`active`)) AS `players` from `player` group by `player`.`team`) `p` on((`p`.`id` = `t`.`id`)));
+
+-- ----------------------------
+-- View structure for view_mappool
+-- ----------------------------
+DROP VIEW IF EXISTS `view_mappool`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `view_mappool` AS select `mappool`.`id` AS `id`,`mappool`.`round_id` AS `round_id`,`mappool`.`beatmap_id` AS `beatmap_id`,`map_group`.`name` AS `map_group`,`map_group`.`badge_color` AS `badge_color`,`map_group`.`hex_color` AS `hex_color`,`mappool`.`code` AS `code`,`mappool`.`mods` AS `mods`,`mappool`.`info` AS `info`,`mappool`.`note` AS `note`,`mappool`.`add_date` AS `add_date`,`view_staff`.`id` AS `nominator_id`,`view_staff`.`user_id` AS `nominator_uid`,`view_staff`.`group_id` AS `nominator_gid`,`view_staff`.`username` AS `nominator_name` from ((`mappool` left join `view_staff` on((`view_staff`.`id` = `mappool`.`nominator`))) left join `map_group` on((`map_group`.`name` = `mappool`.`group`)));
 
 SET FOREIGN_KEY_CHECKS = 1;
