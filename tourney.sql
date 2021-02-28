@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : LOCALSERVER
+ Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 80022
+ Source Server Version : 50731
  Source Host           : localhost:3306
  Source Schema         : tourney
 
  Target Server Type    : MySQL
- Target Server Version : 80022
+ Target Server Version : 50731
  File Encoding         : 65001
 
- Date: 26/02/2021 16:46:15
+ Date: 01/03/2021 04:02:20
 */
 
 SET NAMES utf8mb4;
@@ -22,11 +22,11 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `game`;
 CREATE TABLE `game`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `match_id` int NOT NULL,
-  `map` int NOT NULL,
-  `team1_score` int NOT NULL,
-  `team2_score` int NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `match_id` int(11) NOT NULL,
+  `map` int(11) NOT NULL,
+  `team1_score` int(11) NOT NULL,
+  `team2_score` int(11) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `match`(`match_id`) USING BTREE,
   INDEX `map`(`map`) USING BTREE,
@@ -43,7 +43,7 @@ CREATE TABLE `game`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `group`;
 CREATE TABLE `group`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '群組 ID',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '群組 ID',
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '群組名稱 (英)',
   `ch_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '群組名稱 (中)',
   PRIMARY KEY (`id`) USING BTREE
@@ -71,7 +71,7 @@ CREATE TABLE `map_group`  (
   `name` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `hex_color` char(8) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `badge_color` char(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `enabled_mods` int NULL DEFAULT 0,
+  `enabled_mods` int(11) NULL DEFAULT 0,
   `freemod` tinyint(1) NULL DEFAULT 0,
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '圖譜的分類' ROW_FORMAT = DYNAMIC;
@@ -94,15 +94,15 @@ INSERT INTO `map_group` VALUES ('TB', 'D9EAD3', 'lime', 0, 1);
 -- ----------------------------
 DROP TABLE IF EXISTS `mappool`;
 CREATE TABLE `mappool`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `round_id` int NOT NULL COMMENT '階段 ID',
-  `beatmap_id` int NOT NULL COMMENT '圖譜 ID',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `round_id` int(11) NOT NULL COMMENT '階段 ID',
+  `beatmap_id` int(11) NOT NULL COMMENT '圖譜 ID',
   `group` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '圖譜分類',
   `code` varchar(6) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '圖譜代碼',
   `mods` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '使用Mod(s)',
   `info` json NULL COMMENT '圖譜資訊',
   `note` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '備註',
-  `nominator` int NULL DEFAULT NULL COMMENT '提名人',
+  `nominator` int(11) NULL DEFAULT NULL COMMENT '提名人',
   `add_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `round_id`(`round_id`) USING BTREE,
@@ -163,25 +163,25 @@ INSERT INTO `mappool` VALUES (58, 5, 2788471, 'NM', '3', '0', '{\"bpm\": 110, \"
 -- ----------------------------
 DROP TABLE IF EXISTS `match`;
 CREATE TABLE `match`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `code` char(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '自訂代碼',
-  `round_id` int NULL DEFAULT NULL COMMENT '階段 ID',
-  `team1` int NULL DEFAULT NULL COMMENT '隊伍1 ID',
-  `team1_score` int NOT NULL DEFAULT 0 COMMENT '隊伍1 分數',
-  `team2` int NULL DEFAULT NULL COMMENT '隊伍2 ID',
-  `team2_score` int NOT NULL DEFAULT 0 COMMENT '隊伍2 分數',
+  `round_id` int(11) NULL DEFAULT NULL COMMENT '階段 ID',
+  `team1` int(11) NULL DEFAULT NULL COMMENT '隊伍1 ID',
+  `team1_score` int(11) NOT NULL DEFAULT 0 COMMENT '隊伍1 分數',
+  `team2` int(11) NULL DEFAULT NULL COMMENT '隊伍2 ID',
+  `team2_score` int(11) NOT NULL DEFAULT 0 COMMENT '隊伍2 分數',
   `date` datetime NULL DEFAULT NULL COMMENT '比賽日期',
-  `referee` int NULL DEFAULT NULL COMMENT '裁判',
-  `streamer` int NULL DEFAULT NULL COMMENT '直播',
-  `commentator` int NULL DEFAULT NULL COMMENT '賽評',
-  `commentator2` int NULL DEFAULT NULL COMMENT '賽評',
+  `referee` int(11) NULL DEFAULT NULL COMMENT '裁判',
+  `streamer` int(11) NULL DEFAULT NULL COMMENT '直播',
+  `commentator` int(11) NULL DEFAULT NULL COMMENT '賽評',
+  `commentator2` int(11) NULL DEFAULT NULL COMMENT '賽評',
   `mp_link` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'MP連結',
   `video_link` varchar(2000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'VOD連結',
   `loser` tinyint(1) NULL DEFAULT 0 COMMENT '是否為敗部',
   `stats` tinyint(1) NULL DEFAULT 0 COMMENT '狀態(0 未開始,1 結束,2 棄賽)',
   `note` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
-  `winto` int NULL DEFAULT NULL,
-  `losto` int NULL DEFAULT NULL,
+  `winto` int(11) NULL DEFAULT NULL,
+  `losto` int(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `code`(`code`) USING BTREE,
   INDEX `FK_TEAM1`(`team1`) USING BTREE,
@@ -214,61 +214,63 @@ INSERT INTO `match` VALUES (37, 'WB 2.5', 5, 4, 18, 3, 14, '2021-02-20 21:14:00'
 -- ----------------------------
 DROP TABLE IF EXISTS `player`;
 CREATE TABLE `player`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '玩家 ID',
-  `team` int NOT NULL COMMENT '隊伍 ID',
-  `user_id` int NOT NULL COMMENT 'OSU ID',
+  `user_id` int(11) NOT NULL COMMENT 'OSU ID',
   `username` varchar(16) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'OSU 用戶名',
+  `team` int(11) NOT NULL COMMENT '隊伍 ID',
   `register_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '報名時間',
   `info` json NULL COMMENT '玩家資料',
   `bp1` json NULL COMMENT '玩家最佳成績',
-  `active` tinyint(1) NULL DEFAULT NULL COMMENT '是否活躍',
-  PRIMARY KEY (`id`) USING BTREE,
+  `active` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否活躍',
+  `leader` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否為隊長',
+  PRIMARY KEY (`user_id`) USING BTREE,
   UNIQUE INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `FK1_team`(`team`) USING BTREE,
   CONSTRAINT `FK1_team` FOREIGN KEY (`team`) REFERENCES `team` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '玩家' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '玩家' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of player
 -- ----------------------------
-INSERT INTO `player` VALUES (1, 1, 9868529, 'We Luv Nanahira', '2021-01-15 02:15:38', '{\"level\": 100.866, \"pp_raw\": 8541.71, \"count50\": 95094, \"country\": \"TW\", \"pp_rank\": 3410, \"user_id\": 9868529, \"accuracy\": 99.23779296875, \"count100\": 1087558, \"count300\": 13366782, \"username\": \"We Luv Nanahira\", \"join_date\": \"2017-03-10 13:37:47\", \"playcount\": 62008, \"total_score\": 113550784952, \"count_rank_a\": 2178, \"count_rank_s\": 195, \"ranked_score\": 34020657291, \"count_rank_sh\": 684, \"count_rank_ss\": 12, \"count_rank_ssh\": 39, \"pp_country_rank\": 58, \"total_seconds_played\": 3695480}', '{\"pp\": 478.467, \"date\": \"2020-06-07 14:32:11\", \"rank\": \"SH\", \"score\": 51133861, \"count50\": 0, \"perfect\": 0, \"user_id\": 9868529, \"count100\": 11, \"count300\": 1004, \"maxcombo\": 1485, \"score_id\": 3113609893, \"countgeki\": 209, \"countkatu\": 10, \"countmiss\": 0, \"beatmap_id\": 2204234, \"enabled_mods\": 24, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (2, 2, 654296, 'Bitcoin', '2021-01-15 02:17:22', '{\"level\": 101.044, \"pp_raw\": 8187.21, \"count50\": 81905, \"country\": \"TW\", \"pp_rank\": 4368, \"user_id\": 654296, \"accuracy\": 98.5335464477539, \"count100\": 896120, \"count300\": 12503192, \"username\": \"Bitcoin\", \"join_date\": \"2011-01-21 02:50:27\", \"playcount\": 50878, \"total_score\": 131352923382, \"count_rank_a\": 848, \"count_rank_s\": 893, \"ranked_score\": 30479220582, \"count_rank_sh\": 1063, \"count_rank_ss\": 114, \"count_rank_ssh\": 73, \"pp_country_rank\": 72, \"total_seconds_played\": 2959327}', '{\"pp\": 492.174, \"date\": \"2019-03-24 03:36:55\", \"rank\": \"B\", \"score\": 31262182, \"count50\": 13, \"perfect\": 0, \"user_id\": 654296, \"count100\": 97, \"count300\": 881, \"maxcombo\": 1324, \"score_id\": 2765645759, \"countgeki\": 163, \"countkatu\": 31, \"countmiss\": 3, \"beatmap_id\": 1945175, \"enabled_mods\": 584, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (3, 3, 2472609, 'Imokora', '2021-01-15 02:17:23', '{\"level\": 100.673, \"pp_raw\": 9183.2, \"count50\": 88414, \"country\": \"TW\", \"pp_rank\": 2531, \"user_id\": 2472609, \"accuracy\": 98.94832611083984, \"count100\": 725456, \"count300\": 10689209, \"username\": \"Imokora\", \"join_date\": \"2013-03-24 12:00:26\", \"playcount\": 40977, \"total_score\": 94232731299, \"count_rank_a\": 1555, \"count_rank_s\": 755, \"ranked_score\": 27267063326, \"count_rank_sh\": 298, \"count_rank_ss\": 149, \"count_rank_ssh\": 110, \"pp_country_rank\": 38, \"total_seconds_played\": 2790461}', '{\"pp\": 567.919, \"date\": \"2019-06-29 12:57:30\", \"rank\": \"S\", \"score\": 133665590, \"count50\": 0, \"perfect\": 0, \"user_id\": 2472609, \"count100\": 32, \"count300\": 1780, \"maxcombo\": 2423, \"score_id\": 2840299012, \"countgeki\": 221, \"countkatu\": 15, \"countmiss\": 0, \"beatmap_id\": 1537566, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (4, 4, 5155973, 'Rizer', '2021-01-15 02:17:24', '{\"level\": 107.86, \"pp_raw\": 13699.8, \"count50\": 60655, \"country\": \"TW\", \"pp_rank\": 106, \"user_id\": 5155973, \"accuracy\": 99.13928985595705, \"count100\": 1069546, \"count300\": 41950272, \"username\": \"Rizer\", \"join_date\": \"2014-11-04 14:04:46\", \"playcount\": 165711, \"total_score\": 812885636530, \"count_rank_a\": 1629, \"count_rank_s\": 2788, \"ranked_score\": 215310474864, \"count_rank_sh\": 5613, \"count_rank_ss\": 781, \"count_rank_ssh\": 2136, \"pp_country_rank\": 2, \"total_seconds_played\": 9807816}', '{\"pp\": 780.894, \"date\": \"2020-08-29 14:08:35\", \"rank\": \"S\", \"score\": 422251960, \"count50\": 0, \"perfect\": 0, \"user_id\": 5155973, \"count100\": 37, \"count300\": 3370, \"maxcombo\": 4192, \"score_id\": 3217970033, \"countgeki\": 433, \"countkatu\": 27, \"countmiss\": 0, \"beatmap_id\": 2365752, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (5, 5, 3416783, '_kyuu', '2021-01-15 02:17:25', '{\"level\": 100.92, \"pp_raw\": 5737.74, \"count50\": 49944, \"country\": \"TW\", \"pp_rank\": 28376, \"user_id\": 3416783, \"accuracy\": 99.33747863769533, \"count100\": 697794, \"count300\": 12078952, \"username\": \"_kyuu\", \"join_date\": \"2013-10-12 10:19:14\", \"playcount\": 46151, \"total_score\": 118945512963, \"count_rank_a\": 2878, \"count_rank_s\": 941, \"ranked_score\": 40365830109, \"count_rank_sh\": 517, \"count_rank_ss\": 93, \"count_rank_ssh\": 50, \"pp_country_rank\": 495, \"total_seconds_played\": 3211433}', '{\"pp\": 342.071, \"date\": \"2018-08-29 08:36:53\", \"rank\": \"A\", \"score\": 73320820, \"count50\": 0, \"perfect\": 0, \"user_id\": 3416783, \"count100\": 9, \"count300\": 1466, \"maxcombo\": 1800, \"score_id\": 2619479813, \"countgeki\": 342, \"countkatu\": 7, \"countmiss\": 1, \"beatmap_id\": 1519282, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (6, 6, 2200982, 'Muji', '2021-01-15 02:17:25', '{\"level\": 100.188, \"pp_raw\": 10368.4, \"count50\": 48392, \"country\": \"HK\", \"pp_rank\": 1006, \"user_id\": 2200982, \"accuracy\": 97.6399917602539, \"count100\": 462554, \"count300\": 5159992, \"username\": \"Muji\", \"join_date\": \"2012-12-21 08:18:30\", \"playcount\": 32005, \"total_score\": 45758627674, \"count_rank_a\": 498, \"count_rank_s\": 226, \"ranked_score\": 11817957981, \"count_rank_sh\": 160, \"count_rank_ss\": 33, \"count_rank_ssh\": 19, \"pp_country_rank\": 22, \"total_seconds_played\": 1339046}', '{\"pp\": 605.812, \"date\": \"2020-10-15 09:50:44\", \"rank\": \"A\", \"score\": 1529014, \"count50\": 0, \"perfect\": 0, \"user_id\": 2200982, \"count100\": 21, \"count300\": 181, \"maxcombo\": 265, \"score_id\": 3279951206, \"countgeki\": 50, \"countkatu\": 15, \"countmiss\": 0, \"beatmap_id\": 2338610, \"enabled_mods\": 72, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (7, 7, 9539163, 'EthanTC', '2021-01-15 02:17:27', '{\"level\": 102.089, \"pp_raw\": 10054.3, \"count50\": 89474, \"country\": \"TW\", \"pp_rank\": 1274, \"user_id\": 9539163, \"accuracy\": 99.17862701416016, \"count100\": 908709, \"count300\": 18824828, \"username\": \"EthanTC\", \"join_date\": \"2017-01-07 08:54:47\", \"playcount\": 69590, \"total_score\": 235817637267, \"count_rank_a\": 1426, \"count_rank_s\": 2, \"ranked_score\": 37316960111, \"count_rank_sh\": 648, \"count_rank_ss\": 0, \"count_rank_ssh\": 46, \"pp_country_rank\": 25, \"total_seconds_played\": 4749461}', '{\"pp\": 613.157, \"date\": \"2019-12-10 08:44:22\", \"rank\": \"SH\", \"score\": 141649759, \"count50\": 3, \"perfect\": 1, \"user_id\": 9539163, \"count100\": 32, \"count300\": 1777, \"maxcombo\": 2424, \"score_id\": 2955865849, \"countgeki\": 216, \"countkatu\": 19, \"countmiss\": 0, \"beatmap_id\": 1537566, \"enabled_mods\": 8, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (8, 8, 2808144, 'Music Lord', '2021-01-15 02:17:28', '{\"level\": 101.491, \"pp_raw\": 8128.27, \"count50\": 161397, \"country\": \"TW\", \"pp_rank\": 4934, \"user_id\": 2808144, \"accuracy\": 98.47891235351562, \"count100\": 1842477, \"count300\": 19227786, \"username\": \"Music Lord\", \"join_date\": \"2013-06-15 03:16:06\", \"playcount\": 97271, \"total_score\": 176067410749, \"count_rank_a\": 2521, \"count_rank_s\": 292, \"ranked_score\": 49164370443, \"count_rank_sh\": 1825, \"count_rank_ss\": 9, \"count_rank_ssh\": 93, \"pp_country_rank\": 80, \"total_seconds_played\": 5103897}', '{\"pp\": 454.36, \"date\": \"2019-09-25 12:08:19\", \"rank\": \"A\", \"score\": 26123631, \"count50\": 1, \"perfect\": 0, \"user_id\": 2808144, \"count100\": 5, \"count300\": 840, \"maxcombo\": 1129, \"score_id\": 2901642155, \"countgeki\": 184, \"countkatu\": 5, \"countmiss\": 1, \"beatmap_id\": 574471, \"enabled_mods\": 72, \"replay_available\": 0}', 1);
-INSERT INTO `player` VALUES (9, 9, 7172340, 'NekoKamui', '2021-01-15 02:17:28', '{\"level\": 101.36, \"pp_raw\": 9836.83, \"count50\": 155574, \"country\": \"TW\", \"pp_rank\": 1448, \"user_id\": 7172340, \"accuracy\": 98.16925048828124, \"count100\": 1503440, \"count300\": 16942419, \"username\": \"NekoKamui\", \"join_date\": \"2015-10-02 12:44:17\", \"playcount\": 101699, \"total_score\": 162974127073, \"count_rank_a\": 1951, \"count_rank_s\": 1288, \"ranked_score\": 47579729585, \"count_rank_sh\": 481, \"count_rank_ss\": 140, \"count_rank_ssh\": 70, \"pp_country_rank\": 30, \"total_seconds_played\": 4847125}', '{\"pp\": 544.821, \"date\": \"2020-05-24 13:28:06\", \"rank\": \"SH\", \"score\": 1282720, \"count50\": 0, \"perfect\": 1, \"user_id\": 7172340, \"count100\": 1, \"count300\": 182, \"maxcombo\": 225, \"score_id\": 3097115524, \"countgeki\": 42, \"countkatu\": 1, \"countmiss\": 0, \"beatmap_id\": 1068383, \"enabled_mods\": 72, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (10, 10, 12717375, 'NashiKari', '2021-01-15 02:17:29', '{\"level\": 100.523, \"pp_raw\": 8525.51, \"count50\": 150050, \"country\": \"TW\", \"pp_rank\": 3444, \"user_id\": 12717375, \"accuracy\": 97.90440368652344, \"count100\": 1623527, \"count300\": 13955807, \"username\": \"NashiKari\", \"join_date\": \"2018-07-23 12:19:12\", \"playcount\": 72710, \"total_score\": 79205359482, \"count_rank_a\": 1260, \"count_rank_s\": 404, \"ranked_score\": 16202723565, \"count_rank_sh\": 393, \"count_rank_ss\": 24, \"count_rank_ssh\": 39, \"pp_country_rank\": 59, \"total_seconds_played\": 3998076}', '{\"pp\": 495.754, \"date\": \"2019-11-26 13:49:01\", \"rank\": \"A\", \"score\": 30469108, \"count50\": 7, \"perfect\": 0, \"user_id\": 12717375, \"count100\": 82, \"count300\": 904, \"maxcombo\": 1321, \"score_id\": 2945892110, \"countgeki\": 166, \"countkatu\": 29, \"countmiss\": 1, \"beatmap_id\": 1945175, \"enabled_mods\": 64, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (11, 11, 1860489, '_Shield', '2021-01-15 02:17:31', '{\"level\": 104.455, \"pp_raw\": 12507.5, \"count50\": 68971, \"country\": \"TW\", \"pp_rank\": 254, \"user_id\": 1860489, \"accuracy\": 99.08057403564452, \"count100\": 942443, \"count300\": 28177552, \"username\": \"_Shield\", \"join_date\": \"2012-08-21 15:10:18\", \"playcount\": 116427, \"total_score\": 472480882978, \"count_rank_a\": 1780, \"count_rank_s\": 2324, \"ranked_score\": 106048446366, \"count_rank_sh\": 119, \"count_rank_ss\": 351, \"count_rank_ssh\": 15, \"pp_country_rank\": 6, \"total_seconds_played\": 6173490}', '{\"pp\": 742.292, \"date\": \"2020-10-03 17:24:05\", \"rank\": \"S\", \"score\": 187403050, \"count50\": 0, \"perfect\": 1, \"user_id\": 1860489, \"count100\": 43, \"count300\": 2273, \"maxcombo\": 2741, \"score_id\": 3265654159, \"countgeki\": 361, \"countkatu\": 27, \"countmiss\": 0, \"beatmap_id\": 2079597, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (12, 12, 5920715, '2rdiodul', '2021-01-15 02:17:33', '{\"level\": 100.741, \"pp_raw\": 7937.81, \"count50\": 60547, \"country\": \"TW\", \"pp_rank\": 5225, \"user_id\": 5920715, \"accuracy\": 97.23833465576172, \"count100\": 986399, \"count300\": 10227158, \"username\": \"2rdiodul\", \"join_date\": \"2015-02-09 02:07:41\", \"playcount\": 52632, \"total_score\": 100991759710, \"count_rank_a\": 1565, \"count_rank_s\": 1016, \"ranked_score\": 30397938607, \"count_rank_sh\": 597, \"count_rank_ss\": 36, \"count_rank_ssh\": 4, \"pp_country_rank\": 94, \"total_seconds_played\": 2783576}', '{\"pp\": 449.783, \"date\": \"2020-05-20 12:45:27\", \"rank\": \"SH\", \"score\": 4234897, \"count50\": 0, \"perfect\": 0, \"user_id\": 5920715, \"count100\": 10, \"count300\": 329, \"maxcombo\": 459, \"score_id\": 3092541015, \"countgeki\": 70, \"countkatu\": 8, \"countmiss\": 0, \"beatmap_id\": 2118443, \"enabled_mods\": 72, \"replay_available\": 0}', 1);
-INSERT INTO `player` VALUES (13, 13, 3366658, 'MiyazonoKuma', '2021-01-15 02:17:34', '{\"level\": 100.589, \"pp_raw\": 9035.97, \"count50\": 157854, \"country\": \"TW\", \"pp_rank\": 2450, \"user_id\": 3366658, \"accuracy\": 98.17486572265624, \"count100\": 1326694, \"count300\": 11443387, \"username\": \"MiyazonoKuma\", \"join_date\": \"2013-10-01 10:28:03\", \"playcount\": 67520, \"total_score\": 85792604412, \"count_rank_a\": 776, \"count_rank_s\": 166, \"ranked_score\": 19726324095, \"count_rank_sh\": 690, \"count_rank_ss\": 23, \"count_rank_ssh\": 80, \"pp_country_rank\": 42, \"total_seconds_played\": 3281271}', '{\"pp\": 535.755, \"date\": \"2019-09-22 13:03:46\", \"rank\": \"XH\", \"score\": 591005, \"count50\": 0, \"perfect\": 1, \"user_id\": 3366658, \"count100\": 0, \"count300\": 123, \"maxcombo\": 166, \"score_id\": 2899742728, \"countgeki\": 24, \"countkatu\": 0, \"countmiss\": 0, \"beatmap_id\": 2150733, \"enabled_mods\": 72, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (14, 14, 4519494, 'Spinesnight', '2021-01-15 02:17:36', '{\"level\": 102.565, \"pp_raw\": 9255.88, \"count50\": 206352, \"country\": \"TW\", \"pp_rank\": 2148, \"user_id\": 4519494, \"accuracy\": 98.711669921875, \"count100\": 2474045, \"count300\": 27799311, \"username\": \"Spinesnight\", \"join_date\": \"2014-06-13 09:02:53\", \"playcount\": 122082, \"total_score\": 283469211797, \"count_rank_a\": 1531, \"count_rank_s\": 1943, \"ranked_score\": 78481561462, \"count_rank_sh\": 1221, \"count_rank_ss\": 76, \"count_rank_ssh\": 31, \"pp_country_rank\": 37, \"total_seconds_played\": 7077492}', '{\"pp\": 495.212, \"date\": \"2020-04-23 12:22:43\", \"rank\": \"A\", \"score\": 49907310, \"count50\": 0, \"perfect\": 0, \"user_id\": 4519494, \"count100\": 18, \"count300\": 1150, \"maxcombo\": 1448, \"score_id\": 3062573386, \"countgeki\": 192, \"countkatu\": 15, \"countmiss\": 1, \"beatmap_id\": 1270000, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (15, 15, 5413624, 'Hibiki', '2021-01-15 02:17:37', '{\"level\": 101.274, \"pp_raw\": 10893.1, \"count50\": 158831, \"country\": \"HK\", \"pp_rank\": 695, \"user_id\": 5413624, \"accuracy\": 98.67893981933594, \"count100\": 1259802, \"count300\": 15543007, \"username\": \"Hibiki\", \"join_date\": \"2014-12-24 13:28:57\", \"playcount\": 83155, \"total_score\": 154295013314, \"count_rank_a\": 865, \"count_rank_s\": 119, \"ranked_score\": 29463073477, \"count_rank_sh\": 681, \"count_rank_ss\": 15, \"count_rank_ssh\": 166, \"pp_country_rank\": 18, \"total_seconds_played\": 4125168}', '{\"pp\": 611.499, \"date\": \"2019-11-19 07:42:45\", \"rank\": \"SH\", \"score\": 4533140, \"count50\": 0, \"perfect\": 1, \"user_id\": 5413624, \"count100\": 7, \"count300\": 280, \"maxcombo\": 407, \"score_id\": 2940851121, \"countgeki\": 86, \"countkatu\": 6, \"countmiss\": 0, \"beatmap_id\": 1925194, \"enabled_mods\": 72, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (16, 16, 3163649, 'GfMRT', '2021-01-15 02:17:39', '{\"level\": 105.823, \"pp_raw\": 12348.7, \"count50\": 148437, \"country\": \"TW\", \"pp_rank\": 285, \"user_id\": 3163649, \"accuracy\": 99.09882354736328, \"count100\": 1720189, \"count300\": 36360084, \"username\": \"GfMRT\", \"join_date\": \"2013-08-21 13:15:25\", \"playcount\": 128104, \"total_score\": 609260190284, \"count_rank_a\": 948, \"count_rank_s\": 851, \"ranked_score\": 145321037859, \"count_rank_sh\": 4770, \"count_rank_ss\": 172, \"count_rank_ssh\": 801, \"pp_country_rank\": 7, \"total_seconds_played\": 8228788}', '{\"pp\": 655.787, \"date\": \"2020-05-06 13:34:23\", \"rank\": \"SH\", \"score\": 864708, \"count50\": 0, \"perfect\": 1, \"user_id\": 3163649, \"count100\": 3, \"count300\": 135, \"maxcombo\": 173, \"score_id\": 3077136058, \"countgeki\": 43, \"countkatu\": 3, \"countmiss\": 0, \"beatmap_id\": 1992711, \"enabled_mods\": 72, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (17, 17, 4183988, 'Zxcy', '2021-01-15 02:17:40', '{\"level\": 100.669, \"pp_raw\": 7578.18, \"count50\": 87376, \"country\": \"HK\", \"pp_rank\": 6765, \"user_id\": 4183988, \"accuracy\": 98.49141693115234, \"count100\": 1018564, \"count300\": 12363354, \"username\": \"Zxcy\", \"join_date\": \"2014-03-25 11:27:06\", \"playcount\": 78273, \"total_score\": 93811750881, \"count_rank_a\": 492, \"count_rank_s\": 517, \"ranked_score\": 10836505751, \"count_rank_sh\": 116, \"count_rank_ss\": 29, \"count_rank_ssh\": 9, \"pp_country_rank\": 109, \"total_seconds_played\": 3528194}', '{\"pp\": 447.867, \"date\": \"2019-06-25 20:12:25\", \"rank\": \"SH\", \"score\": 1759375, \"count50\": 0, \"perfect\": 0, \"user_id\": 4183988, \"count100\": 11, \"count300\": 211, \"maxcombo\": 273, \"score_id\": 2837744367, \"countgeki\": 34, \"countkatu\": 8, \"countmiss\": 0, \"beatmap_id\": 2060305, \"enabled_mods\": 72, \"replay_available\": 0}', 1);
-INSERT INTO `player` VALUES (18, 18, 1786610, 'Naze Meiyue', '2021-01-15 02:17:41', '{\"level\": 102.587, \"pp_raw\": 8004.52, \"count50\": 215712, \"country\": \"TW\", \"pp_rank\": 4963, \"user_id\": 1786610, \"accuracy\": 99.05582427978516, \"count100\": 1791046, \"count300\": 26200362, \"username\": \"Naze Meiyue\", \"join_date\": \"2012-07-26 07:53:04\", \"playcount\": 151047, \"total_score\": 285673729778, \"count_rank_a\": 2370, \"count_rank_s\": 1945, \"ranked_score\": 63803780142, \"count_rank_sh\": 236, \"count_rank_ss\": 219, \"count_rank_ssh\": 34, \"pp_country_rank\": 89, \"total_seconds_played\": 7071584}', '{\"pp\": 415.247, \"date\": \"2020-01-01 15:12:53\", \"rank\": \"A\", \"score\": 59985190, \"count50\": 0, \"perfect\": 0, \"user_id\": 1786610, \"count100\": 42, \"count300\": 1154, \"maxcombo\": 1787, \"score_id\": 2972494997, \"countgeki\": 307, \"countkatu\": 28, \"countmiss\": 1, \"beatmap_id\": 1583228, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (19, 19, 3066316, '[ MILK_Jiang]', '2021-01-15 02:17:42', '{\"level\": 101.979, \"pp_raw\": 7378.27, \"count50\": 135706, \"country\": \"TW\", \"pp_rank\": 7854, \"user_id\": 3066316, \"accuracy\": 99.3375473022461, \"count100\": 1303419, \"count300\": 20739969, \"username\": \"[ MILK_Jiang]\", \"join_date\": \"2013-08-04 02:41:30\", \"playcount\": 80279, \"total_score\": 224861119801, \"count_rank_a\": 1495, \"count_rank_s\": 1089, \"ranked_score\": 40899483109, \"count_rank_sh\": 176, \"count_rank_ss\": 106, \"count_rank_ssh\": 26, \"pp_country_rank\": 155, \"total_seconds_played\": 4353586}', '{\"pp\": 389.145, \"date\": \"2016-04-03 12:42:23\", \"rank\": \"SH\", \"score\": 70741534, \"count50\": 0, \"perfect\": 0, \"user_id\": 3066316, \"count100\": 11, \"count300\": 1212, \"maxcombo\": 1737, \"score_id\": 2091603501, \"countgeki\": 308, \"countkatu\": 11, \"countmiss\": 0, \"beatmap_id\": 827803, \"enabled_mods\": 8, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (20, 20, 1593180, 'XzCraftP', '2021-01-15 02:17:43', '{\"level\": 100.431, \"pp_raw\": 8398.57, \"count50\": 50840, \"country\": \"TW\", \"pp_rank\": 4243, \"user_id\": 1593180, \"accuracy\": 99.0665054321289, \"count100\": 396248, \"count300\": 5569959, \"username\": \"XzCraftP\", \"join_date\": \"2012-05-11 10:50:34\", \"playcount\": 20312, \"total_score\": 70045589828, \"count_rank_a\": 1137, \"count_rank_s\": 597, \"ranked_score\": 32879723907, \"count_rank_sh\": 300, \"count_rank_ss\": 54, \"count_rank_ssh\": 46, \"pp_country_rank\": 63, \"total_seconds_played\": 1493743}', '{\"pp\": 518.912, \"date\": \"2019-09-19 15:46:26\", \"rank\": \"A\", \"score\": 126725030, \"count50\": 1, \"perfect\": 0, \"user_id\": 1593180, \"count100\": 37, \"count300\": 1934, \"maxcombo\": 2242, \"score_id\": 2897534935, \"countgeki\": 214, \"countkatu\": 15, \"countmiss\": 1, \"beatmap_id\": 658127, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (21, 21, 2529213, 'SugiuraAyano', '2021-01-15 02:17:44', '{\"level\": 100.876, \"pp_raw\": 7407.4, \"count50\": 72065, \"country\": \"TW\", \"pp_rank\": 7652, \"user_id\": 2529213, \"accuracy\": 99.1696319580078, \"count100\": 789914, \"count300\": 11655342, \"username\": \"SugiuraAyano\", \"join_date\": \"2013-04-10 07:43:05\", \"playcount\": 42829, \"total_score\": 114572531149, \"count_rank_a\": 2246, \"count_rank_s\": 1030, \"ranked_score\": 41459505390, \"count_rank_sh\": 621, \"count_rank_ss\": 47, \"count_rank_ssh\": 50, \"pp_country_rank\": 150, \"total_seconds_played\": 3075188}', '{\"pp\": 390.251, \"date\": \"2019-12-14 06:25:20\", \"rank\": \"SH\", \"score\": 31599079, \"count50\": 1, \"perfect\": 1, \"user_id\": 2529213, \"count100\": 9, \"count300\": 854, \"maxcombo\": 1259, \"score_id\": 2958666414, \"countgeki\": 154, \"countkatu\": 7, \"countmiss\": 0, \"beatmap_id\": 2188430, \"enabled_mods\": 72, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (22, 22, 2165650, 'mcy4', '2021-01-15 02:17:45', '{\"level\": 102.923, \"pp_raw\": 15065.4, \"count50\": 488859, \"country\": \"HK\", \"pp_rank\": 39, \"user_id\": 2165650, \"accuracy\": 98.57315063476562, \"count100\": 4065898, \"count300\": 40866893, \"username\": \"mcy4\", \"join_date\": \"2012-12-08 08:33:38\", \"playcount\": 208934, \"total_score\": 319205326003, \"count_rank_a\": 1690, \"count_rank_s\": 575, \"ranked_score\": 39820280865, \"count_rank_sh\": 560, \"count_rank_ss\": 12, \"count_rank_ssh\": 14, \"pp_country_rank\": 2, \"total_seconds_played\": 9724688}', '{\"pp\": 867.191, \"date\": \"2020-10-14 14:27:58\", \"rank\": \"A\", \"score\": 40878591, \"count50\": 0, \"perfect\": 0, \"user_id\": 2165650, \"count100\": 13, \"count300\": 909, \"maxcombo\": 1243, \"score_id\": 3278943063, \"countgeki\": 236, \"countkatu\": 9, \"countmiss\": 2, \"beatmap_id\": 1778560, \"enabled_mods\": 72, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (23, 23, 9991663, '[-koume-]', '2021-01-15 02:17:47', '{\"level\": 101.086, \"pp_raw\": 7771.48, \"count50\": 106262, \"country\": \"HK\", \"pp_rank\": 5860, \"user_id\": 9991663, \"accuracy\": 98.63877868652344, \"count100\": 1351069, \"count300\": 17624791, \"username\": \"[-koume-]\", \"join_date\": \"2017-04-02 14:14:29\", \"playcount\": 104391, \"total_score\": 135566103186, \"count_rank_a\": 2313, \"count_rank_s\": 690, \"ranked_score\": 35869204640, \"count_rank_sh\": 1340, \"count_rank_ss\": 62, \"count_rank_ssh\": 228, \"pp_country_rank\": 94, \"total_seconds_played\": 5124911}', '{\"pp\": 458.453, \"date\": \"2020-04-19 09:54:05\", \"rank\": \"SH\", \"score\": 4326951, \"count50\": 0, \"perfect\": 1, \"user_id\": 9991663, \"count100\": 8, \"count300\": 313, \"maxcombo\": 468, \"score_id\": 3058174327, \"countgeki\": 72, \"countkatu\": 7, \"countmiss\": 0, \"beatmap_id\": 1619564, \"enabled_mods\": 72, \"replay_available\": 0}', 1);
-INSERT INTO `player` VALUES (24, 24, 9632700, 'Odiz', '2021-01-15 02:17:48', '{\"level\": 100.495, \"pp_raw\": 7842.59, \"count50\": 45314, \"country\": \"TW\", \"pp_rank\": 6320, \"user_id\": 9632700, \"accuracy\": 98.98811340332033, \"count100\": 586506, \"count300\": 8893212, \"username\": \"Odiz\", \"join_date\": \"2017-01-25 07:18:32\", \"playcount\": 54942, \"total_score\": 76467155434, \"count_rank_a\": 681, \"count_rank_s\": 182, \"ranked_score\": 9827963636, \"count_rank_sh\": 201, \"count_rank_ss\": 15, \"count_rank_ssh\": 24, \"pp_country_rank\": 100, \"total_seconds_played\": 2446194}', '{\"pp\": 429.261, \"date\": \"2020-03-10 13:50:59\", \"rank\": \"A\", \"score\": 32345484, \"count50\": 0, \"perfect\": 0, \"user_id\": 9632700, \"count100\": 6, \"count300\": 1164, \"maxcombo\": 1277, \"score_id\": 3020887081, \"countgeki\": 275, \"countkatu\": 5, \"countmiss\": 6, \"beatmap_id\": 915210, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (25, 25, 3517706, '[ Zane ]', '2021-01-15 02:17:49', '{\"level\": 106.006, \"pp_raw\": 13868.8, \"count50\": 203748, \"country\": \"TW\", \"pp_rank\": 95, \"user_id\": 3517706, \"accuracy\": 99.2180633544922, \"count100\": 2534714, \"count300\": 44697245, \"username\": \"[ Zane ]\", \"join_date\": \"2013-10-30 01:44:16\", \"playcount\": 190618, \"total_score\": 627532069300, \"count_rank_a\": 2440, \"count_rank_s\": 1801, \"ranked_score\": 108639516926, \"count_rank_sh\": 1301, \"count_rank_ss\": 151, \"count_rank_ssh\": 119, \"pp_country_rank\": 1, \"total_seconds_played\": 10110143}', '{\"pp\": 789.862, \"date\": \"2020-10-19 21:01:16\", \"rank\": \"S\", \"score\": 423634160, \"count50\": 0, \"perfect\": 0, \"user_id\": 3517706, \"count100\": 29, \"count300\": 3378, \"maxcombo\": 4196, \"score_id\": 3285919901, \"countgeki\": 440, \"countkatu\": 20, \"countmiss\": 0, \"beatmap_id\": 2365752, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
-INSERT INTO `player` VALUES (26, 26, 8660293, 'willy0214', '2021-01-15 02:17:50', '{\"level\": 102.114, \"pp_raw\": 10294.5, \"count50\": 92850, \"country\": \"TW\", \"pp_rank\": 1238, \"user_id\": 8660293, \"accuracy\": 98.72705841064452, \"count100\": 1228176, \"count300\": 23161852, \"username\": \"willy0214\", \"join_date\": \"2016-07-05 09:02:57\", \"playcount\": 130674, \"total_score\": 238311517618, \"count_rank_a\": 660, \"count_rank_s\": 336, \"ranked_score\": 15441907627, \"count_rank_sh\": 17, \"count_rank_ss\": 38, \"count_rank_ssh\": 6, \"pp_country_rank\": 19, \"total_seconds_played\": 5680907}', '{\"pp\": 612.023, \"date\": \"2019-12-30 11:01:58\", \"rank\": \"S\", \"score\": 179969540, \"count50\": 0, \"perfect\": 0, \"user_id\": 8660293, \"count100\": 28, \"count300\": 2195, \"maxcombo\": 2723, \"score_id\": 2970848482, \"countgeki\": 382, \"countkatu\": 22, \"countmiss\": 0, \"beatmap_id\": 1241370, \"enabled_mods\": 0, \"replay_available\": 1}', 1);
+INSERT INTO `player` VALUES (2, 'peppy', 1, '2021-02-27 22:36:16', NULL, NULL, 1, 0);
+INSERT INTO `player` VALUES (3, 'BanchoBot', 1, '2021-02-27 22:36:38', NULL, NULL, 1, 0);
+INSERT INTO `player` VALUES (654296, 'Bitcoin', 2, '2021-01-15 02:17:22', '{\"level\": 101.044, \"pp_raw\": 8187.21, \"count50\": 81905, \"country\": \"TW\", \"pp_rank\": 4368, \"user_id\": 654296, \"accuracy\": 98.5335464477539, \"count100\": 896120, \"count300\": 12503192, \"username\": \"Bitcoin\", \"join_date\": \"2011-01-21 02:50:27\", \"playcount\": 50878, \"total_score\": 131352923382, \"count_rank_a\": 848, \"count_rank_s\": 893, \"ranked_score\": 30479220582, \"count_rank_sh\": 1063, \"count_rank_ss\": 114, \"count_rank_ssh\": 73, \"pp_country_rank\": 72, \"total_seconds_played\": 2959327}', '{\"pp\": 492.174, \"date\": \"2019-03-24 03:36:55\", \"rank\": \"B\", \"score\": 31262182, \"count50\": 13, \"perfect\": 0, \"user_id\": 654296, \"count100\": 97, \"count300\": 881, \"maxcombo\": 1324, \"score_id\": 2765645759, \"countgeki\": 163, \"countkatu\": 31, \"countmiss\": 3, \"beatmap_id\": 1945175, \"enabled_mods\": 584, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (1593180, 'XzCraftP', 20, '2021-01-15 02:17:43', '{\"level\": 100.431, \"pp_raw\": 8398.57, \"count50\": 50840, \"country\": \"TW\", \"pp_rank\": 4243, \"user_id\": 1593180, \"accuracy\": 99.0665054321289, \"count100\": 396248, \"count300\": 5569959, \"username\": \"XzCraftP\", \"join_date\": \"2012-05-11 10:50:34\", \"playcount\": 20312, \"total_score\": 70045589828, \"count_rank_a\": 1137, \"count_rank_s\": 597, \"ranked_score\": 32879723907, \"count_rank_sh\": 300, \"count_rank_ss\": 54, \"count_rank_ssh\": 46, \"pp_country_rank\": 63, \"total_seconds_played\": 1493743}', '{\"pp\": 518.912, \"date\": \"2019-09-19 15:46:26\", \"rank\": \"A\", \"score\": 126725030, \"count50\": 1, \"perfect\": 0, \"user_id\": 1593180, \"count100\": 37, \"count300\": 1934, \"maxcombo\": 2242, \"score_id\": 2897534935, \"countgeki\": 214, \"countkatu\": 15, \"countmiss\": 1, \"beatmap_id\": 658127, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (1786610, 'Naze Meiyue', 18, '2021-01-15 02:17:41', '{\"level\": 102.587, \"pp_raw\": 8004.52, \"count50\": 215712, \"country\": \"TW\", \"pp_rank\": 4963, \"user_id\": 1786610, \"accuracy\": 99.05582427978516, \"count100\": 1791046, \"count300\": 26200362, \"username\": \"Naze Meiyue\", \"join_date\": \"2012-07-26 07:53:04\", \"playcount\": 151047, \"total_score\": 285673729778, \"count_rank_a\": 2370, \"count_rank_s\": 1945, \"ranked_score\": 63803780142, \"count_rank_sh\": 236, \"count_rank_ss\": 219, \"count_rank_ssh\": 34, \"pp_country_rank\": 89, \"total_seconds_played\": 7071584}', '{\"pp\": 415.247, \"date\": \"2020-01-01 15:12:53\", \"rank\": \"A\", \"score\": 59985190, \"count50\": 0, \"perfect\": 0, \"user_id\": 1786610, \"count100\": 42, \"count300\": 1154, \"maxcombo\": 1787, \"score_id\": 2972494997, \"countgeki\": 307, \"countkatu\": 28, \"countmiss\": 1, \"beatmap_id\": 1583228, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (1860489, '_Shield', 11, '2021-01-15 02:17:31', '{\"level\": 104.455, \"pp_raw\": 12507.5, \"count50\": 68971, \"country\": \"TW\", \"pp_rank\": 254, \"user_id\": 1860489, \"accuracy\": 99.08057403564452, \"count100\": 942443, \"count300\": 28177552, \"username\": \"_Shield\", \"join_date\": \"2012-08-21 15:10:18\", \"playcount\": 116427, \"total_score\": 472480882978, \"count_rank_a\": 1780, \"count_rank_s\": 2324, \"ranked_score\": 106048446366, \"count_rank_sh\": 119, \"count_rank_ss\": 351, \"count_rank_ssh\": 15, \"pp_country_rank\": 6, \"total_seconds_played\": 6173490}', '{\"pp\": 742.292, \"date\": \"2020-10-03 17:24:05\", \"rank\": \"S\", \"score\": 187403050, \"count50\": 0, \"perfect\": 1, \"user_id\": 1860489, \"count100\": 43, \"count300\": 2273, \"maxcombo\": 2741, \"score_id\": 3265654159, \"countgeki\": 361, \"countkatu\": 27, \"countmiss\": 0, \"beatmap_id\": 2079597, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (2165650, 'mcy4', 22, '2021-01-15 02:17:45', '{\"level\": 102.923, \"pp_raw\": 15065.4, \"count50\": 488859, \"country\": \"HK\", \"pp_rank\": 39, \"user_id\": 2165650, \"accuracy\": 98.57315063476562, \"count100\": 4065898, \"count300\": 40866893, \"username\": \"mcy4\", \"join_date\": \"2012-12-08 08:33:38\", \"playcount\": 208934, \"total_score\": 319205326003, \"count_rank_a\": 1690, \"count_rank_s\": 575, \"ranked_score\": 39820280865, \"count_rank_sh\": 560, \"count_rank_ss\": 12, \"count_rank_ssh\": 14, \"pp_country_rank\": 2, \"total_seconds_played\": 9724688}', '{\"pp\": 867.191, \"date\": \"2020-10-14 14:27:58\", \"rank\": \"A\", \"score\": 40878591, \"count50\": 0, \"perfect\": 0, \"user_id\": 2165650, \"count100\": 13, \"count300\": 909, \"maxcombo\": 1243, \"score_id\": 3278943063, \"countgeki\": 236, \"countkatu\": 9, \"countmiss\": 2, \"beatmap_id\": 1778560, \"enabled_mods\": 72, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (2200982, 'Muji', 6, '2021-01-15 02:17:25', '{\"level\": 100.188, \"pp_raw\": 10368.4, \"count50\": 48392, \"country\": \"HK\", \"pp_rank\": 1006, \"user_id\": 2200982, \"accuracy\": 97.6399917602539, \"count100\": 462554, \"count300\": 5159992, \"username\": \"Muji\", \"join_date\": \"2012-12-21 08:18:30\", \"playcount\": 32005, \"total_score\": 45758627674, \"count_rank_a\": 498, \"count_rank_s\": 226, \"ranked_score\": 11817957981, \"count_rank_sh\": 160, \"count_rank_ss\": 33, \"count_rank_ssh\": 19, \"pp_country_rank\": 22, \"total_seconds_played\": 1339046}', '{\"pp\": 605.812, \"date\": \"2020-10-15 09:50:44\", \"rank\": \"A\", \"score\": 1529014, \"count50\": 0, \"perfect\": 0, \"user_id\": 2200982, \"count100\": 21, \"count300\": 181, \"maxcombo\": 265, \"score_id\": 3279951206, \"countgeki\": 50, \"countkatu\": 15, \"countmiss\": 0, \"beatmap_id\": 2338610, \"enabled_mods\": 72, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (2472609, 'Imokora', 3, '2021-01-15 02:17:23', '{\"level\": 100.673, \"pp_raw\": 9183.2, \"count50\": 88414, \"country\": \"TW\", \"pp_rank\": 2531, \"user_id\": 2472609, \"accuracy\": 98.94832611083984, \"count100\": 725456, \"count300\": 10689209, \"username\": \"Imokora\", \"join_date\": \"2013-03-24 12:00:26\", \"playcount\": 40977, \"total_score\": 94232731299, \"count_rank_a\": 1555, \"count_rank_s\": 755, \"ranked_score\": 27267063326, \"count_rank_sh\": 298, \"count_rank_ss\": 149, \"count_rank_ssh\": 110, \"pp_country_rank\": 38, \"total_seconds_played\": 2790461}', '{\"pp\": 567.919, \"date\": \"2019-06-29 12:57:30\", \"rank\": \"S\", \"score\": 133665590, \"count50\": 0, \"perfect\": 0, \"user_id\": 2472609, \"count100\": 32, \"count300\": 1780, \"maxcombo\": 2423, \"score_id\": 2840299012, \"countgeki\": 221, \"countkatu\": 15, \"countmiss\": 0, \"beatmap_id\": 1537566, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (2529213, 'SugiuraAyano', 21, '2021-01-15 02:17:44', '{\"level\": 100.876, \"pp_raw\": 7407.4, \"count50\": 72065, \"country\": \"TW\", \"pp_rank\": 7652, \"user_id\": 2529213, \"accuracy\": 99.1696319580078, \"count100\": 789914, \"count300\": 11655342, \"username\": \"SugiuraAyano\", \"join_date\": \"2013-04-10 07:43:05\", \"playcount\": 42829, \"total_score\": 114572531149, \"count_rank_a\": 2246, \"count_rank_s\": 1030, \"ranked_score\": 41459505390, \"count_rank_sh\": 621, \"count_rank_ss\": 47, \"count_rank_ssh\": 50, \"pp_country_rank\": 150, \"total_seconds_played\": 3075188}', '{\"pp\": 390.251, \"date\": \"2019-12-14 06:25:20\", \"rank\": \"SH\", \"score\": 31599079, \"count50\": 1, \"perfect\": 1, \"user_id\": 2529213, \"count100\": 9, \"count300\": 854, \"maxcombo\": 1259, \"score_id\": 2958666414, \"countgeki\": 154, \"countkatu\": 7, \"countmiss\": 0, \"beatmap_id\": 2188430, \"enabled_mods\": 72, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (2808144, 'Music Lord', 8, '2021-01-15 02:17:28', '{\"level\": 101.491, \"pp_raw\": 8128.27, \"count50\": 161397, \"country\": \"TW\", \"pp_rank\": 4934, \"user_id\": 2808144, \"accuracy\": 98.47891235351562, \"count100\": 1842477, \"count300\": 19227786, \"username\": \"Music Lord\", \"join_date\": \"2013-06-15 03:16:06\", \"playcount\": 97271, \"total_score\": 176067410749, \"count_rank_a\": 2521, \"count_rank_s\": 292, \"ranked_score\": 49164370443, \"count_rank_sh\": 1825, \"count_rank_ss\": 9, \"count_rank_ssh\": 93, \"pp_country_rank\": 80, \"total_seconds_played\": 5103897}', '{\"pp\": 454.36, \"date\": \"2019-09-25 12:08:19\", \"rank\": \"A\", \"score\": 26123631, \"count50\": 1, \"perfect\": 0, \"user_id\": 2808144, \"count100\": 5, \"count300\": 840, \"maxcombo\": 1129, \"score_id\": 2901642155, \"countgeki\": 184, \"countkatu\": 5, \"countmiss\": 1, \"beatmap_id\": 574471, \"enabled_mods\": 72, \"replay_available\": 0}', 1, 0);
+INSERT INTO `player` VALUES (3066316, '[ MILK_Jiang]', 19, '2021-01-15 02:17:42', '{\"level\": 101.979, \"pp_raw\": 7378.27, \"count50\": 135706, \"country\": \"TW\", \"pp_rank\": 7854, \"user_id\": 3066316, \"accuracy\": 99.3375473022461, \"count100\": 1303419, \"count300\": 20739969, \"username\": \"[ MILK_Jiang]\", \"join_date\": \"2013-08-04 02:41:30\", \"playcount\": 80279, \"total_score\": 224861119801, \"count_rank_a\": 1495, \"count_rank_s\": 1089, \"ranked_score\": 40899483109, \"count_rank_sh\": 176, \"count_rank_ss\": 106, \"count_rank_ssh\": 26, \"pp_country_rank\": 155, \"total_seconds_played\": 4353586}', '{\"pp\": 389.145, \"date\": \"2016-04-03 12:42:23\", \"rank\": \"SH\", \"score\": 70741534, \"count50\": 0, \"perfect\": 0, \"user_id\": 3066316, \"count100\": 11, \"count300\": 1212, \"maxcombo\": 1737, \"score_id\": 2091603501, \"countgeki\": 308, \"countkatu\": 11, \"countmiss\": 0, \"beatmap_id\": 827803, \"enabled_mods\": 8, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (3163649, 'GfMRT', 16, '2021-01-15 02:17:39', '{\"level\": 105.823, \"pp_raw\": 12348.7, \"count50\": 148437, \"country\": \"TW\", \"pp_rank\": 285, \"user_id\": 3163649, \"accuracy\": 99.09882354736328, \"count100\": 1720189, \"count300\": 36360084, \"username\": \"GfMRT\", \"join_date\": \"2013-08-21 13:15:25\", \"playcount\": 128104, \"total_score\": 609260190284, \"count_rank_a\": 948, \"count_rank_s\": 851, \"ranked_score\": 145321037859, \"count_rank_sh\": 4770, \"count_rank_ss\": 172, \"count_rank_ssh\": 801, \"pp_country_rank\": 7, \"total_seconds_played\": 8228788}', '{\"pp\": 655.787, \"date\": \"2020-05-06 13:34:23\", \"rank\": \"SH\", \"score\": 864708, \"count50\": 0, \"perfect\": 1, \"user_id\": 3163649, \"count100\": 3, \"count300\": 135, \"maxcombo\": 173, \"score_id\": 3077136058, \"countgeki\": 43, \"countkatu\": 3, \"countmiss\": 0, \"beatmap_id\": 1992711, \"enabled_mods\": 72, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (3366658, 'MiyazonoKuma', 13, '2021-01-15 02:17:34', '{\"level\": 100.589, \"pp_raw\": 9035.97, \"count50\": 157854, \"country\": \"TW\", \"pp_rank\": 2450, \"user_id\": 3366658, \"accuracy\": 98.17486572265624, \"count100\": 1326694, \"count300\": 11443387, \"username\": \"MiyazonoKuma\", \"join_date\": \"2013-10-01 10:28:03\", \"playcount\": 67520, \"total_score\": 85792604412, \"count_rank_a\": 776, \"count_rank_s\": 166, \"ranked_score\": 19726324095, \"count_rank_sh\": 690, \"count_rank_ss\": 23, \"count_rank_ssh\": 80, \"pp_country_rank\": 42, \"total_seconds_played\": 3281271}', '{\"pp\": 535.755, \"date\": \"2019-09-22 13:03:46\", \"rank\": \"XH\", \"score\": 591005, \"count50\": 0, \"perfect\": 1, \"user_id\": 3366658, \"count100\": 0, \"count300\": 123, \"maxcombo\": 166, \"score_id\": 2899742728, \"countgeki\": 24, \"countkatu\": 0, \"countmiss\": 0, \"beatmap_id\": 2150733, \"enabled_mods\": 72, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (3416783, '_kyuu', 5, '2021-01-15 02:17:25', '{\"level\": 100.92, \"pp_raw\": 5737.74, \"count50\": 49944, \"country\": \"TW\", \"pp_rank\": 28376, \"user_id\": 3416783, \"accuracy\": 99.33747863769533, \"count100\": 697794, \"count300\": 12078952, \"username\": \"_kyuu\", \"join_date\": \"2013-10-12 10:19:14\", \"playcount\": 46151, \"total_score\": 118945512963, \"count_rank_a\": 2878, \"count_rank_s\": 941, \"ranked_score\": 40365830109, \"count_rank_sh\": 517, \"count_rank_ss\": 93, \"count_rank_ssh\": 50, \"pp_country_rank\": 495, \"total_seconds_played\": 3211433}', '{\"pp\": 342.071, \"date\": \"2018-08-29 08:36:53\", \"rank\": \"A\", \"score\": 73320820, \"count50\": 0, \"perfect\": 0, \"user_id\": 3416783, \"count100\": 9, \"count300\": 1466, \"maxcombo\": 1800, \"score_id\": 2619479813, \"countgeki\": 342, \"countkatu\": 7, \"countmiss\": 1, \"beatmap_id\": 1519282, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (3517706, '[ Zane ]', 25, '2021-01-15 02:17:49', '{\"level\": 106.006, \"pp_raw\": 13868.8, \"count50\": 203748, \"country\": \"TW\", \"pp_rank\": 95, \"user_id\": 3517706, \"accuracy\": 99.2180633544922, \"count100\": 2534714, \"count300\": 44697245, \"username\": \"[ Zane ]\", \"join_date\": \"2013-10-30 01:44:16\", \"playcount\": 190618, \"total_score\": 627532069300, \"count_rank_a\": 2440, \"count_rank_s\": 1801, \"ranked_score\": 108639516926, \"count_rank_sh\": 1301, \"count_rank_ss\": 151, \"count_rank_ssh\": 119, \"pp_country_rank\": 1, \"total_seconds_played\": 10110143}', '{\"pp\": 789.862, \"date\": \"2020-10-19 21:01:16\", \"rank\": \"S\", \"score\": 423634160, \"count50\": 0, \"perfect\": 0, \"user_id\": 3517706, \"count100\": 29, \"count300\": 3378, \"maxcombo\": 4196, \"score_id\": 3285919901, \"countgeki\": 440, \"countkatu\": 20, \"countmiss\": 0, \"beatmap_id\": 2365752, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (4183988, 'Zxcy', 17, '2021-01-15 02:17:40', '{\"level\": 100.669, \"pp_raw\": 7578.18, \"count50\": 87376, \"country\": \"HK\", \"pp_rank\": 6765, \"user_id\": 4183988, \"accuracy\": 98.49141693115234, \"count100\": 1018564, \"count300\": 12363354, \"username\": \"Zxcy\", \"join_date\": \"2014-03-25 11:27:06\", \"playcount\": 78273, \"total_score\": 93811750881, \"count_rank_a\": 492, \"count_rank_s\": 517, \"ranked_score\": 10836505751, \"count_rank_sh\": 116, \"count_rank_ss\": 29, \"count_rank_ssh\": 9, \"pp_country_rank\": 109, \"total_seconds_played\": 3528194}', '{\"pp\": 447.867, \"date\": \"2019-06-25 20:12:25\", \"rank\": \"SH\", \"score\": 1759375, \"count50\": 0, \"perfect\": 0, \"user_id\": 4183988, \"count100\": 11, \"count300\": 211, \"maxcombo\": 273, \"score_id\": 2837744367, \"countgeki\": 34, \"countkatu\": 8, \"countmiss\": 0, \"beatmap_id\": 2060305, \"enabled_mods\": 72, \"replay_available\": 0}', 1, 0);
+INSERT INTO `player` VALUES (4519494, 'Spinesnight', 14, '2021-01-15 02:17:36', '{\"level\": 102.565, \"pp_raw\": 9255.88, \"count50\": 206352, \"country\": \"TW\", \"pp_rank\": 2148, \"user_id\": 4519494, \"accuracy\": 98.711669921875, \"count100\": 2474045, \"count300\": 27799311, \"username\": \"Spinesnight\", \"join_date\": \"2014-06-13 09:02:53\", \"playcount\": 122082, \"total_score\": 283469211797, \"count_rank_a\": 1531, \"count_rank_s\": 1943, \"ranked_score\": 78481561462, \"count_rank_sh\": 1221, \"count_rank_ss\": 76, \"count_rank_ssh\": 31, \"pp_country_rank\": 37, \"total_seconds_played\": 7077492}', '{\"pp\": 495.212, \"date\": \"2020-04-23 12:22:43\", \"rank\": \"A\", \"score\": 49907310, \"count50\": 0, \"perfect\": 0, \"user_id\": 4519494, \"count100\": 18, \"count300\": 1150, \"maxcombo\": 1448, \"score_id\": 3062573386, \"countgeki\": 192, \"countkatu\": 15, \"countmiss\": 1, \"beatmap_id\": 1270000, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (5155973, 'Rizer', 4, '2021-01-15 02:17:24', '{\"level\": 107.86, \"pp_raw\": 13699.8, \"count50\": 60655, \"country\": \"TW\", \"pp_rank\": 106, \"user_id\": 5155973, \"accuracy\": 99.13928985595705, \"count100\": 1069546, \"count300\": 41950272, \"username\": \"Rizer\", \"join_date\": \"2014-11-04 14:04:46\", \"playcount\": 165711, \"total_score\": 812885636530, \"count_rank_a\": 1629, \"count_rank_s\": 2788, \"ranked_score\": 215310474864, \"count_rank_sh\": 5613, \"count_rank_ss\": 781, \"count_rank_ssh\": 2136, \"pp_country_rank\": 2, \"total_seconds_played\": 9807816}', '{\"pp\": 780.894, \"date\": \"2020-08-29 14:08:35\", \"rank\": \"S\", \"score\": 422251960, \"count50\": 0, \"perfect\": 0, \"user_id\": 5155973, \"count100\": 37, \"count300\": 3370, \"maxcombo\": 4192, \"score_id\": 3217970033, \"countgeki\": 433, \"countkatu\": 27, \"countmiss\": 0, \"beatmap_id\": 2365752, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (5413624, 'Hibiki', 15, '2021-01-15 02:17:37', '{\"level\": 101.274, \"pp_raw\": 10893.1, \"count50\": 158831, \"country\": \"HK\", \"pp_rank\": 695, \"user_id\": 5413624, \"accuracy\": 98.67893981933594, \"count100\": 1259802, \"count300\": 15543007, \"username\": \"Hibiki\", \"join_date\": \"2014-12-24 13:28:57\", \"playcount\": 83155, \"total_score\": 154295013314, \"count_rank_a\": 865, \"count_rank_s\": 119, \"ranked_score\": 29463073477, \"count_rank_sh\": 681, \"count_rank_ss\": 15, \"count_rank_ssh\": 166, \"pp_country_rank\": 18, \"total_seconds_played\": 4125168}', '{\"pp\": 611.499, \"date\": \"2019-11-19 07:42:45\", \"rank\": \"SH\", \"score\": 4533140, \"count50\": 0, \"perfect\": 1, \"user_id\": 5413624, \"count100\": 7, \"count300\": 280, \"maxcombo\": 407, \"score_id\": 2940851121, \"countgeki\": 86, \"countkatu\": 6, \"countmiss\": 0, \"beatmap_id\": 1925194, \"enabled_mods\": 72, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (5920715, '2rdiodul', 12, '2021-01-15 02:17:33', '{\"level\": 100.741, \"pp_raw\": 7937.81, \"count50\": 60547, \"country\": \"TW\", \"pp_rank\": 5225, \"user_id\": 5920715, \"accuracy\": 97.23833465576172, \"count100\": 986399, \"count300\": 10227158, \"username\": \"2rdiodul\", \"join_date\": \"2015-02-09 02:07:41\", \"playcount\": 52632, \"total_score\": 100991759710, \"count_rank_a\": 1565, \"count_rank_s\": 1016, \"ranked_score\": 30397938607, \"count_rank_sh\": 597, \"count_rank_ss\": 36, \"count_rank_ssh\": 4, \"pp_country_rank\": 94, \"total_seconds_played\": 2783576}', '{\"pp\": 449.783, \"date\": \"2020-05-20 12:45:27\", \"rank\": \"SH\", \"score\": 4234897, \"count50\": 0, \"perfect\": 0, \"user_id\": 5920715, \"count100\": 10, \"count300\": 329, \"maxcombo\": 459, \"score_id\": 3092541015, \"countgeki\": 70, \"countkatu\": 8, \"countmiss\": 0, \"beatmap_id\": 2118443, \"enabled_mods\": 72, \"replay_available\": 0}', 1, 0);
+INSERT INTO `player` VALUES (7172340, 'NekoKamui', 9, '2021-01-15 02:17:28', '{\"level\": 101.36, \"pp_raw\": 9836.83, \"count50\": 155574, \"country\": \"TW\", \"pp_rank\": 1448, \"user_id\": 7172340, \"accuracy\": 98.16925048828124, \"count100\": 1503440, \"count300\": 16942419, \"username\": \"NekoKamui\", \"join_date\": \"2015-10-02 12:44:17\", \"playcount\": 101699, \"total_score\": 162974127073, \"count_rank_a\": 1951, \"count_rank_s\": 1288, \"ranked_score\": 47579729585, \"count_rank_sh\": 481, \"count_rank_ss\": 140, \"count_rank_ssh\": 70, \"pp_country_rank\": 30, \"total_seconds_played\": 4847125}', '{\"pp\": 544.821, \"date\": \"2020-05-24 13:28:06\", \"rank\": \"SH\", \"score\": 1282720, \"count50\": 0, \"perfect\": 1, \"user_id\": 7172340, \"count100\": 1, \"count300\": 182, \"maxcombo\": 225, \"score_id\": 3097115524, \"countgeki\": 42, \"countkatu\": 1, \"countmiss\": 0, \"beatmap_id\": 1068383, \"enabled_mods\": 72, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (8660293, 'willy0214', 26, '2021-01-15 02:17:50', '{\"level\": 102.114, \"pp_raw\": 10294.5, \"count50\": 92850, \"country\": \"TW\", \"pp_rank\": 1238, \"user_id\": 8660293, \"accuracy\": 98.72705841064452, \"count100\": 1228176, \"count300\": 23161852, \"username\": \"willy0214\", \"join_date\": \"2016-07-05 09:02:57\", \"playcount\": 130674, \"total_score\": 238311517618, \"count_rank_a\": 660, \"count_rank_s\": 336, \"ranked_score\": 15441907627, \"count_rank_sh\": 17, \"count_rank_ss\": 38, \"count_rank_ssh\": 6, \"pp_country_rank\": 19, \"total_seconds_played\": 5680907}', '{\"pp\": 612.023, \"date\": \"2019-12-30 11:01:58\", \"rank\": \"S\", \"score\": 179969540, \"count50\": 0, \"perfect\": 0, \"user_id\": 8660293, \"count100\": 28, \"count300\": 2195, \"maxcombo\": 2723, \"score_id\": 2970848482, \"countgeki\": 382, \"countkatu\": 22, \"countmiss\": 0, \"beatmap_id\": 1241370, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (9539163, 'EthanTC', 7, '2021-01-15 02:17:27', '{\"level\": 102.089, \"pp_raw\": 10054.3, \"count50\": 89474, \"country\": \"TW\", \"pp_rank\": 1274, \"user_id\": 9539163, \"accuracy\": 99.17862701416016, \"count100\": 908709, \"count300\": 18824828, \"username\": \"EthanTC\", \"join_date\": \"2017-01-07 08:54:47\", \"playcount\": 69590, \"total_score\": 235817637267, \"count_rank_a\": 1426, \"count_rank_s\": 2, \"ranked_score\": 37316960111, \"count_rank_sh\": 648, \"count_rank_ss\": 0, \"count_rank_ssh\": 46, \"pp_country_rank\": 25, \"total_seconds_played\": 4749461}', '{\"pp\": 613.157, \"date\": \"2019-12-10 08:44:22\", \"rank\": \"SH\", \"score\": 141649759, \"count50\": 3, \"perfect\": 1, \"user_id\": 9539163, \"count100\": 32, \"count300\": 1777, \"maxcombo\": 2424, \"score_id\": 2955865849, \"countgeki\": 216, \"countkatu\": 19, \"countmiss\": 0, \"beatmap_id\": 1537566, \"enabled_mods\": 8, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (9632700, 'Odiz', 24, '2021-01-15 02:17:48', '{\"level\": 100.495, \"pp_raw\": 7842.59, \"count50\": 45314, \"country\": \"TW\", \"pp_rank\": 6320, \"user_id\": 9632700, \"accuracy\": 98.98811340332033, \"count100\": 586506, \"count300\": 8893212, \"username\": \"Odiz\", \"join_date\": \"2017-01-25 07:18:32\", \"playcount\": 54942, \"total_score\": 76467155434, \"count_rank_a\": 681, \"count_rank_s\": 182, \"ranked_score\": 9827963636, \"count_rank_sh\": 201, \"count_rank_ss\": 15, \"count_rank_ssh\": 24, \"pp_country_rank\": 100, \"total_seconds_played\": 2446194}', '{\"pp\": 429.261, \"date\": \"2020-03-10 13:50:59\", \"rank\": \"A\", \"score\": 32345484, \"count50\": 0, \"perfect\": 0, \"user_id\": 9632700, \"count100\": 6, \"count300\": 1164, \"maxcombo\": 1277, \"score_id\": 3020887081, \"countgeki\": 275, \"countkatu\": 5, \"countmiss\": 6, \"beatmap_id\": 915210, \"enabled_mods\": 0, \"replay_available\": 1}', 1, 0);
+INSERT INTO `player` VALUES (9868529, 'We Luv Nanahira', 1, '2021-01-15 02:15:38', '{\"level\": 100.866, \"pp_raw\": 8541.71, \"count50\": 95094, \"country\": \"TW\", \"pp_rank\": 3410, \"user_id\": 9868529, \"accuracy\": 99.23779296875, \"count100\": 1087558, \"count300\": 13366782, \"username\": \"We Luv Nanahira\", \"join_date\": \"2017-03-10 13:37:47\", \"playcount\": 62008, \"total_score\": 113550784952, \"count_rank_a\": 2178, \"count_rank_s\": 195, \"ranked_score\": 34020657291, \"count_rank_sh\": 684, \"count_rank_ss\": 12, \"count_rank_ssh\": 39, \"pp_country_rank\": 58, \"total_seconds_played\": 3695480}', '{\"pp\": 478.467, \"date\": \"2020-06-07 14:32:11\", \"rank\": \"SH\", \"score\": 51133861, \"count50\": 0, \"perfect\": 0, \"user_id\": 9868529, \"count100\": 11, \"count300\": 1004, \"maxcombo\": 1485, \"score_id\": 3113609893, \"countgeki\": 209, \"countkatu\": 10, \"countmiss\": 0, \"beatmap_id\": 2204234, \"enabled_mods\": 24, \"replay_available\": 1}', 1, 1);
+INSERT INTO `player` VALUES (9991663, '[-koume-]', 23, '2021-01-15 02:17:47', '{\"level\": 101.086, \"pp_raw\": 7771.48, \"count50\": 106262, \"country\": \"HK\", \"pp_rank\": 5860, \"user_id\": 9991663, \"accuracy\": 98.63877868652344, \"count100\": 1351069, \"count300\": 17624791, \"username\": \"[-koume-]\", \"join_date\": \"2017-04-02 14:14:29\", \"playcount\": 104391, \"total_score\": 135566103186, \"count_rank_a\": 2313, \"count_rank_s\": 690, \"ranked_score\": 35869204640, \"count_rank_sh\": 1340, \"count_rank_ss\": 62, \"count_rank_ssh\": 228, \"pp_country_rank\": 94, \"total_seconds_played\": 5124911}', '{\"pp\": 458.453, \"date\": \"2020-04-19 09:54:05\", \"rank\": \"SH\", \"score\": 4326951, \"count50\": 0, \"perfect\": 1, \"user_id\": 9991663, \"count100\": 8, \"count300\": 313, \"maxcombo\": 468, \"score_id\": 3058174327, \"countgeki\": 72, \"countkatu\": 7, \"countmiss\": 0, \"beatmap_id\": 1619564, \"enabled_mods\": 72, \"replay_available\": 0}', 1, 0);
+INSERT INTO `player` VALUES (12717375, 'NashiKari', 10, '2021-01-15 02:17:29', '{\"level\": 100.523, \"pp_raw\": 8525.51, \"count50\": 150050, \"country\": \"TW\", \"pp_rank\": 3444, \"user_id\": 12717375, \"accuracy\": 97.90440368652344, \"count100\": 1623527, \"count300\": 13955807, \"username\": \"NashiKari\", \"join_date\": \"2018-07-23 12:19:12\", \"playcount\": 72710, \"total_score\": 79205359482, \"count_rank_a\": 1260, \"count_rank_s\": 404, \"ranked_score\": 16202723565, \"count_rank_sh\": 393, \"count_rank_ss\": 24, \"count_rank_ssh\": 39, \"pp_country_rank\": 59, \"total_seconds_played\": 3998076}', '{\"pp\": 495.754, \"date\": \"2019-11-26 13:49:01\", \"rank\": \"A\", \"score\": 30469108, \"count50\": 7, \"perfect\": 0, \"user_id\": 12717375, \"count100\": 82, \"count300\": 904, \"maxcombo\": 1321, \"score_id\": 2945892110, \"countgeki\": 166, \"countkatu\": 29, \"countmiss\": 1, \"beatmap_id\": 1945175, \"enabled_mods\": 64, \"replay_available\": 1}', 1, 0);
 
 -- ----------------------------
 -- Table structure for round
 -- ----------------------------
 DROP TABLE IF EXISTS `round`;
 CREATE TABLE `round`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '階段 ID',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '階段 ID',
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '階段名稱',
   `description` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '備註',
-  `best_of` int NOT NULL DEFAULT 9 COMMENT '預設Base Of',
+  `best_of` int(11) NOT NULL DEFAULT 9 COMMENT '預設Base Of',
   `start_date` datetime NULL DEFAULT NULL COMMENT '預設開始時間',
-  `pool_publish` tinyint NOT NULL DEFAULT 0 COMMENT '圖池是否已公開',
+  `pool_publish` tinyint(4) NOT NULL DEFAULT 0 COMMENT '圖池是否已公開',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '階段' ROW_FORMAT = DYNAMIC;
 
@@ -287,13 +289,13 @@ INSERT INTO `round` VALUES (6, 'Grand Final', '總決賽', 13, '2021-01-18 00:00
 -- ----------------------------
 DROP TABLE IF EXISTS `staff`;
 CREATE TABLE `staff`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '工作人員 ID',
-  `user_id` int NOT NULL COMMENT 'OSU ID',
-  `group_id` int NOT NULL COMMENT '群組 ID',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '工作人員 ID',
+  `user_id` int(11) NOT NULL COMMENT 'OSU ID',
+  `group_id` int(11) NOT NULL COMMENT '群組 ID',
   `username` varchar(16) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'OSU 用戶名',
-  `privileges` int NOT NULL DEFAULT 1,
+  `privileges` int(11) NOT NULL DEFAULT 1,
   `join_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `active` tinyint NOT NULL DEFAULT 1,
+  `active` tinyint(4) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `group_id`(`group_id`) USING BTREE,
@@ -341,63 +343,64 @@ INSERT INTO `staff` VALUES (33, 9834516, 2, 'Himeno Sena', 64, '2021-02-15 21:40
 -- ----------------------------
 DROP TABLE IF EXISTS `team`;
 CREATE TABLE `team`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '隊伍 ID',
-  `full_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '隊伍全名',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '隊伍 ID',
+  `full_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '隊伍全名',
   `flag_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '隊伍旗幟名',
   `acronym` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '隊伍簡稱',
+  `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '狀態',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '隊伍' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of team
 -- ----------------------------
-INSERT INTO `team` VALUES (1, 'We Luv Nanahira', 'avatar.9868529', 'We Luv Nanahira');
-INSERT INTO `team` VALUES (2, 'Bitcoin', 'avatar.654296', 'Bitcoin');
-INSERT INTO `team` VALUES (3, 'Imokora', 'avatar.2472609', 'Imokora');
-INSERT INTO `team` VALUES (4, 'Rizer', 'avatar.5155973', 'Rizer');
-INSERT INTO `team` VALUES (5, '_kyuu', 'avatar.3416783', '_kyuu');
-INSERT INTO `team` VALUES (6, 'Muji', 'avatar.2200982', 'Muji');
-INSERT INTO `team` VALUES (7, 'EthanTC', 'avatar.9539163', 'EthanTC');
-INSERT INTO `team` VALUES (8, 'Music Lord', 'avatar.2808144', 'Music Lord');
-INSERT INTO `team` VALUES (9, 'NekoKamui', 'avatar.7172340', 'NekoKamui');
-INSERT INTO `team` VALUES (10, 'NashiKari', 'avatar.12717375', 'NashiKari');
-INSERT INTO `team` VALUES (11, '_Shield', 'avatar.1860489', '_Shield');
-INSERT INTO `team` VALUES (12, '2rdiodul', 'avatar.5920715', '2rdiodul');
-INSERT INTO `team` VALUES (13, 'MiyazonoKuma', 'avatar.3366658', 'MiyazonoKuma');
-INSERT INTO `team` VALUES (14, 'Spinesnight', 'avatar.4519494', 'Spinesnight');
-INSERT INTO `team` VALUES (15, 'Hibiki', 'avatar.5413624', 'Hibiki');
-INSERT INTO `team` VALUES (16, 'GfMRT', 'avatar.3163649', 'GfMRT');
-INSERT INTO `team` VALUES (17, 'Zxcy', 'avatar.4183988', 'Zxcy');
-INSERT INTO `team` VALUES (18, 'Naze Meiyue', 'avatar.1786610', 'Naze Meiyue');
-INSERT INTO `team` VALUES (19, '[ MILK_Jiang]', 'avatar.3066316', '[ MILK_Jiang]');
-INSERT INTO `team` VALUES (20, 'XzCraftP', 'avatar.1593180', 'XzCraftP');
-INSERT INTO `team` VALUES (21, 'SugiuraAyano', 'avatar.2529213', 'SugiuraAyano');
-INSERT INTO `team` VALUES (22, 'mcy4', 'avatar.2165650', 'mcy4');
-INSERT INTO `team` VALUES (23, '[-koume-]', 'avatar.9991663', '[-koume-]');
-INSERT INTO `team` VALUES (24, 'Odiz', 'avatar.9632700', 'Odiz');
-INSERT INTO `team` VALUES (25, '[ Zane ]', 'avatar.3517706', '[ Zane ]');
-INSERT INTO `team` VALUES (26, 'willy0214', 'avatar.8660293', 'willy0214');
-INSERT INTO `team` VALUES (27, 'Hibiki', 'avatar.5413624', 'Hibiki');
+INSERT INTO `team` VALUES (1, 'We Luv Nanahira', 'avatar.9868529', 'We Luv Nanahira', 0);
+INSERT INTO `team` VALUES (2, 'Bitcoin', 'avatar.654296', 'Bitcoin', 0);
+INSERT INTO `team` VALUES (3, 'Imokora', 'avatar.2472609', 'Imokora', 0);
+INSERT INTO `team` VALUES (4, 'Rizer', 'avatar.5155973', 'Rizer', 0);
+INSERT INTO `team` VALUES (5, '_kyuu', 'avatar.3416783', '_kyuu', 0);
+INSERT INTO `team` VALUES (6, 'Muji', 'avatar.2200982', 'Muji', 0);
+INSERT INTO `team` VALUES (7, 'EthanTC', 'avatar.9539163', 'EthanTC', 0);
+INSERT INTO `team` VALUES (8, 'Music Lord', 'avatar.2808144', 'Music Lord', 0);
+INSERT INTO `team` VALUES (9, 'NekoKamui', 'avatar.7172340', 'NekoKamui', 0);
+INSERT INTO `team` VALUES (10, 'NashiKari', 'avatar.12717375', 'NashiKari', 0);
+INSERT INTO `team` VALUES (11, '_Shield', 'avatar.1860489', '_Shield', 0);
+INSERT INTO `team` VALUES (12, '2rdiodul', 'avatar.5920715', '2rdiodul', 0);
+INSERT INTO `team` VALUES (13, 'MiyazonoKuma', 'avatar.3366658', 'MiyazonoKuma', 0);
+INSERT INTO `team` VALUES (14, 'Spinesnight', 'avatar.4519494', 'Spinesnight', 0);
+INSERT INTO `team` VALUES (15, 'Hibiki', 'avatar.5413624', 'Hibiki', 0);
+INSERT INTO `team` VALUES (16, 'GfMRT', 'avatar.3163649', 'GfMRT', 0);
+INSERT INTO `team` VALUES (17, 'Zxcy', 'avatar.4183988', 'Zxcy', 0);
+INSERT INTO `team` VALUES (18, 'Naze Meiyue', 'avatar.1786610', 'Naze Meiyue', 0);
+INSERT INTO `team` VALUES (19, '[ MILK_Jiang]', 'avatar.3066316', '[ MILK_Jiang]', 0);
+INSERT INTO `team` VALUES (20, 'XzCraftP', 'avatar.1593180', 'XzCraftP', 0);
+INSERT INTO `team` VALUES (21, 'SugiuraAyano', 'avatar.2529213', 'SugiuraAyano', 0);
+INSERT INTO `team` VALUES (22, 'mcy4', 'avatar.2165650', 'mcy4', 0);
+INSERT INTO `team` VALUES (23, '[-koume-]', 'avatar.9991663', '[-koume-]', 0);
+INSERT INTO `team` VALUES (24, 'Odiz', 'avatar.9632700', 'Odiz', 0);
+INSERT INTO `team` VALUES (25, '[ Zane ]', 'avatar.3517706', '[ Zane ]', 0);
+INSERT INTO `team` VALUES (26, 'willy0214', 'avatar.8660293', 'willy0214', 0);
+INSERT INTO `team` VALUES (27, 'Hibiki', 'avatar.5413624', 'Hibiki', 0);
 
 -- ----------------------------
 -- Table structure for tourney
 -- ----------------------------
 DROP TABLE IF EXISTS `tourney`;
 CREATE TABLE `tourney`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '比賽 ID',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '比賽 ID',
   `full_name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '比賽全名',
   `acronym` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '比賽簡稱',
   `register_start_date` datetime NULL DEFAULT NULL COMMENT '比賽註冊開始時間',
   `register_end_date` datetime NULL DEFAULT NULL COMMENT '比賽註冊截止時間',
-  `max_team` int NOT NULL DEFAULT 0 COMMENT '註冊隊伍上限(0=無限)',
-  `room_size` int NOT NULL DEFAULT 9 COMMENT '預設房間大小',
-  `team_size` int NOT NULL DEFAULT 4 COMMENT '預設房間每隊人數',
-  `per_team_players_min` int NOT NULL DEFAULT 4 COMMENT '每隊最少人數',
-  `per_team_players_max` int NOT NULL DEFAULT 8 COMMENT '每隊最多人數',
-  `game_mode` int NOT NULL DEFAULT 0 COMMENT '預設房間遊戲模式',
-  `win_condition` int NOT NULL DEFAULT 0 COMMENT '預設房間勝利條件',
-  `team_mode` int NOT NULL DEFAULT 0 COMMENT '預設房間分組方式',
-  `timer` int NOT NULL DEFAULT 90 COMMENT '預設房間倒數時間',
+  `max_team` int(11) NOT NULL DEFAULT 0 COMMENT '註冊隊伍上限(0=無限)',
+  `room_size` int(11) NOT NULL DEFAULT 9 COMMENT '預設房間大小',
+  `team_size` int(11) NOT NULL DEFAULT 4 COMMENT '預設房間每隊人數',
+  `per_team_players_min` int(11) NOT NULL DEFAULT 4 COMMENT '每隊最少人數',
+  `per_team_players_max` int(11) NOT NULL DEFAULT 8 COMMENT '每隊最多人數',
+  `game_mode` int(11) NOT NULL DEFAULT 0 COMMENT '預設房間遊戲模式',
+  `win_condition` int(11) NOT NULL DEFAULT 0 COMMENT '預設房間勝利條件',
+  `team_mode` int(11) NOT NULL DEFAULT 0 COMMENT '預設房間分組方式',
+  `timer` int(11) NOT NULL DEFAULT 90 COMMENT '預設房間倒數時間',
   `live_link` varchar(500) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '直播網址',
   `map_sort` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `1v1` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否為1v1',
@@ -420,25 +423,25 @@ CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `view_staff` AS select `s
 -- View structure for json_mappool
 -- ----------------------------
 DROP VIEW IF EXISTS `json_mappool`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_mappool` AS select `m`.`id` AS `id`,`m`.`round_id` AS `round_id`,json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = true),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)) AS `json` from ((`mappool` `m` left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`)));
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_mappool` AS select `m`.`id` AS `id`,`m`.`round_id` AS `round_id`,json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = TRUE),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)) AS `json` from ((`mappool` `m` left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`)));
+
+-- ----------------------------
+-- View structure for json_player
+-- ----------------------------
+DROP VIEW IF EXISTS `json_player`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_player` AS select `player`.`user_id` AS `user_id`,`player`.`team` AS `team`,json_object('user_id',`player`.`user_id`,'username',`player`.`username`,'team',`player`.`team`,'register_date',`player`.`register_date`,'info',`player`.`info`,'bp1',`player`.`bp1`,'active',`player`.`active`,'leader',`player`.`leader`) AS `json` from `player`;
 
 -- ----------------------------
 -- View structure for json_round
 -- ----------------------------
 DROP VIEW IF EXISTS `json_round`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_round` AS select `r`.`id` AS `id`,`r`.`pool_publish` AS `pool_publish`,json_object('id',`r`.`id`,'name',`r`.`name`,'description',`r`.`description`,'best_of',`r`.`best_of`,'start_date',`r`.`start_date`,'pool_publish',`r`.`pool_publish`,'mappool',json_arrayagg(json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = true),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)))) AS `json` from (((`round` `r` left join `mappool` `m` on((`m`.`round_id` = `r`.`id`))) left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`))) group by `r`.`id`;
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_round` AS select `r`.`id` AS `id`,`r`.`pool_publish` AS `pool_publish`,json_object('id',`r`.`id`,'name',`r`.`name`,'description',`r`.`description`,'best_of',`r`.`best_of`,'start_date',`r`.`start_date`,'pool_publish',`r`.`pool_publish`,'mappool',json_arrayagg(json_object('id',`m`.`id`,'beatmap_id',`m`.`beatmap_id`,'round_id',`m`.`round_id`,'group',`m`.`group`,'code',`m`.`code`,'enabled_mods',`g`.`enabled_mods`,'freemod',(`g`.`freemod` = TRUE),'info',`m`.`info`,'nominator',json_object('id',`s`.`id`,'user_id',`s`.`user_id`,'username',`s`.`username`,'group',json_object('id',`s`.`group_id`,'name',`s`.`group_name`,'ch_name',`s`.`group_chname`)),'add_date',`m`.`add_date`,'note',`m`.`note`,'colour',json_object('hex',`g`.`hex_color`,'badge',`g`.`badge_color`)))) AS `json` from (((`round` `r` left join `mappool` `m` on((`m`.`round_id` = `r`.`id`))) left join `view_staff` `s` on((`s`.`id` = `m`.`nominator`))) left join `map_group` `g` on((`g`.`name` = `m`.`group`))) group by `r`.`id`;
 
 -- ----------------------------
 -- View structure for json_team
 -- ----------------------------
 DROP VIEW IF EXISTS `json_team`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_team` AS select json_arrayagg(json_object('id',`t`.`id`,'full_name',`t`.`full_name`,'acronym',`t`.`acronym`,'flag_name',`t`.`flag_name`,'players',`p`.`players`)) AS `json` from (`team` `t` left join (select `player`.`team` AS `id`,json_arrayagg(json_object('id',`player`.`id`,'team_id',`player`.`team`,'user_id',`player`.`user_id`,'username',`player`.`username`,'register_date',`player`.`register_date`,'info',`player`.`info`,'bp1',`player`.`bp1`,'active',`player`.`active`)) AS `players` from `player` group by `player`.`team`) `p` on((`p`.`id` = `t`.`id`)));
-
--- ----------------------------
--- View structure for json_teams
--- ----------------------------
-DROP VIEW IF EXISTS `json_teams`;
-CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_teams` AS select json_arrayagg(json_object('id',`t`.`id`,'full_name',`t`.`full_name`,'acronym',`t`.`acronym`,'flag_name',`t`.`flag_name`,'players',`p`.`players`)) AS `json` from (`team` `t` left join (select `player`.`team` AS `id`,json_arrayagg(json_object('id',`player`.`id`,'team_id',`player`.`team`,'user_id',`player`.`user_id`,'username',`player`.`username`,'register_date',`player`.`register_date`,'info',`player`.`info`,'bp1',`player`.`bp1`,'active',`player`.`active`)) AS `players` from `player` group by `player`.`team`) `p` on((`p`.`id` = `t`.`id`)));
+CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `json_team` AS select `t`.`id` AS `id`,json_object('id',`t`.`id`,'full_name',`t`.`full_name`,'acronym',`t`.`acronym`,'flag_name',`t`.`flag_name`,'players',`p`.`players`,'status',`t`.`status`) AS `json` from (`tourney`.`team` `t` left join (select `json_player`.`team` AS `id`,json_arrayagg(`json_player`.`json`) AS `players` from `tourney`.`json_player` group by `json_player`.`team`) `p` on((`p`.`id` = `t`.`id`)));
 
 -- ----------------------------
 -- View structure for view_mappool
