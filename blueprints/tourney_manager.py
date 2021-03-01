@@ -505,65 +505,87 @@ def settings():
             return redirect(url_for('tourney.settings'))
     return render_template('manager/settings.html', settings=db.query_one('select * from tourney where id = 1'))
 
-
-@tourney.route('/mappool/')
-@tourney.route('/mappool/<round_id>', methods=['GET', 'POST'])
+# view
+@tourney.route('/mappool/', defaults={'round_id': '1'})
+@tourney.route('/mappool/<round_id>')
 @login_required
 @need_privilege(Staff.MAPPOOLER)
-def mappool(round_id=None):
-    if round_id == None: return redirect(url_for('tourney.mappool', round_id=1))
-    
-    # POST: 新增圖譜
-    if request.method == 'POST':
-        try:
-            # request.form 取得的訊息
-            beatmap_id:str = request.form['id']      # 圖譜Id
-            if not beatmap_id.isdigit(): 
-                raise ValueError('beatmap_id 必須是數字')
-            use_mods = request.form['mods']      # 開啟的Mods
-            group = request.form['group']        # 分類
-            note = request.form['note']          # 備註
+def mappool(round_id):
+    mappool = db.query("SELECT JSON_ARRAYAGG(json) json FROM json_mappool WHERE round_id = %s GROUP BY round_id", round_id)['json']
+    return render_template('manager/mappool.html', mappool=json.loads(mappool))
 
-            # session 取得的訊息
-            poster = int(session['id'])          # 提名人Id
+# action
+@tourney.route('/mappool/<round>/add', methods=['POST'])
+def mappool_add(round):
+    try:
+        # request.form 取得的訊息
+        beatmap_id:str = request.form['id']     # 圖譜Id
+        if not beatmap_id.isdigit(): 
+            raise ValueError('beatmap_id 必須是數字')
+        use_mods = request.form['mods']         # 開啟的Mods
+        group = request.form['group']           # 分類
+        note = request.form.get('note',None)    # 備註
 
-            # sql 取得的訊息
-            round_info = db.query_one('select * from round where id = %s', (round_id,)) # Round 資料
-            if round_info['pool_publish'] == 1:
-                raise Exception('此階段圖池已公布，無法進行變動!')
-            modcount = db.query_one('SELECT `group`, COUNT(*) AS `count` FROM mappool WHERE round_id = 1 and `group` = %s', (request.form['group'],)) # 取得該 group 計數
+        # session 取得的訊息
+        poster = int(session['id'])          # 提名人Id
 
+        # sql 取得的訊息
+        round_info = db.query_one('select * from round where id = %s', (round,)) # Round 資料
+        if round_info['pool_publish'] == 1:
+            raise Exception('此階段圖池已公布，無法進行變動!')
+
+        modcount = db.query_one('SELECT `group`, COUNT(*) AS `count` FROM mappool WHERE round_id = 1 and `group` = %s', (request.form['group'],)) # 取得該 group 計數
+
+        # 判斷是否為會改變難度的mods
+        if use_mods in ('tb', 'fm') :
+            request_mods = 0
+        elif Mods(int(use_mods)) in (Mods.Easy | Mods.HalfTime | Mods.HardRock | Mods.DoubleTime | Mods.Nightcore):
+            request_mods = use_mods
+        else : 
+            request_mods = 0
+
+        # api 取得的訊息
+        beatmap = osuapi.get(osuapi.V1Path.get_beatmaps, b=request.form['id'], m=0, mods=request_mods)[0]
+        # 將 api 的資料轉換成正確的類型
+        for k in beatmap:
+            beatmap[k] = osuapi.todata(beatmap[k])
+
+        # debug
+        log.debug(dict(request.form))
+        # 圖譜插入至SQL
+        db.query('insert into `mappool` (`round_id`, `beatmap_id`, `group`, `code`, `mods`, `info`, `note`, `nominator`) values (%s, %s, %s, %s, %s, %s, %s, %s)',
+            (int(round), int(beatmap_id), group, modcount['count']+1, use_mods, json.dumps(beatmap), note, poster))
             
-            # 判斷是否為會改變難度的mods
-            if use_mods in ('tb', 'fm') :
-                request_mods = 0
-            elif Mods(int(use_mods)) in (Mods.Easy | Mods.HalfTime | Mods.HardRock | Mods.DoubleTime | Mods.Nightcore):
-                request_mods = use_mods
-            else : 
-                request_mods = 0
-
-            # api 取得的訊息
-            beatmap = osuapi.get(osuapi.V1Path.get_beatmaps, b=request.form['id'], m=0, mods=request_mods)[0]
-            # 將 api 的資料轉換成正確的類型
-            for k in beatmap:
-                beatmap[k] = osuapi.todata(beatmap[k])
-
-            # debug
-            log.debug(dict(request.form))
-            # 圖譜插入至SQL
-            db.query('insert into mappool (`round_id`, `beatmap_id`, `group`, `code`, `mods`, `info`, `note`, `nominator`) values (%s, %s, %s, %s, %s, %s, %s, %s)',
-                (int(round_id), int(beatmap_id), group, modcount['count']+1, use_mods, json.dumps(beatmap), note, poster))
+        # 成功訊息
+        info = '%s - %s [%s] (%s) 已新增至 %s' % (beatmap['artist'], beatmap['title'], beatmap['version'], group, round_info['name'])
+        flash(info, 'success')
+    except Exception as e:
+        flash(e.args[0], 'danger')
+        log.exception(e)
+    finally:
+        return redirect(url_for('tourney.mappool'))
             
-            # 成功訊息
-            info = '%s - %s [%s] (%s) 已新增至 %s' % (beatmap['artist'], beatmap['title'], beatmap['version'], group, round_info['name'])
-            flash(info, 'success')
-        except Exception as e:
-            # 錯誤訊息
-            flash(e.args[0], 'danger')
-            log.exception(e)
-        finally:
-            return redirect(url_for('tourney.mappool', round_id=round_id))
+@tourney.route('/mappool/<round>/update', methods=['POST'])
+def mappool_update(round):
+    try:
+        id = request.form['id']
+        sm = get('mappool', id)
 
-    # GET: 查看網頁
-    mappool = db.get_mappool(round_id, ingore_pool_publish=True, format=False)
-    return render_template('manager/mappool.html', round_id=round_id, mappool=mappool)
+        db.update('mappool', ('id', id), dict_cmp())
+        flash(info, 'success')
+    except Exception as e:
+        flash(e.args[0], 'danger')
+        log.exception(e)
+    finally:
+        return redirect(url_for('tourney.mappool'))
+
+@tourney.route('/mappool/<round>/del', methods=['POST'])
+def mappool_del(round):
+    try:
+        db.query("delete from `mappool` where id = %s")
+        flash(info, 'success')
+    except Exception as e:
+        flash(e.args[0], 'danger')
+        log.exception(e)
+    finally:
+        return redirect(url_for('tourney.mappool'))
