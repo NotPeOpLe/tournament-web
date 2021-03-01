@@ -337,9 +337,8 @@ def team_update(team_id):
         # 檢查TeamPlayers
         diff_players = set(c_players) ^ set(s_players)
         if diff_players:
-            if set(c_players) >= set(s_players):
-                # 新增玩家
-                for player in diff_players:
+            for player in diff_players:
+                if player not in s_players:
                     args = {'k': Config.OSU_API_KEY, 'u': player}
                     player_info = conv(requests.get('https://osu.ppy.sh/api/get_user', args).json()[0])
                     player_bp1 = conv(requests.get('https://osu.ppy.sh/api/get_user_best', args|{'limit': 1}).json()[0])
@@ -347,8 +346,7 @@ def team_update(team_id):
                     db.query(
                         "INSERT INTO player (user_id, username, team, info, bp1, leader) VALUES (%s, %s, %s, %s, %s, %s)",
                         (player_info["user_id"], player_info["username"], team_id, json.dumps(player_info), json.dumps(player_bp1), leader))
-            else: 
-                for player in diff_players:
+                else: 
                     db.query("DELETE FROM player WHERE team = %s AND user_id = %s", (team_id, player))
 
         flash('TeamID: {} 已更新'.format(team_id), 'success')
