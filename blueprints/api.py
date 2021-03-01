@@ -53,6 +53,13 @@ def getdata(table_name:str, id:str):
             abort(404)
     else:
         abort(404)
+        
+@api.route('/check_round')
+def check_round():
+    if request.args.get('id'):
+        return db.query("SELECT COUNT(*) as match_count from `match` WHERE round_id = %s", (request.args.get('id'),))
+    else:
+        abort(400, 'id?')
 
 @api.route('/teams/<int:team_id>/')
 @login_required
