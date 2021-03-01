@@ -309,7 +309,7 @@ def teams():
 @tourney.route('/team/<team_id>/update', methods=['POST'])
 @login_required
 def team_update(team_id):
-    s_team = db.query_one("SELECT id, full_name, flag_name, acronym FROM team WHERE id = 1")
+    s_team = db.query_one("SELECT id, full_name, flag_name, acronym FROM team WHERE id = %s", (team_id,))
     s_leader = db.query_one("SELECT user_id, COUNT(*) AS bool FROM player WHERE team = %s AND leader = 1", (team_id,))["user_id"]
     s_players = json.loads(db.query_one("SELECT JSON_ARRAYAGG(user_id) playsers FROM player WHERE team = %s", (team_id,))["playsers"])
     c_team = dict(
