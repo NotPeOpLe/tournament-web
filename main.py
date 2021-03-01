@@ -1,3 +1,4 @@
+from config import Config
 from flag import Staff
 from flask.json import JSONEncoder
 from flask import Flask, render_template, url_for, redirect, send_from_directory, jsonify, request, session
@@ -175,4 +176,4 @@ def page_not_foubd(error):
     return error
 
 if __name__ == '__main__':
-    app.run()
+    app.run(**Config.RUN_ARGS)

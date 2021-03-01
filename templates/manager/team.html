@@ -128,8 +128,13 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">修改 Team</h5>
+                <div>
+                    <h5 class="modal-title">修改 Team</h5>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="spinner" class="alert" style="display: none;">
+                <div class="spinner-border spinner-border-sm" role="status"></div> Loading...
             </div>
             <div class="modal-body">
                 <form action="" method="post" id="update-form" autocomplete="off">
@@ -143,7 +148,7 @@
                         <input type="text" class="form-control" id="u-acronym" name="acronym">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label required">旗幟/頭像</label>
+                        <label class="form-label">旗幟/頭像</label>
                         <div class="input-group">
                             <select name="flag_type" id="u-flagtype" class="form-select-g">
                                 <option value="avatar">Avatar</option>
@@ -152,9 +157,15 @@
                             </select>
                             <input type="text" class="form-control" id="u-flagname" name="flag_name" aria-label="Text input with dropdown button">
                         </div>
+                        <ul class="mt-2">
+                            <li>Avatar: 輸入Osu! User ID</li>
+                            <li>URL: 輸入圖片網址</li>
+                            <li>Local: 上傳圖片</li>
+                        </ul>
                     </div>
-                    <div id="spinner" style="display: none;">
-                        <div class="spinner-border" role="status"></div>Loading...
+                    <div class="mb-3">
+                        <label class="form-label vcenter">隊員 <a class="btn btn-sm btn-icon" id="add-player-item">+</a></label>
+                        <div id="u-player-aria"></div>
                     </div>
                 </form>
             </div>
@@ -206,9 +217,9 @@
 <script>
     $(".dbtn").click(function(){
         var id = $(this).data('id');
-        $.getJSON(`/api/data/team/${id}`).done(function(data){
-            $("#del-name").text(data.data.full_name);
-            $("#del-id").text(data.data.id);
+        $.getJSON(`/api/teams/${id}/`).done(function(data){
+            $("#del-name").text(data.full_name);
+            $("#del-id").text(data.id);
             $("#del-form")[0].action = `./${id}/delete`;
             $("#del-submit").removeAttr('disabled');
         });
@@ -218,16 +229,78 @@
         $("#spinner").show();
         var id = $(this).data('id');
         $("#update-form")[0].action = `./${id}/update`;
-        $.getJSON(`/api/data/team/${id}`)
+        $.getJSON(`/api/teams/${id}/`)
         .done(function(data){
-            $("#u-id").val(data.data.id);
-            $("#u-fullname").val(data.data.full_name);
-            $("#u-acronym").val(data.data.acronym);
-            $("#u-flagname").val(data.data.flag_name);
+            $("#u-id").val(data.id);
+            $("#u-fullname").val(data.full_name);
+            $("#u-acronym").val(data.acronym);
+            $("#u-flagname").val(data.flag_name.split('.', 2)[1]);
+
+            for (i in data.players) {
+                var isleader = data.players[i].leader == 1 ? true : false
+                $("#u-player-aria").append(createPlayerItem(data.players[i].user_id, data.players[i].username, isleader));
+            }
         })
         .always(function(){
             $("#spinner").hide();
         });
     });
+
+    $("#update-modal").on("hidden.bs.modal", function(){
+        $("#u-player-aria").html(null);
+        $("#update-form input").val('')
+    });
+    
+    $("#u-player-aria").on("click","#del-player-list-btn",function(){
+        $(this).parent().remove();
+    });
+
+    $("#u-player-aria").on("change","input[name='player[]']",function(){
+        var user_id = $(this).val();
+        var pi_name = $(this).parent().children(".pinput-username");
+        var pi_avat = $(this).parent().children(".pinput-avatar");
+        var pi_isle = $(this).parent().children(".pinput-isleader").children(".pinput-isleader");
+        var pi_usid = $(this).parent().children(".pinput-userid");
+        pi_name.text('Loading...');
+        $.getJSON(`/api/web/get_user?u=${user_id}`,
+        function(data){
+            pi_name.text(data[0].username);
+            pi_avat.css("background-image", `url(https://a.ppy.sh/${data[0].user_id})`);
+            pi_isle.attr("value", data[0].user_id);
+            pi_usid.val(data[0].user_id);
+        }).fail(function(){
+            pi_name.text("Unknow");
+            pi_avat.css("background-image", null);
+            pi_isle.attr("value", null);
+            pi_isle.attr("checked", null);
+        });
+    });
+
+    var playerItem = `
+    <div class="input-group mb-2">
+        <span class="avatar input-group-text pinput-avatar"></span>
+        <span class="input-group-text form-control pinput-username">Unknow</span>
+        <input type="text" name="player[]" class="form-control pinput-userid" placeholder="id or name">
+        <span class="input-group-text pinput-isleader">
+            <input class="form-check-input pinput-isleader" name="leader" type="radio"> 隊長
+        </span>
+        <a class="btn btn-outline-danger" id="del-player-list-btn">X</a>
+    </div>`
+
+    $("#add-player-item").click(function(){
+        $("#u-player-aria").append(playerItem);
+    });
+
+    function createPlayerItem(user_id, username, isLeader = false) {
+        var el = $(playerItem)
+        el.children(".pinput-avatar").css("background-image", `url(https://a.ppy.sh/${user_id})`);
+        el.children(".pinput-username").text(username);
+        el.children(".pinput-userid").val(user_id);
+        el.children(".pinput-isleader").children(".pinput-isleader").val(user_id);
+        if (isLeader) {
+            el.children(".pinput-isleader").children(".pinput-isleader").attr("checked", "true");
+        }
+        return el
+    }
 </script>
 {% endblock script %}
