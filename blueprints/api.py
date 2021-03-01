@@ -1,7 +1,6 @@
 from functools import wraps
 from types import resolve_bases
-from flask import Blueprint, render_template, jsonify, Response, abort, session, redirect, url_for
-from flask.globals import request
+from flask import Blueprint, render_template, jsonify, Response, abort, session, redirect, url_for, request
 from werkzeug.exceptions import HTTPException
 from pymysql.err import *
 import mysql
