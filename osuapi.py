@@ -1,10 +1,11 @@
 import requests, os
 from logger import log
+from config import Config
 
-CLIENT_ID = 647
-CLIENT_SCERET = 'DRAgvrg7F3rRlaKc26BHGaRbyR5r5R372cIAchNF'
-REDIRECT_URL = 'https://840.tw/manager/callback'
-API_KEY = os.getenv('OSU_API_KEY')
+CLIENT_ID = Config.OSU_CLIENT_ID
+CLIENT_SCERET = Config.OSU_CLIENT_SCERET
+REDIRECT_URL = Config.OSU_REDIRECT_URL
+API_KEY = Config.OSU_API_KEY
 
 def todata(value):
     try:
@@ -40,8 +41,8 @@ def clientToken():
     toekn_read = tokenr.read().strip()
     tokenr.close()
     if not toen_isactive(toekn_read):
-        payload = {'username': os.getenv('osu_username'),	
-            'password': os.getenv('osu_password'),	
+        payload = {'username': Config.OSU_USERNAME,	
+            'password': Config.OSU_PASSWORD,	
             'grant_type': 'password',	
             'client_id': '5',	
             'client_secret': 'FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk',	

@@ -1,3 +1,4 @@
+from config import Config
 from pymysql.err import *
 from blueprints.api import getdata
 from flask import Blueprint, render_template, redirect, url_for, flash, session, request, jsonify
@@ -5,7 +6,7 @@ from logger import log
 from flag import Staff, Mods
 from rich.console import Console
 from functools import wraps
-import osuapi, mysql, json, re
+import osuapi, mysql, json, re, requests
 
 tourney = Blueprint('tourney', __name__)
 db = mysql.DB()
@@ -18,6 +19,20 @@ def get(table_name: str, id: str):
 def dict_cmp(a: dict, b: dict):
     cmp = a.items() - b.items()
     return dict(cmp)
+
+def conv(x):
+    def c(d):
+        try:
+            return eval(d)
+        except Exception:
+            return d
+
+    if type(x) == dict:
+        for y in x:
+            x[y] = c(x[y])
+        return x
+    elif type(x) == list:
+        return [c(a) for a in x]
 
 @tourney.context_processor
 def context():
@@ -169,8 +184,6 @@ def match_update(id):
         note = request.form.get('note'),
     )
 
-    print(dict_cmp(cmatch,match))
-
     try:
         db.update('match', ('id', id), **dict_cmp(cmatch,match))
         flash('MathId: %s 已更新' % id, 'success')
@@ -286,10 +299,89 @@ def matchs_job():
         flash('match_id: %d 找不到對應的場次!' % mid, 'danger')
         return redirect(url_for('tourney.matchs'))
 
-@tourney.route('/teams/')
+@tourney.route('/team/')
 @login_required
 def teams():
-    return render_template('manager/teams.html')
+    teams = db.query_one("SELECT JSON_ARRAYAGG(json) json FROM json_team")['json']
+    
+    return render_template('manager/team.html', teams=json.loads(teams))
+
+@tourney.route('/team/<team_id>/update', methods=['POST'])
+@login_required
+def team_update(team_id):
+    s_team = db.query_one("SELECT id, full_name, flag_name, acronym FROM team WHERE id = 1")
+    s_leader = db.query_one("SELECT user_id, COUNT(*) AS bool FROM player WHERE team = %s AND leader = 1", (team_id,))["user_id"]
+    s_players = json.loads(db.query_one("SELECT JSON_ARRAYAGG(user_id) playsers FROM player WHERE team = %s", (team_id,))["playsers"])
+    c_team = dict(
+        id=int(team_id),
+        full_name=request.form.get('full_name'),
+        flag_name="{}.{}".format(request.form.get('flag_type'),request.form.get('flag_name')),
+        acronym=request.form.get('acronym')
+    )
+    c_leader = request.form.get("leader", type=int)
+    c_players = request.form.getlist("player[]", int)
+
+    try:
+        # 檢查更新Team基本訊息
+        diff_var = dict_cmp(c_team, s_team)
+        if diff_var:
+            db.update('team', ('id', team_id), **diff_var)
+
+        # 檢查更新TeamLeader
+        diff_leader = {c_leader}-{s_leader}
+        new_leader = None
+        if diff_leader:
+            new_leader = list(diff_leader)[0]
+            db.query("UPDATE player SET leader = 1 WHERE team = %s AND user_id = %s", (team_id, new_leader))
+
+        # 檢查TeamPlayers
+        diff_players = set(c_players) ^ set(s_players)
+        if diff_players:
+            for player in diff_players:
+                if player not in s_players:
+                    args = {'k': Config.OSU_API_KEY, 'u': player}
+                    player_info = conv(requests.get('https://osu.ppy.sh/api/get_user', args).json()[0])
+                    player_bp1 = conv(requests.get('https://osu.ppy.sh/api/get_user_best', args|{'limit': 1}).json()[0])
+                    leader = 1 if new_leader == player_info["user_id"] else 0
+                    db.query(
+                        "INSERT INTO player (user_id, username, team, info, bp1, leader) VALUES (%s, %s, %s, %s, %s, %s)",
+                        (player_info["user_id"], player_info["username"], team_id, json.dumps(player_info), json.dumps(player_bp1), leader))
+                else: 
+                    db.query("DELETE FROM player WHERE team = %s AND user_id = %s", (team_id, player))
+
+        flash('TeamID: {} 已更新'.format(team_id), 'success')
+        return redirect(url_for('tourney.teams'))
+    except Exception as e:
+        flash('發生錯誤: {}'.format(e.args), 'danger')
+        return redirect(url_for('tourney.teams'))
+
+
+@tourney.route('/team/<id>/delete', methods=['POST'])
+@login_required
+def team_delete(id):
+    try:
+        db.query("DELETE FROM `team` WHERE id = %s;", [id])
+        flash('TeamID: {} 已刪除'.format(id), 'success')
+        return redirect(url_for('tourney.teams'))
+    except Exception as e:
+        flash('發生錯誤: {}'.format(e.args), 'danger')
+        return redirect(url_for('tourney.teams'))
+
+
+@tourney.route('/team/<id>/players/add', methods=['POST'])
+@login_required
+def team_players_add(id):
+    return '', 200
+
+@tourney.route('/team/<id>/players/<uid>/delete', methods=['POST'])
+@login_required
+def team_players_update(id, uid):
+    return '', 200
+
+@tourney.route('/team/<id>/players/<uid>/update', methods=['POST'])
+@login_required
+def team_players_delete(id):
+    return '', 200
 
 @tourney.route('/rounds/', methods=['GET', 'POST'])
 @login_required
@@ -497,4 +589,3 @@ def mappool_del(round):
         log.exception(e)
     finally:
         return redirect(url_for('tourney.mappool'))
-

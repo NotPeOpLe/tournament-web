@@ -1,9 +1,10 @@
+from config import Config
 from functools import wraps
 from types import resolve_bases
-from flask import Blueprint, render_template, jsonify, Response, abort, session, redirect, url_for
+from flask import Blueprint, render_template, jsonify, Response, abort, session, request, redirect, url_for
 from werkzeug.exceptions import HTTPException
 from pymysql.err import *
-import mysql
+import mysql, json, requests
 
 db = mysql.DB()
 api = Blueprint('api', __name__)
@@ -52,6 +53,41 @@ def getdata(table_name:str, id:str):
             abort(404)
     else:
         abort(404)
+        
+@api.route('/check_round')
+def check_round():
+    if request.args.get('id'):
+        return db.query("SELECT COUNT(*) as match_count from `match` WHERE round_id = %s", (request.args.get('id'),))
+    else:
+        abort(400, 'id?')
+
+@api.route('/teams/<int:team_id>/')
+@login_required
+def teams(team_id: int):
+    try:
+        data = db.query_one("SELECT json FROM `json_team` WHERE id = %s", (team_id,))
+        return jsonify(json.loads(data['json']))
+    except Exception as e:
+        abort(400, e)
+
+@api.route('/web/<p>')
+@login_required
+def osuapiv1(p):
+    try:
+        args = request.args.to_dict()
+        args['k'] = Config.OSU_API_KEY
+        req = requests.get(
+            url = 'https://osu.ppy.sh/api/%s' % p,
+            params = args
+            )
+
+        result = req.json()
+        if len(result):
+            return jsonify(result)
+        else:
+            return 'no context', 400
+    except Exception as e:
+        abort(400, e)
 
 @api.errorhandler(HTTPException)
 def handle_exception(e):

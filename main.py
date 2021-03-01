@@ -1,3 +1,4 @@
+from config import Config
 from flag import Staff
 from flask.json import JSONEncoder
 from flask import Flask, render_template, url_for, redirect, send_from_directory, jsonify, request, session
@@ -20,11 +21,10 @@ class CustomJSONEncoder(JSONEncoder):
 
 test = 'ABC TEST'
 sql = mysql.DB()
-app = Flask(__name__)
-app.secret_key = b'840' # os.urandom(16)
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_object('config.Config')
 app.register_blueprint(tourney, url_prefix='/manager')
 app.register_blueprint(api, url_prefix='/api')
-app.config['JSON_SORT_KEYS'] = False
 app.json_encoder = CustomJSONEncoder
 
 @app.route('/favicon.ico')
@@ -176,9 +176,4 @@ def page_not_foubd(error):
     return error
 
 if __name__ == '__main__':
-    app.run(
-        host='0.0.0.0',
-        debug=True,
-        port=443,
-        ssl_context=('server.crt', 'server.key')
-    ) 
+    app.run(**Config.RUN_ARGS)
