@@ -57,7 +57,7 @@ def getdata(table_name:str, id:str):
 @api.route('/check_round')
 def check_round():
     if request.args.get('id'):
-        return db.query("SELECT COUNT(*) as match_count from `match` WHERE round_id = %s", (request.args.get('id'),))
+        return db.query("SELECT COUNT(*) as match_count, r.pool_publish from `match` lnner join `round` as r on r.id=round_id WHERE round_id = %s", (request.args.get('id'),))
     else:
         abort(400, 'id?')
 
@@ -66,6 +66,15 @@ def check_round():
 def teams(team_id: int):
     try:
         data = db.query_one("SELECT json FROM `json_team` WHERE id = %s", (team_id,))
+        return jsonify(json.loads(data['json']))
+    except Exception as e:
+        abort(400, e)
+
+@api.route('/maps/<int:map_id>/')
+@login_required
+def maps(map_id: int):
+    try:
+        data = db.query_one("SELECT json FROM `json_mappool` WHERE id = %s", (map_id,))
         return jsonify(json.loads(data['json']))
     except Exception as e:
         abort(400, e)

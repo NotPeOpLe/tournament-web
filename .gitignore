@@ -130,3 +130,5 @@ importsql.py
 server.key
 server.crt
 config.py
+840.tw.crt
+840.tw.key

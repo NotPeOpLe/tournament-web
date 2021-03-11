@@ -165,10 +165,8 @@
                     <path d="M12 9v2m0 4v.01" />
                     <path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" />
                 </svg>
-                <h3 id="del-round-modal-title"></h3>
-                <div class="text-muted" id="del-round-modal-text">
-                    
-                </div>
+                <h3 id="del-round-modal-title"><div class="spinner-border"></div></h3>
+                <div class="text-muted" id="del-round-modal-text">Loading...</div>
                 <form action="" method="post" id="del-round-form"></form>
             </div>
             <div class="modal-footer">
@@ -177,7 +175,7 @@
                         <div class="col">
                             <button type="button" class="btn btn-white w-100 align-bottom" data-bs-dismiss="modal">取消</button>
                         </div>
-                        <div class="col text-nowrap text-center">
+                        <div class="col text-nowrap text-center" style="display: none;">
                             <button type="button" id="del-submit" form="del-round-form" class="btn btn-danger w-100" disabled>確認刪除</button>
                         </div>
                     </div>
@@ -190,14 +188,13 @@
 
 {% block script %}
 <script>
-
     $(document).ready(function(){
         $(".dbtn").click(function(){
             var id = $(this).data('id');
             var this_el = $(this);
             console.log(this_el.attr("data-bs-traget"));
             $.getJSON(`/api/check_round?id=${id}`).done(function(data){
-                if (data.match_count == 0) {
+                if (data.match_count == 0 && data.pool_publish == 0) {
                     $.getJSON(`/api/data/round/${id}`).done(function(data){
                         $("#del-round-modal-title").text("Are you sure?");
                         $("#del-round-modal-text").html(`
@@ -208,15 +205,22 @@
                         $("#del-round-form")[0].action = `./${id}/delete`;
                         $("#del-submit").attr("type", "submit");
                         $("#del-submit").removeAttr('disabled');
-                        $("#del-submit").show();
+                        $("#del-submit").parent().show();
                     });
                 } else {
-                    $("#del-submit").hide();
+                    $("#del-submit").parent().hide();
                     $("#del-submit").attr("disabled", "true");
                     $("#del-submit").attr("type", "button");
                     $("#del-round-modal-title").text("Sorry");
-                    $("#del-round-modal-text").html(`該階段含有場次，無法刪除!`)
+                    if (data.pool_publish > 0) {
+                        $("#del-round-modal-text").text("該階已鎖定，無法刪除!");
+                    } else if (data.match_count > 0) {
+                        $("#del-round-modal-text").text("該階段含有場次，無法刪除!");
+                    }
                 }
+            }).fail(function(){
+                $("#del-round-modal-title").text("Error");
+                $("#del-round-modal-text").text("發生錯誤，請再重試一次。");
             });
         });
 
@@ -237,6 +241,15 @@
                 $("#spinner").hide();
             });
         });
+
+        $("#del-round-modal").on("hidden.bs.modal", function(){
+            $("#del-round-form")[0].action = '';
+            $("#del-round-modal-title").html('<div class="spinner-border"></div>');
+            $("#del-round-modal-text").text("Loading...");
+            $("#del-submit").parent().hide();
+            $("#del-submit").attr("disabled", "true");
+            $("#del-submit").attr("type", "button");
+        })
     });
 </script>
 <script>

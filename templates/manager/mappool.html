@@ -44,11 +44,11 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% if mappool %}
                     {% for m in mappool %}
                     <tr class="hover-dark">
                         <td class="p-0">
                             <div class="card song-banner" style="background-image: url(https://assets.ppy.sh/beatmaps/{{m.info.beatmapset_id}}/covers/cover.jpg); background-size:cover; background-clip: content-box;">
-                                <div style="background-color: rgba(0, 0, 0, 0.753);"></div>
                                 <div class="card-body" style="background-color: rgba(0, 0, 0, 0.3);">
                                     <a href="https://osu.ppy.sh/b/{{m.beatmap_id}}" class="text-white">{{m.info.artist}} - {{m.info.title}} [{{m.info.version}}]</a>
                                 </div>
@@ -61,7 +61,7 @@
                         <td>{{m.info.difficultyrating | floatfix}}</td>
                         <td>{{m.info.bpm}}</td>
                         <td>{{m.info.total_length | timef}}</td>
-                        <td><span class="badge bg-{{ m.colour.badge | default('none') }} w-4">{{m.group}}</span></td>
+                        <td><span class="badge bg-{{ m.colour.badge | default('none') }} w-4">{{m.group}}{{m.code}}</span></td>
                         <td>{{m.nominator.username}}</td>
                         <td class="text-start">{{m.note}}</td>
                         <td>
@@ -91,226 +91,168 @@
                         </td>
                     </tr>
                     {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
         </div>
     </div>
     <div class="modal fade"  tabindex="-1" id="add-map-modal" aria-labelledby="add-map-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="add-map-modal-label">Add map</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="add-map-modal-label">Add map</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card song-banner mb-3" id="a-mapbg" style="background-size:cover; background-clip: content-box;">
+                        <div class="card-body" style="background-color: rgba(0, 0, 0, 0.3);">
+                            <div class="d-flex">
+                                <a href="#" class="text-white text-truncate song-banner-title" id="a-mapt">??? - ??? [???]</a>
+                                <span class="ms-auto badge w-4 song-banner-mods" id="a-mapm">???</span><div class="ms-1 spinner-border spinner-border-sm" role="status" style="display: none;"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        <form id="add-map-form" method="POST">
-                            <div class="mb-3">
-                                <label for="add-map-id" class="col-form-label">Map ID:</label>
+                    <form id="add-map-form" method="POST" action="./{{ request.view_args.round_id }}/add">
+                        <div class="mb-3">
+                            <label for="add-map-id" class="col-form-label">Map ID</label>
+                            <div class="input-icon mb-3">
                                 <input type="text" name="id" class="form-control" id="add-map-id" autocomplete="off" pattern="[0-9]{0:10}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="add-map-group" class="col-form-label">Group:</label>
-                                <input type="text" name="group" class="form-control" id="add-map-group" value="NM" autocomplete="off" required>
-                                <div class="form-text">自動填入，如果需要特別分開可自另外取名，NF不會分類</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="add-map-mods" class="col-form-label">Mods: <span id="add-map-selected-mods"></span></label>
-                                <br>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="2" id="ez">
-                                    <label class="form-check-label" for="ez">EZ</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="1" id="nf">
-                                    <label class="form-check-label" for="nf">NF</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="256" id="ht">
-                                    <label class="form-check-label" for="ht">HT</label>
-                                </div>
-                                <br>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="16" id="hr">
-                                    <label class="form-check-label" for="hr">HR</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="8" id="hd">
-                                    <label class="form-check-label" for="hd">HD</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="16384" id="sd">
-                                    <label class="form-check-label" for="sd">SD</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="16416" id="pf">
-                                    <label class="form-check-label" for="pf">PF</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="512" id="dt">
-                                    <label class="form-check-label" for="dt">DT</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="576" id="nc">
-                                    <label class="form-check-label" for="nc">NC</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="1024" id="fl">
-                                    <label class="form-check-label" for="fl">FL</label>
-                                </div>
-                                <br>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="128" id="rx">
-                                    <label class="form-check-label" for="rx">RX</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="8192" id="ap">
-                                    <label class="form-check-label" for="ap">AP</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="4096" id="so">
-                                    <label class="form-check-label" for="so">SO</label>
-                                </div>
-                                <br>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="tb" id="tb">
-                                    <label class="form-check-label" for="tb">TB</label>
-                                </div>
-                                <div class="form-check-inline">
-                                    <input class="form-check-input select-mod" type="checkbox" value="fm" id="fm">
-                                    <label class="form-check-label" for="fm">FM</label>
-                                </div>
-                                <input type="hidden" name="mods" id="add-map-mods" value="0">
-                            </div>
-                            <div class="mb-3">
-                                <label for="add-map-note" class="col-form-label">Note: <small class="text-muted">(max 50 char.)</small></label>
-                                <textarea name="note" class="form-control" id="add-map-note" maxlength="50"></textarea>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">Post</button>
-                            </div>
-                        </form>
-                    </div>
+                                <span class="input-icon-addon" style="display: none;">
+                                  <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
+                                </span>
+                              </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-map-mods" class="col-form-label">Mods</label>
+                            <select type="text" name="mods" class="form-select" id="add-map-mods" autocomplete="off" required>
+                                <option value=""></option>
+                                {% for g in map_groups %}
+                                    <option value="{{ g.name }}">{{ g.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="add-map-note" class="col-form-label">Note<small class="text-muted ms-1">(max 50 char.)</small></label>
+                            <textarea name="note" class="form-control" id="add-map-note" maxlength="50" data-bs-toggle="autosize"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Post</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>   
     </div>
-         
+    <div class="modal fade" tabindex="-1" id="update-round-modal" aria-labelledby="update-round-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="update-round-label">Update Map</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="card song-banner mb-3" id="u-mapbg" style="background-size:cover; background-clip: content-box;">
+                    <div class="card-body" style="background-color: rgba(0, 0, 0, 0.3);">
+                        <div class="d-flex">
+                            <a href="#" class="text-white text-truncate song-banner-title" id="u-mapt">??? - ??? [???]</a>
+                            <span class="ms-auto badge bg-azure w-4 song-banner-mods" id="u-mapm">???</span><div class="ms-1 spinner-border spinner-border-sm" role="status" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <form method="POST" action="./{{ request.view_args.round_id }}/update">
+                    <input type="hidden" name="id">
+                    <div class="mb-3">
+                        <span class="form-label">Mods</span>
+                        <select name="mods" id="u-mods" class="form-select">
+                            <option value=""></option>
+                            {% for g in map_groups %}
+                                <option value="{{ g.name }}">{{ g.name }}</option>
+                            {% endfor %}
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                          <span class="form-label">Note<small class="text-muted ms-1">(max 50 char.)</small></span>
+                          <textarea type="text" name="note" id="u-note" class="form-control" data-bs-toggle="autosize" maxlength="50"></textarea>
+                    </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
+              </div>
+            </div>
+          </div>
+    </div>
 {% endblock content %}
 {% block script %}
     <script>
         {{mappool | tojson}}
     </script>
     <script>
-        //std mods
-        var mod_ez = document.getElementById('ez');
-        var mod_nf = document.getElementById('nf');
-        var mod_ht = document.getElementById('ht');
-        var mod_hr = document.getElementById('hr');
-        var mod_hd = document.getElementById('hd');
-        var mod_sd = document.getElementById('sd');
-        var mod_pf = document.getElementById('pf');
-        var mod_dt = document.getElementById('dt');
-        var mod_nc = document.getElementById('nc');
-        var mod_fl = document.getElementById('fl');
-        var mod_rx = document.getElementById('rx');
-        var mod_ap = document.getElementById('ap');
-        var mod_so = document.getElementById('so');
-        var mod_tb = document.getElementById('tb');
-        var mod_fm = document.getElementById('fm');
-        var map_mods = document.getElementById('add-map-mods');
-        var map_group = document.getElementById('add-map-group');
-        var enabled_mods = 0;
-
+       var map_groups = {{map_groups | tojson}};
+    </script>
+    <script>
         $(document).ready(function(){
             $('#select-round').change(function(){
                 location.href = $(this).val();
             });
 
-            $(document).on('keydown', 'form', function(event) { 
-                return event.key != 'Enter';
-            });
-
-            $('.select-mod').change(function(){
-                if ($(this)[0].checked) {
-                    if ($(this)[0].id != 'tb' || $(this)[0].id != 'tb') {
-                        mod_tb.checked = false;
-                        mod_fm.checked = false;
-                    }
-
-                    switch ($(this)[0].id) {
-                        case 'nf':
-                            mod_sd.checked = false;
-                            mod_pf.checked = false;
-                            break;
-                        case 'ht':
-                            mod_dt.checked = false;
-                            mod_nc.checked = false;
-                            break;
-                        case 'ez':
-                            mod_hr.checked = false;
-                            break;
-                        case 'hr':
-                            mod_ez.checked = false;
-                            break;
-                        case 'sd':
-                            mod_pf.checked = false;
-                            mod_nf.checked = false;
-                            break;
-                        case 'pf':
-                            mod_sd.checked = false;
-                            mod_nf.checked = false;
-                            break;
-                        case 'dt':
-                            mod_ht.checked = false;
-                            mod_nc.checked = false;
-                            break;
-                        case 'nc':
-                            mod_ht.checked = false;
-                            mod_dt.checked = false;
-                            break;
-                        case 'rx':
-                            mod_ap.checked = false;
-                            break;
-                        case 'ap':
-                            mod_rx.checked = false;
-                            break;
-                        case 'tb':
-                            $('.select-mod:checked').click();
-                            mod_tb.checked = true;
-                            break;
-                        case 'fm':
-                            $('.select-mod:checked').click();
-                            mod_fm.checked = true;
-                            break;
-                        default:
-                    }
-                }
-
-                var checked_mods = [].slice.call($('.select-mod:checked'));
-                enabled_mods = 0;
-                map_group.value = "";
-                checked_mods.map(function(element){
-                    if (element.value == 'fm' || element.value == 'tb') {
-                        enabled_mods = element.value;
-                        map_group.value = element.id.toUpperCase();
-                    } else {
-                        enabled_mods += Number(element.value);
-                        if (element.id != 'nf') {
-                            map_group.value += element.id.toUpperCase();
-                        }
-                    }
+            $("#add-map-id").change(function(){
+                var id = $(this).val();
+                $("#add-map-id").next().show();
+                $.getJSON(`/api/web/get_beatmaps?b=${id}`, function(data){
+                    var artist = data[0].artist;
+                    var title = data[0].title;
+                    var version = data[0].version;
+                    $("#a-mapt").text(`${artist} - ${title} [${version}]`);
+                    $("#a-mapt").attr("href", `https://osu.ppy.sh/b/${data[0].beatmap_id}`);
+                    $("#a-mapbg").css("background-image",`url(https://assets.ppy.sh/beatmaps/${data[0].beatmapset_id}/covers/cover.jpg)`)
+                }).always(function(){
+                    $("#add-map-id").next().hide();
                 });
-                map_mods.value = enabled_mods;
-                if (enabled_mods == 0 || enabled_mods == 1) {
-                    map_group.value = "NM";
-                }
-                console.log(enabled_mods);
             });
 
-            $('#add-map-submit').click(function(){
-                $('#add-map-form').submit()
+            $("#add-map-mods").change(function(){
+                $("#a-mapm").attr("class", "ms-auto badge w-4");
+                var value = $(this).val();
+                var i;
+                for (i=0; map_groups.length > i; i++) {
+                    if (map_groups[i].name == value) {
+                        $("#a-mapm").text(map_groups[i].name);
+                        $("#a-mapm").addClass("bg-" + map_groups[i].badge_color);
+                        break;
+                    } else {
+                        $("#a-mapm").text("???");
+                        $("#a-mapm").attr("class", "ms-auto badge w-4 song-banner-mods");
+                    }
+                }
+            });
+
+            $(".ubtn").click(function(){
+                $("#u-mapm").next().show();
+                var id = $(this).data("id");
+                $.getJSON(`/api/maps/${id}`, function(data){
+                    var artist = data.info.artist;
+                    var title = data.info.title;
+                    var version = data.info.version;
+                    $("#u-mapbg").css("background-image",`url(https://assets.ppy.sh/beatmaps/${data.info.beatmapset_id}/covers/cover.jpg)`)
+                    $("#u-mapt").text(`${artist} - ${title} [${version}]`);
+                    $("#u-mapm").text(data.group + data.code);
+                    $("#u-mapm").addClass("bg-" + data.colour.badge);
+                    $("#u-mods").val(data.group);
+                    $("#u-note").val(data.note);
+                }).always(function(){
+                    $("#u-mapm").next().hide();
+                });
+            });
+
+            $(".modal").on("hidden.bs.modal", function(){
+                $(this).children(".modal-dialog").children(".modal-content").children(".modal-body").children("form")[0].reset();
+                $(".modal .song-banner").css("background-image", null);
+                $(".modal .song-banner .song-banner-title").text("??? - ??? [???]");
+                $(".modal .song-banner .song-banner-mods").text("???");
+                $(".modal .song-banner .song-banner-mods").attr("class", "ms-auto badge w-4 song-banner-mods");
             });
         });
     </script>
